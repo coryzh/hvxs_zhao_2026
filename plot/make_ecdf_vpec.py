@@ -3,26 +3,43 @@ import pandas as pd
 import config
 from utils.ecdf import plot_ecdf
 from log.loggers import VerboseLogger
+import seaborn as sns
+
+
+colors = sns.color_palette("hls", 5)
 
 
 def make_ecdf(verbose: bool = False) -> None:
-    source_types = dict(cv="CVs", asab="Active Stars", yso="YSOs")
+    source_types = dict(asab="Active Stars", yso="YSOs", cv="CVs")
+    color_dict = dict(asab=colors[0], yso=colors[1], cv=colors[2], LMXB=colors[3], PSR=colors[4])
     logger = VerboseLogger(verbose=verbose)
 
     logger.begin()
     logger.log(f"Plotting routine starts.\n")
     plt.style.use("mycustomised")
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    fig, ax = plt.subplots(1, 1, figsize=(13, 10))
 
     for key, value in source_types.items():
-        df = pd.read_csv(config.ROOT_DIR / "results" / key / "catalogues" / f"{key}_gaia_w_vpec_min.csv")
+        df = pd.read_csv(config.ROOT_DIR / "results" / key / "catalogues" / f"{key}_gaia_w_vpec.csv")
         logger.log(f"{df.shape[0]} {value} loaded.")
-        vpec_med_min = df["vpec_min_med"].values
+        vpec_med = df["vpec_med"].values
+        # vpec_lo = vpec_med - df["e_vpec"].values
+        # vpec_up = vpec_med + df["E_vpec"].values
 
-        plot_ecdf(arr=vpec_med_min, ax=ax, normalised=True, label=value)
+        plot_ecdf(arr=vpec_med, ax=ax, color=color_dict[key], normalised=True, label=value)
 
-    ax.set_xlabel(r"$v_\mathrm{pec, min}\,(\mathrm{km~s^{-1}})$")
-    ax.set_ylabel(r"$f(\leq v_\mathrm{pec, min})$")
+    df_xrb = pd.read_csv(config.ROOT_DIR / "results" / "xrb" / "catalogues"/ "xrb_gaia_w_vpec.csv")
+    xrb_types = dict(LMXB="LMXBs", PSR="PSRs")
+    for key, value in xrb_types.items():
+        xrb_filter = df_xrb.Type.str.contains(key)
+        df_xrb_sub = df_xrb[xrb_filter]
+        plot_ecdf(df_xrb_sub.vpec_med, ax=ax, color=color_dict[key], normalised=True, label=value)
+
+    ax.set_xlabel(r"$v_\mathrm{pec}\,(\mathrm{km~s^{-1}})$")
+    ax.set_ylabel(r"$f(\leq v_\mathrm{pec})$")
+
+    ax.set_xticks([10, 100, 1000])
+    ax.set_xticklabels(["10", "100", "1000"])
 
     ax.set_xlim(5, None)
     ax.set_ylim(0, 1)
