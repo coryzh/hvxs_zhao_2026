@@ -5,12 +5,13 @@ from typing import Tuple
 
 def get_ecdf(arr: np.ndarray, normalised: bool = True) -> Tuple[np.ndarray, np.ndarray]:
     x = np.sort(arr)
-    y = np.arange(1, len(x) + 1)
+    y = np.arange(0, len(x) + 1)
 
     if normalised:
         y = y / float(len(x))
 
-    return x, y
+    x_new = np.insert(x, obj=0, values=0)
+    return x_new, y
 
 
 def plot_ecdf(arr: np.ndarray, ax: plt.Axes, normalised: bool = True, **kwargs) -> None:
