@@ -6,12 +6,13 @@ from log.loggers import VerboseLogger
 import seaborn as sns
 
 
-colors = sns.color_palette("hls", 5)
+colors = sns.color_palette("hls", 6)
 
 
 def make_ecdf(verbose: bool = False) -> None:
-    source_types = dict(asab="Active Stars", yso="YSOs", cv="CVs")
-    color_dict = dict(asab=colors[0], yso=colors[1], cv=colors[2], LMXB=colors[3], PSR=colors[4])
+    source_types = {"as": "Active stars", "ab": "Active binaries", "yso": "YSOs", "cv": "CVs"}
+    color_dict = {"as": colors[0], "ab": colors[1], "yso": colors[2], "cv": colors[3], "LMXB": colors[4],
+                  "PSR": colors[5]}
     logger = VerboseLogger(verbose=verbose)
 
     logger.begin()
