@@ -3,16 +3,17 @@ import pandas as pd
 import config
 from utils.ecdf import plot_ecdf
 from log.loggers import VerboseLogger
+from matplotlib.ticker import ScalarFormatter
 import seaborn as sns
 
 
-colors = sns.color_palette("hls", 6)
+colors = sns.color_palette("hls", 4)
 
 
 def make_ecdf(verbose: bool = False) -> None:
     source_types = {"as": "Active stars", "ab": "Active binaries", "yso": "YSOs", "cv": "CVs"}
-    color_dict = {"as": colors[0], "ab": colors[1], "yso": colors[2], "cv": colors[3], "LMXB": colors[4],
-                  "PSR": colors[5]}
+    color_dict = {"as": colors[0], "ab": colors[1], "yso": colors[2], "cv": colors[3], "LMXB": colors[0],
+                  "PSR": colors[1], "HMXB": colors[2], "NI": colors[3]}
     logger = VerboseLogger(verbose=verbose)
 
     logger.begin()
@@ -27,26 +28,29 @@ def make_ecdf(verbose: bool = False) -> None:
         # vpec_lo = vpec_med - df["e_vpec"].values
         # vpec_up = vpec_med + df["E_vpec"].values
 
-        plot_ecdf(arr=vpec_med, ax=ax, color=color_dict[key], normalised=True, label=value)
+        plot_ecdf(arr=vpec_med, ax=ax, color=color_dict[key], ls="--", lw=1.5, normalised=True, label=value)
 
-    df_xrb = pd.read_csv(config.ROOT_DIR / "results" / "xrb" / "catalogues"/ "xrb_gaia_w_vpec.csv")
-    xrb_types = dict(LMXB="LMXBs", PSR="PSRs")
+    df_xrb = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "known_co_binaries.csv")
+    xrb_types = dict(LMXB="LMXBs", PSR="PSRs", HMXB="HMXBs", NI="NIs")
     for key, value in xrb_types.items():
         xrb_filter = df_xrb.Type.str.contains(key)
         df_xrb_sub = df_xrb[xrb_filter]
-        plot_ecdf(df_xrb_sub.vpec_med, ax=ax, color=color_dict[key], normalised=True, label=value)
+        plot_ecdf(df_xrb_sub.vpec, ax=ax, color=color_dict[key], lw=2.0, normalised=True, label=value)
+
+    ax.axvline(200.0, dashes=(7, 10), color="k")
 
     ax.set_xlabel(r"$v_\mathrm{pec}\,(\mathrm{km~s^{-1}})$")
     ax.set_ylabel(r"$f(\leq v_\mathrm{pec})$")
 
-    ax.set_xticks([10, 100, 1000])
-    ax.set_xticklabels(["10", "100", "1000"])
-
-    ax.set_xlim(5, None)
-    ax.set_ylim(0, 1)
     ax.set_xscale("log")
 
-    plt.legend(loc="lower right")
+    ax.get_xaxis().set_major_formatter(ScalarFormatter())
+    ax.set_xticks([10.0, 100, 1000])
+
+    ax.set_xlim(5, 600)
+    ax.set_ylim(0, 1)
+
+    plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=4)
     out_file = config.RESULTS_FIGURES_DIR / "ecdf_vpec_min.pdf"
     plt.savefig(out_file)
 
