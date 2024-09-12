@@ -106,29 +106,29 @@ def make_panstarrs_rgb_finder(ra: float, dec: float, pos_err: float = 5.0, size:
 def main() -> None:
     warnings.filterwarnings("ignore")
     out_src_list = []
-    in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "vlt_p115_targets.csv")
+    in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "vlt_p115" / "vlt_p115_targets.csv")
     df = pd.read_csv(in_file)
     for i, row in tqdm(df.iterrows()):
         ra = row["ra_x"]
         dec = row["dec_x"]
         ra_counterpart = row["ra"]
         dec_counterpart = row["dec"]
-        pos_err = row["pos_err_erass"]
+        pos_err = row["pos_x_err"]
         # source_id = row["source_id"]
-        detuid = row["DETUID"]
+        id_x = row["ID_x"]
 
         # out_root = config.RESULTS_FIGURES_DIR / "panstarrs_finders" / "runaway_sample_vpec_gt_200" / "rgb"
-        out_root = config.RESULTS_FIGURES_DIR / "vol_limited_bhs" / "panstarrs_finders" / "rgb"
-        out_file = out_root / f"{detuid}_panstarrs_finder_rgb.pdf"
-        print(f"Making RGB finding chart for {detuid} ...")
-        response = make_panstarrs_rgb_finder(ra, dec, pos_err, title=detuid, out_file=out_file,
+        out_root = config.RESULTS_FIGURES_DIR / "high-v_sources" / "vlt_p115" / "panstarrs"
+        out_file = out_root / f"{id_x}_panstarrs_finder_rgb.pdf"
+        print(f"Making RGB finding chart for {id_x} ...")
+        response = make_panstarrs_rgb_finder(ra, dec, pos_err, title=id_x, out_file=out_file,
                                              ra_counterpart=ra_counterpart, dec_counterpart=dec_counterpart)
 
         if response:
-            out_src_list.append(row["DETUID"])
+            out_src_list.append(row["ID_x"])
 
-    df_src_list = pd.DataFrame(out_src_list, columns=["DETUID"])
-    df_src_list.to_csv("source_list.csv", index=False)
+    df_src_list = pd.DataFrame(out_src_list, columns=["ID_x"])
+    df_src_list.to_csv(in_file.parent / "sources_with_panstarrs.csv", index=False)
     # make_panstarrs_greyscale_finder(ra, dec, pos_err, title=detuid, out_file=out_file,
     #                                 ra_counterpart=ra_counterpart, dec_counterpart=dec_counterpart)
     # rgb_out_file = out_root / "rgb" / f"{detuid}_panstarrs_finder_rgb.jpg"
