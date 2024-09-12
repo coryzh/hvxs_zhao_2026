@@ -51,19 +51,19 @@ def combine_catalogs(verbose: bool = False) -> None:
 
     column_map_xmm = {"iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x", "angDist": "sep_x_g",
                       "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err", "sc_ep_lum_8": "lum_x",
-                      "sc_ep_lum_8_err": "lum_x_err", "pos_x_err": "sc_poserr"}
+                      "sc_ep_lum_8_err": "lum_x_err", "sc_poserr": "pos_x_err"}
     df_xmm = df_xmm.rename(columns=column_map_xmm)
     logger.log(f"XMM columns remapped.")
 
     column_map_erass = {"ra_erass": "ra_x", "dec_erass": "dec_x", "DETUID": "ID_x",
                         "F_X": "f_x", "e_F_X": "f_x_err", "L_X": "lum_x", "e_L_X": "lum_x_err",
-                        "Separation_GAIADR3_ERASS": "sep_x_g", "POS_ERR": "pos_x_err"}
+                        "Separation_GAIADR3_ERASS": "sep_x_g", "pos_err_erass": "pos_x_err"}
     df_erass = df_erass.rename(columns=column_map_erass)
     logger.log(f"eRASS columns remapped.\n")
 
     logger.log(f"Creating an empty DataFrame")
     common_columns = [
-        "ID_x", "source_id", "ra_x", "dec_x", "ra", "dec", "sep_x_g", "ruwe", "gamma_min",
+        "ID_x", "source_id", "ra_x", "dec_x", "pos_x_err", "ra", "dec", "sep_x_g", "ruwe", "gamma_min",
         "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error", "dist_med", "e_dist", "E_dist",
         "vpec_min_med", "e_vpec_min", "E_vpec_min", "distance_inference",
         "phot_g_mean_mag", "phot_rp_mean_mag", "phot_bp_mean_mag",
