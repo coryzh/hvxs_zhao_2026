@@ -46,17 +46,18 @@ def combine_catalogs(verbose: bool = False) -> None:
                       "lum_aper_err_b": "lum_x_err",
                       "ra_csc": "ra_x", "dec_csc": "dec_x", "CSC21P_name": "ID_x", "Sep_GAIA21P_CSC21P": "sep_x_g"}
     df_csc = df_csc.rename(columns=column_map_csc)
+    df_csc["pos_x_err"] = df_csc[["err_ellipse_r0", "err_ellipse_r1"]].max(axis=1)
     logger.log(f"CSC columns remapped.")
 
     column_map_xmm = {"iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x", "angDist": "sep_x_g",
                       "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err", "sc_ep_lum_8": "lum_x",
-                      "sc_ep_lum_8_err": "lum_x_err"}
+                      "sc_ep_lum_8_err": "lum_x_err", "pos_x_err": "sc_poserr"}
     df_xmm = df_xmm.rename(columns=column_map_xmm)
     logger.log(f"XMM columns remapped.")
 
     column_map_erass = {"ra_erass": "ra_x", "dec_erass": "dec_x", "DETUID": "ID_x",
                         "F_X": "f_x", "e_F_X": "f_x_err", "L_X": "lum_x", "e_L_X": "lum_x_err",
-                        "Separation_GAIADR3_ERASS": "sep_x_g"}
+                        "Separation_GAIADR3_ERASS": "sep_x_g", "POS_ERR": "pos_x_err"}
     df_erass = df_erass.rename(columns=column_map_erass)
     logger.log(f"eRASS columns remapped.\n")
 
