@@ -16,7 +16,7 @@ label_dict = {
 }
 
 
-def make_figure() -> None:
+def make_figure_all_hvx() -> None:
     plt.style.use("mycustomised")
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
@@ -64,4 +64,4 @@ def make_figure() -> None:
 
 
 if __name__ == "__main__":
-    make_figure()
+    make_figure_all_hvx()
