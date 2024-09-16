@@ -1,6 +1,5 @@
 import config
 import pandas as pd
-import numpy as np
 from utils.ecdf import get_ecdf
 from scipy.interpolate import interp1d
 
