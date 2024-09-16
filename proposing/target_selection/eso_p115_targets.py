@@ -8,7 +8,7 @@ def select_targets(verbose: bool = False) -> None:
     logger.begin()
 
     logger.log(f"Loading the catalogue ...")
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_gt_200.csv"
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150.0.csv"
     df = pd.read_csv(in_file)
     logger.log(f"Catalogue loaded; the input catalogue contains {df.shape[0]} entries.")
 
