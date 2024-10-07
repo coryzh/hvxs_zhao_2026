@@ -116,10 +116,15 @@ def combine_catalogs(vpec_lim: float = 150., mode: str = "lolim", verbose: bool 
     df_all["fx_fg_err"] = df_all["f_x_err"] / df_all["f_g"]
     logger.log(f"Uncertainty on fx_fg: 'fx_fg_err' added.\n")
 
-    logger.log(f"Saving the combined catalogue ...")
-    out_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / f"combined_vpec_{mode}_gt_{vpec_lim}.csv"
-    df_all.to_csv(out_file, index=False)
-    logger.log(f"Catalogue saved to {out_file}.")
+    logger.log(f"Saving the combined catalogues ...")
+    logger.log(f"Saving the combined catalogue of all X-ray sources ...")
+    out_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / f"combined_vpec_{mode}_gt_{vpec_lim}_all.csv"
+    df_all_updated.to_csv(out_file, index=False)
+    logger.log(f"Catalogue saved to {out_file}.\n")
+    logger.log(f"Saving the combined catalogue of unique X-ray sources ...")
+    out_file_unique = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / f"combined_vpec_{mode}_gt_{vpec_lim}_unique.csv"
+    df_all_unique.to_csv(out_file_unique)
+    logger.log(f"Catalogue saved to {out_file_unique}.")
 
 
 if __name__ == "__main__":
