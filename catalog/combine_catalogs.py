@@ -70,9 +70,12 @@ def combine_catalogs(vpec_lim: float = 150., mode: str = "lolim", verbose: bool 
         df_selected = df_selected.rename(columns=column_map_dict[_name])
         logger.log(f"Column names remapped for {_name.upper()}. \n")
 
-        source_id = set(df_selected.source_id)
-        if overlap_ids is None:
-            overlap_ids = source_id
+        # source_id = set(df_selected.source_id)
+        # if overlap_ids is None:
+        #     overlap_ids = source_id
+        #
+        # else:
+        #     overlap_ids &= source_id
 
         logger.log(f"Concatenating the {_name} DataFrame to the combined DataFrame")
         df_selected = df_selected[common_columns]
@@ -90,33 +93,19 @@ def combine_catalogs(vpec_lim: float = 150., mode: str = "lolim", verbose: bool 
 
     # overlap_ids = source_id_csc & source_id_xmm & source_id_erass
     logger.log(f"Checking for overlapping Gaia source_ids ...")
-    if overlap_ids:
-        print(f"Overlapping source_id's: {overlap_ids}")
+    id_counts = df_all["source_id"].value_counts()  # Count the number of occurrences of unique source_ids
+    id_counts_summary = id_counts.value_counts().sort_index()  # Counts how many times each id_counts value occur.
+    logger.log("Multiple identifications summary:\n")
+    logger.log(id_counts_summary)
+    logger.log("Reforming the 'from' column ...")
+    # Grouped by "source_id" — bringing together rows with the same source_id...
+    grouped = df_all.groupby('source_id')['from']
 
-    else:
-        print(f"No overlapping source_id found.\n")
-
-    # %%
-    # Assign labels ("csc", "xmm", "erass") to the sources
-    # df_csc["from"] = "csc"
-    # df_xmm["from"] = "xmm"
-    # df_erass["from"] = "erass"
-    #
-    # df_csc = df_csc.rename(columns=column_map_csc)
-    # df_csc["pos_x_err"] = df_csc[["err_ellipse_r0", "err_ellipse_r1"]].max(axis=1)
-    # logger.log(f"CSC columns remapped.")
-    #
-    # df_xmm = df_xmm.rename(columns=column_map_xmm)
-    # logger.log(f"XMM columns remapped.")
-    # df_erass = df_erass.rename(columns=column_map_erass)
-    # logger.log(f"eRASS columns remapped.\n")
-
-    # df_all = pd.DataFrame(columns=common_columns)
-    # for df in [df_csc, df_xmm, df_erass]:
-    #     df_sub = df[common_columns]
-    #     df_all = pd.concat([df_sub, df_all], ignore_index=True)
-
-    df_all = df_all.drop_duplicates()
+    # Then aggregate on the groupby object; this generates a df with the source_id and new from values:
+    new_from_column = grouped.apply(lambda x: ', '.join(sorted(set(x)))).reset_index()
+    new_from_column.rename(columns={"from": "from_catalogues"}, inplace=True)
+    df_all_updated = pd.merge(df_all, new_from_column, on="source_id", how="left")
+    df_all_unique = df_all_updated.drop_duplicates(subset="source_id", keep="first")
 
     # Derived columns
     logger.log(f"Adding derived columns ...")
