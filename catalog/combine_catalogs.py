@@ -1,6 +1,5 @@
 import pandas as pd
 import config
-import numpy as np
 from log.loggers import VerboseLogger
 
 column_map_csc = {"flux_aper_b": "f_x", "flux_aper_b_sym_err": "f_x_err", "lum_aper_b": "lum_x",
@@ -15,7 +14,11 @@ column_map_erass = {"ra_erass": "ra_x", "dec_erass": "dec_x", "DETUID": "ID_x",
                     "F_X": "f_x", "e_F_X": "f_x_err", "L_X": "lum_x", "e_L_X": "lum_x_err",
                     "Separation_GAIADR3_ERASS": "sep_x_g", "pos_err_erass": "pos_x_err"}
 
-column_map_dict = {"csc": column_map_csc, "xmm": column_map_xmm, "erass": column_map_erass}
+column_map_swift = {"RA": "ra_x", "Decl": "dec_x", "IAUName": "ID_x",
+                    "PowFlux_cen": "f_x", "PowFlux_cen_err": "f_x_err", "PowLum": "lum_x", "PowLum_err": "lum_x_err",
+                    "angDist": "sep_x_g", "Err90": "pos_x_err"}
+
+column_map_dict = {"csc": column_map_csc, "xmm": column_map_xmm, "erass": column_map_erass, "swift": column_map_swift}
 
 common_columns = [
     "ID_x", "source_id", "ra_x", "dec_x", "pos_x_err", "ra", "dec", "sep_x_g", "ruwe", "gamma_min",
@@ -31,8 +34,8 @@ def combine_catalogs(vpec_lim: float = 150., mode: str = "lolim", verbose: bool 
     logger.begin()
     logger.log(f"Loading the high-velocity source catalogues.\n")
 
-    catalogue_names = ["csc", "erass", "xmm"]
-    overlap_ids = None
+    catalogue_names = ["csc", "erass", "xmm", "swift"]
+    # overlap_ids = None
     df_all = pd.DataFrame(columns=common_columns)
     for _name in catalogue_names:
         df_dir = config.RESULTS_CATALOGUE_DIR / f"{_name}_gaia_vpec.csv"
@@ -71,10 +74,7 @@ def combine_catalogs(vpec_lim: float = 150., mode: str = "lolim", verbose: bool 
         if overlap_ids is None:
             overlap_ids = source_id
 
-        else:
-            overlap_ids &= source_id
-
-        logger.log(f"Concatenating {_name} an empty DataFrame")
+        logger.log(f"Concatenating the {_name} DataFrame to the combined DataFrame")
         df_selected = df_selected[common_columns]
         df_all = pd.concat([df_all, df_selected])
 
