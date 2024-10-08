@@ -29,7 +29,7 @@ common_columns = [
 ]
 
 
-def combine_catalogs(vpec_lim: float = 150., mode: str = "lolim", verbose: bool = False) -> None:
+def combine_catalogs(vpec_lim: float = 0., mode: str = "med", verbose: bool = False) -> None:
     logger = VerboseLogger(verbose=verbose)
     logger.begin()
     logger.log(f"Loading the high-velocity source catalogues.\n")
