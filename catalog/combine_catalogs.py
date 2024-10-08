@@ -108,12 +108,14 @@ def combine_catalogs(vpec_lim: float = 150., mode: str = "lolim", verbose: bool 
     df_all_unique = df_all_updated.drop_duplicates(subset="source_id", keep="first")
 
     # Derived columns
-    logger.log(f"Adding derived columns ...")
-    df_all["bp_rp"] = df_all.phot_bp_mean_mag - df_all.phot_rp_mean_mag
-    logger.log(f"Bp-Rp colour: 'bp_rp' added.\n")
+    for df_indiv in [df_all, df_all_unique]:
+        logger.log(f"Adding derived columns ...")
+        df_indiv["bp_rp"] = df_indiv.phot_bp_mean_mag - df_indiv.phot_rp_mean_mag
 
-    df_all["f_g"] = df_all.f_x / df_all.fx_fg
-    df_all["fx_fg_err"] = df_all["f_x_err"] / df_all["f_g"]
+        df_indiv["f_g"] = df_indiv.f_x / df_indiv.fx_fg
+        df_indiv["fx_fg_err"] = df_indiv["f_x_err"] / df_indiv["f_g"]
+
+    logger.log(f"Bp-Rp colour: 'bp_rp' added.\n")
     logger.log(f"Uncertainty on fx_fg: 'fx_fg_err' added.\n")
 
     logger.log(f"Saving the combined catalogues ...")
