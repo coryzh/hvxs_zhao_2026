@@ -117,7 +117,7 @@ def combine_catalogs(vpec_lim: float = 0., mode: str = "med", verbose: bool = Fa
         # df_indiv["fx_fg_err"] = df_indiv["f_x_err"] / df_indiv["f_g"]
 
     logger.log(f"Bp-Rp colour: 'bp_rp' added.\n")
-    logger.log(f"Uncertainty on fx_fg: 'fx_fg_err' added.\n")
+    # logger.log(f"Uncertainty on fx_fg: 'fx_fg_err' added.\n")
 
     logger.log(f"Saving the combined catalogues ...")
     logger.log(f"Saving the combined catalogue of all X-ray sources ...")
