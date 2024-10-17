@@ -38,8 +38,9 @@ def combine_catalogs(vpec_lim: float = 0., mode: str = "med", verbose: bool = Fa
     # overlap_ids = None
     df_all = pd.DataFrame(columns=common_columns)
     for _name in catalogue_names:
-        df_dir = config.RESULTS_CATALOGUE_DIR / f"{_name}_gaia_vpec.csv"
-        df = pd.read_csv(df_dir)
+        cat_dir = config.ROOT_DIR.parent / "results" / "catalogues" / "nway_match"
+        cat_path = cat_dir / f"{_name}_gaia_vpec_master_catalog_w_lx_and_fxfg.csv"
+        df = pd.read_csv(cat_path)
 
         logger.log(f"Catalogues loaded.\n")
         logger.log(f"Shapes:\n"
