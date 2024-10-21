@@ -4,19 +4,19 @@ from log.loggers import VerboseLogger
 
 column_map_csc = {"flux_aper_b": "f_x", "flux_aper_b_sym_err": "f_x_err", "lum_aper_b": "lum_x",
                   "lum_aper_err_b": "lum_x_err",
-                  "ra_csc": "ra_x", "dec_csc": "dec_x", "CSC21P_name": "ID_x", "Sep_GAIA21P_CSC21P": "sep_x_g"}
+                  "ra_deg": "ra_x", "dec_deg": "dec_x", "name": "ID_x", "Separation_gaia_csc": "sep_x_g"}
 
-column_map_xmm = {"iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x", "angDist": "sep_x_g",
+column_map_xmm = {"iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x", "Separation_gaia_xmm": "sep_x_g",
                   "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err", "sc_ep_lum_8": "lum_x",
                   "sc_ep_lum_8_err": "lum_x_err", "sc_poserr": "pos_x_err"}
 
-column_map_erass = {"ra_erass": "ra_x", "dec_erass": "dec_x", "DETUID": "ID_x",
-                    "F_X": "f_x", "e_F_X": "f_x_err", "L_X": "lum_x", "e_L_X": "lum_x_err",
-                    "Separation_GAIADR3_ERASS": "sep_x_g", "pos_err_erass": "pos_x_err"}
+column_map_erass = {"RA": "ra_x", "DEC": "dec_x", "IAUNAME": "ID_x",
+                    "ML_FLUX_1": "f_x", "ML_FLUX_ERR_1": "f_x_err", "lum_x": "lum_x", "lum_x_err": "lum_x_err",
+                    "Separation_gaia_erass": "sep_x_g", "POS_ERR": "pos_x_err"}
 
 column_map_swift = {"RA": "ra_x", "Decl": "dec_x", "IAUName": "ID_x",
                     "PowFlux_cen": "f_x", "PowFlux_cen_err": "f_x_err", "PowLum": "lum_x", "PowLum_err": "lum_x_err",
-                    "angDist": "sep_x_g", "Err90": "pos_x_err"}
+                    "Separation_gaia_swift": "sep_x_g", "Err90": "pos_x_err"}
 
 column_map_dict = {"csc": column_map_csc, "xmm": column_map_xmm, "erass": column_map_erass, "swift": column_map_swift}
 
@@ -29,7 +29,7 @@ common_columns = [
 ]
 
 
-def combine_catalogs(vpec_lim: float = 0., mode: str = "med", verbose: bool = False) -> None:
+def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim", verbose: bool = False) -> None:
     logger = VerboseLogger(verbose=verbose)
     logger.begin()
     logger.log(f"Loading the high-velocity source catalogues.\n")
@@ -38,7 +38,7 @@ def combine_catalogs(vpec_lim: float = 0., mode: str = "med", verbose: bool = Fa
     # overlap_ids = None
     df_all = pd.DataFrame(columns=common_columns)
     for _name in catalogue_names:
-        cat_dir = config.ROOT_DIR.parent / "results" / "catalogues" / "nway_match"
+        cat_dir = config.ROOT_DIR / "results" / _name / "catalogues" / "nway_match"
         cat_path = cat_dir / f"{_name}_gaia_vpec_master_catalog_w_lx_and_fxfg.csv"
         df = pd.read_csv(cat_path)
 
@@ -126,9 +126,9 @@ def combine_catalogs(vpec_lim: float = 0., mode: str = "med", verbose: bool = Fa
     logger.log(f"Catalogue saved to {out_file}.\n")
     logger.log(f"Saving the combined catalogue of unique X-ray sources ...")
     out_file_unique = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / f"combined_vpec_{mode}_gt_{vpec_lim}_unique.csv"
-    df_all_unique.to_csv(out_file_unique)
+    df_all_unique.to_csv(out_file_unique, index=False)
     logger.log(f"Catalogue saved to {out_file_unique}.")
 
 
 if __name__ == "__main__":
-    combine_catalogs(verbose=True)
+    combine_catalogs(vpec_lim=800, mode="lolim", verbose=True)
