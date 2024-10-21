@@ -1,8 +1,11 @@
+import numpy as np
+
 import config
 import pandas as pd
 import matplotlib.pyplot as plt
 from plot.plot_settings import SURVEY_COLOR_DICT, SURVEY_NAME_DICT
 from typing import Tuple
+from scipy.stats import gaussian_kde
 
 
 def make_figure() -> Tuple[plt.Figure, plt.Axes]:
@@ -14,26 +17,37 @@ def make_figure() -> Tuple[plt.Figure, plt.Axes]:
 
 def axes_settings(ax: plt.Axes) -> None:
     ax.set_xlabel(r"Gaia-X-ray separation ($\sigma$)")
-    ax.set_ylabel(r"Normalized counts")
+    ax.set_ylabel(r"Probability density")
+    ax.set_xlim(0, None)
+    ax.set_ylim(0, None)
 
 
 def add_histogram(ax: plt.Axes, from_catalog: str) -> None:
     # for key, val in SURVEY_COLOR_DICT.items():
-    in_file = (config.ROOT_DIR / "results" / from_catalog / "catalogues"
-               / "nway_match" / f"{from_catalog}_gaia_nway_match.csv")
+    in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0_all.csv")
 
     df = pd.read_csv(in_file)
-    sep = df["sep_x_g"] / df["pos_x_err"]
+    sep_sigma_all = df["sep_x_g"] / df["pos_x_err"]
+    bins = np.linspace(sep_sigma_all.min(), sep_sigma_all.max(), 100)
+    df_filtered = df[df["from"] == from_catalog]
+    sep = df_filtered["sep_x_g"] / df_filtered["pos_x_err"]
 
-    _ = ax.hist(sep, bins="scott", density=True, histtype="step", ec=val, label=SURVEY_NAME_DICT[key])
+    kde = gaussian_kde(sep)
+    sep_range = np.arange(0, max(sep), 0.01)
+
+    ax.plot(sep_range, kde(sep_range), lw=2.0, color=SURVEY_COLOR_DICT[from_catalog],
+            label=SURVEY_NAME_DICT[from_catalog])
+    # _ = ax.hist(sep, bins=bins, density=True, histtype="step", ec=SURVEY_COLOR_DICT[from_catalog],
+    #             label=SURVEY_NAME_DICT[from_catalog], lw=1.5)
 
 
 def make_histogram() -> None:
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0.0_unique.csv")
     fig, ax = make_figure()
-    axes_settings(ax)
-    add_histogram(ax, df)
 
+    for key in SURVEY_NAME_DICT.keys():
+        add_histogram(ax, from_catalog=key)
+
+    axes_settings(ax)
     plt.legend(loc="upper right")
     plt.savefig(config.RESULTS_FIGURES_DIR / "sep_x_g_histogram.pdf")
 

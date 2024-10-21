@@ -21,5 +21,5 @@ def make_cmd(df: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "vlt_p115_targets.csv")
+    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "vlt_p115" /"vlt_p115_targets_curated.csv")
     make_cmd(df)

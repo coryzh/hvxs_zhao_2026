@@ -10,7 +10,7 @@ def make_figure(df: pd.DataFrame, out_file: Path = None) -> None:
     plt.style.use("mycustomised")
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
-    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_gt_200.csv")
+    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150.0.csv")
 
     x_all = df_all["bp_rp"]
     y_all = df_all["fx_fg"]
@@ -19,7 +19,7 @@ def make_figure(df: pd.DataFrame, out_file: Path = None) -> None:
     y_target_err = df["fx_fg_err"]
 
     ax.scatter(x_all, y_all, s=0.6, marker=".", fc="k", ec="k")
-    ax.errorbar(x_target, y_target, yerr=y_target_err, marker="o", ms=8.0, mfc="limegreen", mec="k",
+    ax.errorbar(x_target, y_target, yerr=y_target_err, marker="o", ms=13.0, mfc="limegreen", mec="k",
                 ls="none", ecolor="k", capsize=3)
 
     ax.set_yscale("log")
@@ -30,7 +30,7 @@ def make_figure(df: pd.DataFrame, out_file: Path = None) -> None:
     bp_rp_min, bp_rp_max = ax.get_xlim()
     bp_rp_line = np.linspace(bp_rp_min, bp_rp_max, 100)
     fxfg_line = 10 ** (bp_rp_line - 3.5)
-    ax.plot(bp_rp_line, fxfg_line, lw=1.5, color="r", dashes=(5, 8))
+    ax.plot(bp_rp_line, fxfg_line, lw=2.5, color="r", dashes=(5, 8))
 
     ax.set_xlim(-0.8, 5.0)
     ax.set_xlabel(f"Bp$-$Rp")
@@ -42,7 +42,7 @@ def make_figure(df: pd.DataFrame, out_file: Path = None) -> None:
 
 def main() -> None:
     df_targets = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                             / "vlt_p115" / "vlt_p115_targets_w_observability.csv")
+                             / "vlt_p115" / "vlt_p115_targets_curated.csv")
     make_figure(df_targets, out_file=config.RESULTS_FIGURES_DIR / "high-v_sources"/ "vlt_p115" / "fxfg_vs_bprp.pdf")
 
 
