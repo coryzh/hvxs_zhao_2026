@@ -21,9 +21,10 @@ column_map_swift = {"RA": "ra_x", "Decl": "dec_x", "IAUName": "ID_x",
 column_map_dict = {"csc": column_map_csc, "xmm": column_map_xmm, "erass": column_map_erass, "swift": column_map_swift}
 
 common_columns = [
-    "ID_x", "source_id", "ra_x", "dec_x", "pos_x_err", "ra", "dec", "sep_x_g", "ruwe", "gamma_min",
-    "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error", "dist_med", "e_dist", "E_dist",
-    "vpec_min_med", "e_vpec_min", "E_vpec_min", "distance_inference",
+    "ID_x", "source_id", "ra_x", "dec_x", "pos_x_err", "ra", "dec", "sep_x_g", "ruwe", "astrometric_excess_noise",
+    "astrometric_excess_noise_sig", "non_single_star", "mh_gspphot", "mh_gspphot_lower", "mh_gspphot_upper",
+    "gamma_min", "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error",
+    "dist_med", "e_dist", "E_dist", "vpec_min_med", "e_vpec_min", "E_vpec_min", "distance_inference",
     "phot_g_mean_mag", "phot_rp_mean_mag", "phot_bp_mean_mag",
     "f_x", "f_x_err", "lum_x", "lum_x_err", "fx_fg", "from"
 ]
