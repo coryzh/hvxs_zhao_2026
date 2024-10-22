@@ -114,7 +114,7 @@ def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim", verbose: bool = F
         df_indiv["bp_rp"] = df_indiv.phot_bp_mean_mag - df_indiv.phot_rp_mean_mag
 
         df_indiv["f_g"] = df_indiv.f_x / df_indiv.fx_fg
-        # df_indiv["fx_fg_err"] = df_indiv["f_x_err"] / df_indiv["f_g"]
+        df_indiv["fx_fg_err"] = df_indiv["f_x_err"] / df_indiv["f_g"]
 
     logger.log(f"Bp-Rp colour: 'bp_rp' added.\n")
     # logger.log(f"Uncertainty on fx_fg: 'fx_fg_err' added.\n")
@@ -131,4 +131,4 @@ def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim", verbose: bool = F
 
 
 if __name__ == "__main__":
-    combine_catalogs(vpec_lim=800, mode="lolim", verbose=True)
+    combine_catalogs(vpec_lim=150, mode="lolim", verbose=True)
