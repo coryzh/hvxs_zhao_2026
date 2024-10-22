@@ -3,6 +3,8 @@ import pandas as pd
 import config
 import data_schema as ds
 import warnings
+from log.loggers import VerboseLogger
+
 
 unwanted_otype_patterns = [
     'Galaxy', 'Seyfert2', 'QSO', 'AGN', 'BLLac', 'Seyfert1', 'ClG', 'QSO_Candidate', "BrightestCG",
@@ -24,13 +26,13 @@ unwanted_otypes_patterns = [
     'PN', 'EmO', 'ISM', 'Ce*', 'Mas', 'PoG', 'ULX', 'LeQ', 'LeG', 'err',
     'PN?', 'GNe', 'SNR', 'SR?', 'Le?', 'S*', 'SN?', 'RV?', 'Lev', 'gLe',
     'cor', 'LS?', 's?r', "WV*", "UX", "s*r", "dS*", "Gl?", "GlC", "gLS",
-    "CV*", 'Psr', 'HXB', 'XB*', 'LXB', '**'
+    "CV*", 'Psr', 'HXB', 'XB*', 'LXB', '**',  "HX?", "OpC", "Pl", "CV?", "MoC"
 ]
 
 unwanted_name_patterns = ["Cl*", "Cl", "NGC", "LEDA"]
 
 
-def _clean_df_simbad_main_type(df: pd.DataFrame) -> pd.DataFrame:
+def _clean_df_simbad_main_type(df: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
     """
     Clean the main type of the sources in the input DataFrame.
     Parameters
@@ -43,12 +45,17 @@ def _clean_df_simbad_main_type(df: pd.DataFrame) -> pd.DataFrame:
     df : pd.DataFrame
         The filtered DataFrame with the main type of the sources cleaned.
     """
+    logger = VerboseLogger(verbose=verbose)
+    logger.begin()
+    logger.log(f"{df.shape[0]} rows loaded.\n")
     _filter = ~df[ds.SimbadSchema.SIMBAD_OTYPE].apply(lambda x: any(types in x for types in unwanted_otype_patterns))
+    logger.log(f"{df.shape[0] - _filter.sum()} rows removed based on their main_type.\n")
+    logger.end()
 
     return df[_filter]
 
 
-def _clean_df_simbad_secondary_types(df: pd.DataFrame) -> pd.DataFrame:
+def _clean_df_simbad_secondary_types(df: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
     """
     Clean the catalogue based on secondary types of the sources in the input DataFrame.
     Parameters
@@ -61,16 +68,23 @@ def _clean_df_simbad_secondary_types(df: pd.DataFrame) -> pd.DataFrame:
     df : pd.DataFrame
         The filtered DataFrame with the secondary types of the sources cleaned.
     """
+
+    logger = VerboseLogger(verbose=verbose)
+    logger.begin()
+    logger.log(f"{df.shape[0]} rows loaded.\n")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         df.loc[:, ds.SimbadSchema.SIMBAD_OTYPES] = df[ds.SimbadSchema.SIMBAD_OTYPES].fillna('nan')
         _filter = ~df[ds.SimbadSchema.SIMBAD_OTYPES].apply(lambda x: any(types in x for types
                                                                          in unwanted_otypes_patterns))
 
+    logger.log(f"{df.shape[0] - _filter.sum()} rows removed based on their secondary types.\n")
+    logger.end()
+
     return df[_filter]
 
 
-def _clean_df_simbad_name(df: pd.DataFrame) -> pd.DataFrame:
+def _clean_df_simbad_name(df: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
     """
     Clean the names of the sources in the input DataFrame.
     Parameters
@@ -83,106 +97,35 @@ def _clean_df_simbad_name(df: pd.DataFrame) -> pd.DataFrame:
     df : pd.DataFrame
         The filtered DataFrame with the names of the sources cleaned.
     """
+
+    logger = VerboseLogger(verbose=verbose)
+    logger.begin()
+    logger.log(f"{df.shape[0]} rows loaded.\n")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        df.loc[:, ds.SimbadSchema.SIMBAD_IDS] = df[ds.SimbadSchema.SIMBAD_IDS].fillna('nan')
-        _filter = ~df[ds.SimbadSchema.SIMBAD_IDS].apply(lambda x: any(types in x for types in unwanted_name_patterns))
+        df.loc[:, ds.SimbadSchema.SIMBAD_ID] = df[ds.SimbadSchema.SIMBAD_ID].fillna('nan')
+        _filter = ~df[ds.SimbadSchema.SIMBAD_ID].apply(lambda x: any(types in x for types in unwanted_name_patterns))
+
+    logger.log(f"{df.shape[0] - _filter.sum()} rows removed based on their SIMBAD names.\n")
+    logger.end()
 
     return df[_filter]
 
 
-def _join_w_vpec_catalogue(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Join the input DataFrame with the vpec catalogue.
-    Parameters
-    ----------
-    df : pd.DataFrame
-        The input DataFrame containing the types of the sources.
-
-    Returns
-    -------
-    df : pd.DataFrame
-        The input DataFrame joined with the vpec catalogue.
-    """
-    df_vpec = pd.read_csv(config.ERASS_GAIA_W_VPEC_AND_FLUX_RATIOS, dtype={"source_id": str})
-    df = df[[ds.SimbadSchema.SIMBAD_ID, "DETUID", ds.SimbadSchema.SIMBAD_OTYPE, ds.SimbadSchema.SIMBAD_OTYPES,
-             ds.SimbadSchema.SIMBAD_OTYPE_OPT]]
-
-    df = pd.merge(df_vpec, df, on="DETUID", how="inner")
-
-    return df
-
-
 def main() -> None:
-    print(f"Loading the VPEC catalogue ...")
-    df = pd.read_csv(config.ERASS_GAIA_W_SIMBAD_TYPES, dtype={"source_id": str})
-    print(f"Catalogue loaded, a total of {df.shape[0]} rows loaded.\n")
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_w_simbad.csv"
+    df = pd.read_csv(in_file)
+    df[ds.SimbadSchema.get_attribute_values()] = df[ds.SimbadSchema.get_attribute_values()].fillna("")
 
-    df_filtered_1 = _clean_df_simbad_main_type(df)
-    print(f"Cleaning the catalogue based on SIMBAD main types (OTYPE) ...")
-    print(f"Removed {df.shape[0] - df_filtered_1.shape[0]} rows based on unwanted SIMBAD main types.\n")
+    verbose = True
+    df_filtered_1 = _clean_df_simbad_main_type(df, verbose=verbose)
 
-    df_filtered_2 = _clean_df_simbad_secondary_types(df_filtered_1)
-    print(f"Cleaning the catalogue based on SIMBAD secondary types (OTYPES) ...")
-    print(f"Removed {df_filtered_1.shape[0] - df_filtered_2.shape[0]} rows based on unwanted SIMBAD secondary types.\n")
+    df_filtered_2 = _clean_df_simbad_secondary_types(df_filtered_1, verbose=verbose)
 
-    df_filtered_3 = _clean_df_simbad_name(df_filtered_2)
-    print(f"Cleaning the catalogue based on SIMBAD names ...")
-    print(f"Removed {df_filtered_2.shape[0] - df_filtered_3.shape[0]} rows based on unwanted SIMBAD names.\n")
+    df_filtered_3 = _clean_df_simbad_name(df_filtered_2, verbose=verbose)
 
-    print(f"The filtered catalogue has {df_filtered_3.shape[0]} rows.\n")
-    out_file_simbad_types = config.ERASS_GAIA_SIMBAD_TYPES_CLEANED
+    df_filtered_3.to_csv(in_file.parent / f"{in_file.stem}_simbad_cleaned.csv", index=False)
 
-    print(f"The 'Unknown' sources were positionally matched with SIMBAD; loading the SIMBAD types table ...\n")
-    df_simbad_pos_match = pd.read_csv(config.DATA_DIR_INTERMEDIATE / "erass_gaia_simbad_types_pos_match.csv",
-                                      dtype={"source_id": str})
-    print(f"The further position match identified {df_simbad_pos_match.OTYPE.notna().sum()} sources.\n")
-
-    print(f"Cleaning the pos_match types table ...\n")
-    df_simbad_pos_match["OTYPE"].fillna("Unknown", inplace=True)
-    df_simbad_pos_match_filtered_1 = _clean_df_simbad_main_type(df_simbad_pos_match)
-    print(f"Removed {df_simbad_pos_match.shape[0] - df_simbad_pos_match_filtered_1.shape[0]} "
-          f"rows based on unwanted SIMBAD main types.\n")
-
-    df_simbad_pos_match_filtered_2 = _clean_df_simbad_secondary_types(df_simbad_pos_match_filtered_1)
-    print(f"Removed {df_simbad_pos_match_filtered_1.shape[0] - df_simbad_pos_match_filtered_2.shape[0]} "
-          f"rows based on unwanted SIMBAD secondary types.\n")
-
-    df_simbad_pos_match_filtered_3 = _clean_df_simbad_name(df_simbad_pos_match_filtered_2)
-    print(f"Removed {df_simbad_pos_match_filtered_2.shape[0] - df_simbad_pos_match_filtered_3.shape[0]} "
-          f"rows based on unwanted SIMBAD names.\n")
-
-    # Now, check which sources have been removed from the original SIMBAD types table
-    # here, indicator=True adds a column to the merged table named "_merge" which indicates the source of each row:
-    # either from the 'left', 'right', or 'both' tables.
-    print(f"Comparing the cleaned (pos_matched) SIMBAD types table with the original one ...\n")
-    df_simbad_pos_compare = pd.merge(df_simbad_pos_match, df_simbad_pos_match_filtered_3, on="DETUID",
-                                     how="outer", indicator=True)
-
-    # The sources that are in the original SIMBAD types table but not in the cleaned one.
-    print(f"Getting a list of sources removed from the original (pos-matched) SIMBAD table ...\n")
-    df_simbad_pos_removed = df_simbad_pos_compare[df_simbad_pos_compare["_merge"] == "left_only"]
-    print(f"In total, {df_simbad_pos_removed.shape[0]} sources "
-          f"were removed from the original (pos-matched) SIMBAD table.\n")
-
-    # Now, remove these sources from df_filtered_3, the cleaned (name-matched) SIMBAD types table
-    print(f"Now, removing these sources from the cleaned (name-matched) SIMBAD table ...\n")
-    df_filtered_4 = df_filtered_3[~df_filtered_3["DETUID"].isin(df_simbad_pos_removed["DETUID"])]
-    print(f"Removed {df_filtered_3.shape[0] - df_filtered_4.shape[0]} sources from the cleaned (name-matched) SIMBAD "
-          f"table.\n")
-    df_filtered_4.to_csv(out_file_simbad_types, index=False)
-    print(f"Catalogue saved to {out_file_simbad_types}.\n")
-
-    print(f"Using the cleaned SIMBAD type catalogue to join with the VPEC catalogue ...\n")
-    df_joined = _join_w_vpec_catalogue(df_filtered_4)
-
-    # print(f"Joining the SIMBAD-cleaned, vpec-hosting catalogue with the raw ERASS main catalogue to "
-    #       f"get detection likelihoods ...\n")
-    # df_w_det_likelihood = _get_detection_likelihood(df_joined)
-
-    out_file_joined = config.ERASS_GAIA_W_VPEC_SIMBAD_TYPES_CLEANED
-    df_joined.to_csv(out_file_joined, index=False)
-    print(f"Catalogue saved to {out_file_joined}.\n")
     print(f"Done!")
 
 
