@@ -232,11 +232,12 @@ class Gaia(Schema):
 
 class SimbadSchema(Schema):
     """Schema for the Simbad database"""
-    SIMBAD_OTYPE: str = "OTYPE"
-    SIMBAD_OTYPES: str = "OTYPES"
-    SIMBAD_OTYPE_OPT: str = "OTYPE_opt"
-    SIMBAD_ID: str = "MAIN_ID"
-    SIMBAD_IDS: str = "IDS"
+    SIMBAD_OTYPE: str = "otype"
+    SIMBAD_OTYPES: str = "other_types"
+    SIMBAD_MAIN_TYPE: str = "main_type"
+    # SIMBAD_OTYPE_OPT: str = "OTYPE_opt"
+    SIMBAD_ID: str = "main_id"
+    # SIMBAD_IDS: str = "IDS"
 
 
 class LX:
