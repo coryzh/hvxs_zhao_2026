@@ -3,8 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import config
 from catalog.select.clean import clean_for_fxfg_vs_bprp
-from matplotlib.ticker import ScalarFormatter
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib import colors
+from pathlib import Path
+
+
 # colors = sns.color_palette("hls", 4)
 #
 # color_dict = {
@@ -16,53 +19,98 @@ from matplotlib import colors
 # }
 
 
-def add_control_sample(ax: plt.Axes) -> None:
+def add_control_sample(axs: np.ndarray[plt.Axes]) -> None:
     """Control sample plotted in the background"""
 
     df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                         / "combined_vpec_med_gt_0.0_unique_cleaned.csv")
+                         / "combined_vpec_med_gt_0_unique.csv")
     df_all = df_all[df_all.dist_med <= 1.5]
-    ax.scatter(df_all.bp_rp, df_all.fx_fg, s=0.01, color="k", marker="o", alpha=0.5, rasterized=True)
+    for ax in axs.flatten():
+        ax.scatter(df_all.bp_rp, df_all.fx_fg, s=0.01, color="k", marker="o", alpha=0.5,
+                   zorder=-1, rasterized=True)
 
 
-def add_hvx(fig: plt.Figure, ax: plt.Axes) -> None:
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_200.0_unique.csv")
+def add_hvx(in_file_csv: Path, fig: plt.Figure, axs: np.ndarray[plt.Axes]) -> None:
+    df = pd.read_csv(in_file_csv)
     df = clean_for_fxfg_vs_bprp(df, verbose=False)
-    color_val = (df["vpec_min_med"] - df["e_vpec_min"]).values
-    scatter = ax.scatter(df.bp_rp, df.fx_fg, s=50, marker="o", ec="k", c=color_val, cmap="Greens", norm=colors.LogNorm())
-    # cbar = fig.colorbar(scatter, ax)
+    color_val = df["vpec_min_med"] - df["e_vpec_min"]
+    color_min = color_val.min()
+    color_max = color_val.max()
+    color_norm = colors.LogNorm(vmin=color_min, vmax=color_max)
+
+    # vpec_bins = np.linspace(color_val.min(), color_val.max(), 5)
+    # print(vpec_bins)
+    vpec_bins = np.array([150.0, 180.0, 220.0, 300.0, 1500.0])
+
+    for i, ax in enumerate(axs.flatten()):
+        _filter = (color_val >= vpec_bins[i]) & (color_val <= vpec_bins[i+1])
+        df_sub = df[_filter]
+        color_val_sub = df_sub["vpec_min_med"] - df_sub["e_vpec_min"]
+        scatter = ax.scatter(df_sub.bp_rp, df_sub.fx_fg, s=30, marker="o", ec="k", c=color_val_sub, norm=color_norm,
+                             cmap="Greens", zorder=1)
+
+        ax.text(x=0.60, y=0.1, s=rf"$[{vpec_bins[i]:.0f}, {vpec_bins[i+1]:.0f}]$",
+                transform=ax.transAxes, fontsize=40, ha="left", va="bottom")
+
+    # Get the positions of the top and bottom subplots to calculate the colorbar's height
+    top_box = axs[0, 1].get_position()  # Get the position of the top-right subplot
+    bottom_box = axs[1, 1].get_position()  # Get the position of the bottom-right subplot
+
+    # Calculate the position and dimensions for the colorbar
+    left = top_box.x1 + 0.005  # Slightly to the right of the rightmost subplot
+    bottom = bottom_box.y0  # Bottom edge aligned with the bottom subplot
+    height = top_box.y1 - bottom_box.y0  # Covering the height of both rows
+    width = 0.03  # Fixed width for the colorbar
+
+    _cbar_ax = fig.add_axes([left, bottom, width, height])
+    _cbar = fig.colorbar(scatter, cax=_cbar_ax, orientation="vertical")
+    _cbar.ax.set_yticks([200, 300, 400, 600, 1000])
+    _cbar.ax.set_yticklabels(["200", "300", "400", "600", "1000"])
+    _cbar.set_label(r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$", fontsize=50)
 
 
-def add_separatrix(ax: plt.Axes) -> None:
-    bp_rp_min, bp_rp_max = ax.get_xlim()
-    bp_rp_line = np.linspace(bp_rp_min, bp_rp_max, 100)
-    fxfg_line = 10 ** (bp_rp_line - 3.5)
-    ax.plot(bp_rp_line, fxfg_line, lw=1.5, color="k")
+def add_separatrix(axs: np.ndarray[plt.Axes]) -> None:
+    for ax in axs.flatten():
+        bp_rp_min, bp_rp_max = ax.get_xlim()
+        bp_rp_line = np.linspace(bp_rp_min, bp_rp_max, 100)
+        fxfg_line = 10 ** (bp_rp_line - 3.5)
+        ax.plot(bp_rp_line, fxfg_line, lw=3.0, color="r")
 
 
-def axes_settings(ax: plt.Axes) -> None:
-    ax.set_xlim(-0.8, 6.0)
-    ax.set_ylim(1.5e-6, 110)
-    ax.set_yscale("log")
-    ax.set_xlabel(r"Bp$-$Rp")
-    ax.set_ylabel(r"$F_X/F_G$")
+def axes_settings(fig: plt.Figure, axs: np.ndarray[plt.Axes]) -> None:
+    for ax in axs.flatten():
+        ax.set_xlim(-0.8, 3.9)
+        ax.set_ylim(1.5e-6, 200)
+        ax.set_yscale("log")
 
-    ax.get_yaxis().set_major_formatter(ScalarFormatter())
-    ax.set_yticks([1e-6, 1e-5, 1e-4, 0.001, 0.01, 0.1, 1, 10, 100])
-    ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", "0.001", "0.01", "0.1", "1", "10", "100"])
+        ax.get_yaxis().set_major_formatter(ScalarFormatter())
+        ax.set_yticks([1e-6, 1e-5, 1e-4, 0.001, 0.01, 0.1, 1, 10, 100])
+        ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", "0.001", "0.01", "0.1", "1", "10", "100"])
+
+    fig.text(0.5, 0.05, r"Bp$-$Rp", ha='center', va='center', fontsize=50)
+    fig.text(0.05, 0.5, r"$F_X/F_G$", ha='center', va='center', rotation=90, fontsize=50)
+    # axs.set_xlabel(r"Bp$-$Rp")
+    # axs.set_ylabel(r"$F_X/F_G$")
 
 
 def make_figure() -> None:
     plt.style.use("mycustomised")
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    fig, ax = plt.subplots(2, 2, figsize=(20, 20),
+                           sharex=True, sharey=True)
 
-    axes_settings(ax)
+    in_file_csv = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+                   / "combined_vpec_lolim_gt_150_unique_w_simbad_high_ratio_simbad_cleaned.csv")
+
+    axes_settings(fig, ax)
     add_control_sample(ax)
     add_separatrix(ax)
-    add_hvx(fig, ax)
+    add_hvx(in_file_csv, fig, ax)
+    plt.subplots_adjust(hspace=0.01, wspace=0.01, right=0.90)
+    plt.savefig(config.RESULTS_FIGURES_DIR / "high-v_sources" / f"{in_file_csv.stem}_bprp_vs_fxfg.pdf")
 
 
-    plt.savefig(config.RESULTS_FIGURES_DIR / "high-v_sources" / "fxfg_vs_bprp_vpec_min_lolim_gt_200.pdf")
+if __name__ == "__main__":
+    make_figure()
 
 # def make_figure_all_hvx() -> None:
 #     plt.style.use("mycustomised")
@@ -110,6 +158,3 @@ def make_figure() -> None:
 #     # plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.1), ncol=3)
 #     plt.savefig(config.RESULTS_FIGURES_DIR / "fxfg_vs_bprp.pdf")
 
-
-if __name__ == "__main__":
-    make_figure()
