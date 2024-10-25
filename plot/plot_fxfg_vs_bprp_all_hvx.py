@@ -84,8 +84,8 @@ def axes_settings(fig: plt.Figure, axs: np.ndarray[plt.Axes]) -> None:
         ax.set_yscale("log")
 
         ax.get_yaxis().set_major_formatter(ScalarFormatter())
-        ax.set_yticks([1e-6, 1e-5, 1e-4, 0.001, 0.01, 0.1, 1, 10, 100])
-        ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", "0.001", "0.01", "0.1", "1", "10", "100"])
+        ax.set_yticks([1e-5, 1e-4, 0.001, 0.01, 0.1, 1, 10, 100])
+        ax.set_yticklabels([r"$10^{-5}$", r"$10^{-4}$", "0.001", "0.01", "0.1", "1", "10", "100"])
 
     fig.text(0.5, 0.05, r"Bp$-$Rp", ha='center', va='center', fontsize=50)
     fig.text(0.05, 0.5, r"$F_X/F_G$", ha='center', va='center', rotation=90, fontsize=50)
