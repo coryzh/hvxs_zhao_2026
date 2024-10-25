@@ -27,7 +27,7 @@ def select_high_fx_fg_ratio_sources(in_file_csv: Path, out_file: bool = False, v
 
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-               / "combined_vpec_lolim_gt_150_unique_w_simbad_simbad_cleaned.csv")
+               / "combined_vpec_lolim_gt_150_unique_w_simbad.csv")
     select_high_fx_fg_ratio_sources(in_file_csv=in_file, out_file=True, verbose=True)
 
 
