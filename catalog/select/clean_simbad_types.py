@@ -113,7 +113,8 @@ def _clean_df_simbad_name(df: pd.DataFrame, verbose: bool = False) -> pd.DataFra
 
 
 def main() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_w_simbad.csv"
+    in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+               / "combined_vpec_lolim_gt_150_unique_w_simbad_high_ratio.csv")
     df = pd.read_csv(in_file)
     df[ds.SimbadSchema.get_attribute_values()] = df[ds.SimbadSchema.get_attribute_values()].fillna("")
 
