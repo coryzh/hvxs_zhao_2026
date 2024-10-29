@@ -59,8 +59,8 @@ def cross_match_astrometry(in_file_csv: Path, verbose: bool = False, radius_type
     df_cl = load_cluster_catalogue(verbose=verbose)
     coords_cl = SkyCoord(df_cl["RA_ICRS"], df_cl["DE_ICRS"], unit="deg")
     cl_radius = df_cl[radius_type]
-    cl_dist_lo = df_cl["dist16"] / 1e3
-    cl_dist_hi = df_cl["dist84"] / 1e3
+    # cl_dist_lo = df_cl["dist16"] / 1e3
+    # cl_dist_hi = df_cl["dist84"] / 1e3
     cl_pmra = df_cl["pmRA"]
     cl_pmdec = df_cl["pmDE"]
     cl_pmra_std = df_cl["e_pmRA"]
