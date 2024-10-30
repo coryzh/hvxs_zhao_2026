@@ -21,6 +21,9 @@ def load_cluster_catalogue(verbose: bool = False) -> pd.DataFrame:
 
 
 def cross_match_ids(in_file_csv: Path, verbose: bool = False) -> None:
+    """
+    Cross-matching based on Gaia DR3 source_ids.
+    """
     logger = VerboseLogger(verbose=verbose)
 
     logger.begin()
@@ -42,14 +45,23 @@ def cross_match_ids(in_file_csv: Path, verbose: bool = False) -> None:
     df_merged = pd.merge(df, df_members[["cluster_name", "source_id", "cl_member_prob"]], on="source_id", how="left")
     logger.log(f"{df_merged['cluster_name'].notna().sum()} sources are likely cluster members.\n")
 
+    df_merged_clean = df_merged[df_merged.cluster_name.isna()]
+
     out_file = in_file_csv.parent / f"{in_file_csv.stem}_w_cl_info.csv"
+    out_file_cleaned = in_file_csv.parent / f"{in_file_csv.stem}_cleaned_cl_members.csv"
     df_merged.to_csv(out_file, index=False)
+    df_merged_clean.to_csv(out_file_cleaned, index=False)
+
     logger.log(f"Catalogue with cluster membership information saved to {out_file}.\n")
 
     logger.end()
 
 
 def cross_match_astrometry(in_file_csv: Path, verbose: bool = False, radius_type: str = "rt") -> None:
+    """
+    Cross-match based on astrometric parameters (distance, proper motions, etc.)
+    """
+
     logger = VerboseLogger(verbose=verbose)
 
     logger.begin()
