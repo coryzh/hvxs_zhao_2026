@@ -14,7 +14,7 @@ unwanted_otype_patterns = [
     'HIIG', 'OH/IR*', 'Supernova', 'Supernova_Candidate', 'TTauri*_Candidate', "HIIReg",
     'InteractingG', 'SXPheV*', 'BLLac_Candidate', 'Ae*_Candidate', 'Ae*', 'CataclyV*', 'GlobCluster',
     "Nova", "XrayBin", "LowMassXBin", "HighMassXBin", "Pulsar", '**', "ULX_Candidate", "alf2CVnV*",
-    "Planet_Candidate", "Cepheid", "Type2Cep", "ClassicalCep", "RSCVnV*", "LensedQ", "GravLens"
+    "Planet_Candidate", "Cepheid", "Type2Cep", "ClassicalCep", "RSCVnV*", "LensedQ", "GravLens", "SB*"
 ]
 
 unwanted_otypes_patterns = [
