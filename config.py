@@ -18,6 +18,7 @@ DATA_DIR_PROCESSED = DATA_DIR / "processed"
 # Path to results directory
 RESULTS_DIR = ROOT_DIR / "results" / SURVEY_NAME
 RESULTS_CATALOGUE_DIR = RESULTS_DIR / "catalogues"
+RESULTS_LATEX_TABLE_DIR = RESULTS_DIR / "latex_tables"
 RESULTS_FIGURES_DIR = RESULTS_DIR / "figures"
 RESULTS_GALACTIC_ORBITS = RESULTS_DIR / "galactic_orbits"
 RESULTS_DISTANCES_FROM_CLUSTERS = RESULTS_DIR / "distances_from_clusters"
