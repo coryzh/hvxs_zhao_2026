@@ -18,7 +18,7 @@ def select_high_fx_fg_ratio_sources(in_file_csv: Path, out_file: bool = False, v
 
     if out_file:
         logger.log(f"Saving the filtered catalogue ...")
-        out_file = in_file_csv.parent / f"{in_file_csv.stem}_high_ratio.csv"
+        out_file = in_file_csv.parent / f"{in_file_csv.stem.replace('stage_1', 'stage_2')}.csv"
         df_filtered.to_csv(out_file, index=False)
         logger.log(f"Catalogue saved to {out_file}.\n")
 
@@ -27,7 +27,7 @@ def select_high_fx_fg_ratio_sources(in_file_csv: Path, out_file: bool = False, v
 
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-               / "combined_vpec_lolim_gt_150_unique_w_simbad.csv")
+               / "combined_vpec_lolim_gt_150_unique_stage_1.csv")
     select_high_fx_fg_ratio_sources(in_file_csv=in_file, out_file=True, verbose=True)
 
 

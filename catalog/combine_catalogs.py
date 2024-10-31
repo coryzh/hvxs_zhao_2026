@@ -126,10 +126,11 @@ def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim", verbose: bool = F
     df_all_updated.to_csv(out_file, index=False)
     logger.log(f"Catalogue saved to {out_file}.\n")
     logger.log(f"Saving the combined catalogue of unique X-ray sources ...")
-    out_file_unique = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / f"combined_vpec_{mode}_gt_{vpec_lim}_unique.csv"
+    out_file_unique = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+                       / f"combined_vpec_{mode}_gt_{vpec_lim}_unique_stage_0.csv")
     df_all_unique.to_csv(out_file_unique, index=False)
     logger.log(f"Catalogue saved to {out_file_unique}.")
 
 
 if __name__ == "__main__":
-    combine_catalogs(vpec_lim=150, mode="lolim", verbose=True)
+    combine_catalogs(vpec_lim=0, mode="med", verbose=True)

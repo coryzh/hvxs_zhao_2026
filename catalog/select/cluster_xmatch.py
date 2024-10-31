@@ -47,8 +47,8 @@ def cross_match_ids(in_file_csv: Path, verbose: bool = False) -> None:
 
     df_merged_clean = df_merged[df_merged.cluster_name.isna()]
 
-    out_file = in_file_csv.parent / f"{in_file_csv.stem}_w_cl_info.csv"
-    out_file_cleaned = in_file_csv.parent / f"{in_file_csv.stem}_cleaned_cl_members.csv"
+    out_file = in_file_csv.parent / f"{in_file_csv.stem.replace('stage_3', 'stage_4')}.csv"
+    out_file_cleaned = in_file_csv.parent / f"{in_file_csv.stem.replace('stage_3', 'stage_5')}.csv"
     df_merged.to_csv(out_file, index=False)
     df_merged_clean.to_csv(out_file_cleaned, index=False)
 
@@ -113,7 +113,7 @@ def cross_match_astrometry(in_file_csv: Path, verbose: bool = False, radius_type
 
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-               / "combined_vpec_lolim_gt_150_unique_w_simbad_high_ratio_simbad_cleaned.csv")
+               / "combined_vpec_lolim_gt_150_unique_stage_3.csv")
 
     # cross_match_astrometry(in_file_csv=in_file, verbose=True, radius_type="r50")
     cross_match_ids(in_file, verbose=True)
