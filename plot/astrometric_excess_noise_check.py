@@ -64,13 +64,15 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
 
 def add_constant_distance_lines(ax: plt.Axes) -> None:
     d_list = [d * u.kpc for d in [0.5, 5.0, 30.0]]
-
+    d_ls = [":", "--", "-."]
     epsilon_min, epsilon_max = ax.get_xlim()
     epsilon_range = np.logspace(np.log10(epsilon_min), np.log10(epsilon_max), 100) * u.mas
 
-    for dist in d_list:
+    for i, dist in enumerate(d_list):
         y = (dist * epsilon_range.to(u.rad).value).to(u.AU).value
-        ax.plot(epsilon_range, y, lw=1.5, dashes=(3.0, 4.0), color="k")
+        ax.plot(epsilon_range, y, lw=1.5, ls=d_ls[i], color="r", label=fr"$d={dist.value:.1f}$ kpc")
+
+    ax.legend(loc="best")
 
 
 def make_plot() -> None:
@@ -82,7 +84,7 @@ def make_plot() -> None:
     axis_settings(ax)
     add_constant_distance_lines(ax)
 
-    plt.savefig(config.RESULTS_FIGURES_DIR / "excess_noise" / "test.pdf")
+    plt.savefig(config.RESULTS_FIGURES_DIR / "excess_noise" / "aen_vs_semi_major_axis.pdf")
 
 
 if __name__ == "__main__":
