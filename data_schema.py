@@ -228,6 +228,7 @@ class Gaia(Schema):
     source_id: str = "source_id"
     parallax_corr: str = "parallax_corr"
     has_valid_parallax_corr: str = "has_valid_parallax_corr"
+    astrometric_excess_noise: str = "astrometric_excess_noise"
 
 
 class SimbadSchema(Schema):
