@@ -1,16 +1,17 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import config
-from utils.ecdf import plot_ecdf
+from utils.ecdf import plot_ecdf, get_ecdf
 from log.loggers import VerboseLogger
 from matplotlib.ticker import ScalarFormatter
+from scipy.interpolate import interp1d
 import seaborn as sns
 
 
 colors = sns.color_palette("hls", 4)
 
 
-def make_ecdf(verbose: bool = False) -> None:
+def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
     source_types = {"as": "Active stars", "ab": "Active binaries", "yso": "YSOs", "cv": "CVs"}
     color_dict = {"as": colors[0], "ab": colors[1], "yso": colors[2], "cv": colors[3], "LMXB": colors[0],
                   "PSR": colors[1], "HMXB": colors[2], "NI": colors[3]}
@@ -29,15 +30,22 @@ def make_ecdf(verbose: bool = False) -> None:
         # vpec_up = vpec_med + df["E_vpec"].values
 
         plot_ecdf(arr=vpec_med, ax=ax, color=color_dict[key], ls="--", lw=1.5, normalised=True, label=value)
+        x, ecdf = get_ecdf(vpec_med)
+        f_ecdf = interp1d(x, ecdf, fill_value=(0, 1.0), bounds_error=False)
+        print(f"{f_ecdf(vpec_lo_lim) * 100:.2f}% of {value} <= {vpec_lo_lim} km/s")
 
     df_xrb = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "known_co_binaries.csv")
     xrb_types = dict(LMXB="LMXBs", PSR="PSRs", HMXB="HMXBs", NI="NIs")
     for key, value in xrb_types.items():
         xrb_filter = df_xrb.Type.str.contains(key)
         df_xrb_sub = df_xrb[xrb_filter]
-        plot_ecdf(df_xrb_sub.vpec, ax=ax, color=color_dict[key], lw=2.0, normalised=True, label=value)
+        vpec_med = df_xrb_sub.vpec
+        plot_ecdf(vpec_med, ax=ax, color=color_dict[key], lw=2.0, normalised=True, label=value)
+        x, ecdf = get_ecdf(vpec_med)
+        f_ecdf = interp1d(x, ecdf, fill_value=(0, 1.0), bounds_error=False)
+        print(f"{f_ecdf(vpec_lo_lim) * 100:.2f}% of {value} <= {vpec_lo_lim} km/s")
 
-    ax.axvline(200.0, dashes=(7, 10), color="k")
+    ax.axvline(vpec_lo_lim, dashes=(7, 10), color="k")
 
     ax.set_xlabel(r"$v_\mathrm{pec}\,(\mathrm{km~s^{-1}})$")
     ax.set_ylabel(r"$f(\leq v_\mathrm{pec})$")
@@ -59,7 +67,7 @@ def make_ecdf(verbose: bool = False) -> None:
 
 
 def main() -> None:
-    make_ecdf(verbose=True)
+    make_ecdf(verbose=True, vpec_lo_lim=150)
 
 
 if __name__ == "__main__":
