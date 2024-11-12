@@ -1,0 +1,70 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+from typing import Tuple
+from plot_settings import SCATTER_DICT_GALACTIC_MAP
+import config
+
+
+def setup_axes() -> Tuple[plt.Figure, plt.Axes]:
+    plt.style.use("mycustomised")
+    fig = plt.figure(figsize=(19, 16))
+    ax = plt.subplot(111, projection='aitoff')
+    ax.grid(True)
+
+    x_ticks = (np.linspace(150, -150, 11) * u.deg).to(u.radian).value
+    x_tick_range = [str(item) for item in np.linspace(-150, 150, 11)]
+    x_tick_labels = [fr"${item.split('.')[0]}^\circ$" for item in x_tick_range]
+
+    y_ticks = (np.linspace(-75, 75, 11) * u.deg).to(u.radian).value
+    y_tick_range = [str(item) for item in np.linspace(-75, 75, 11)]
+    y_tick_labels = [fr"${item.split('.')[0]}^\circ$" for item in y_tick_range]
+
+    ax.set_xticks(x_ticks)
+    ax.set_xticklabels(x_tick_labels)
+    ax.set_yticks(y_ticks)
+    ax.set_yticklabels(y_tick_labels)
+
+    return fig, ax
+
+
+def calc_galactic_coordinates(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
+    n_df = df.index
+
+    l_arr = np.zeros(len(n_df))
+    b_arr = np.zeros(len(n_df))
+
+    coord = SkyCoord(df["ra_x"], df["dec_x"], unit="deg")
+
+    coord_gal = coord.galactic
+
+    l_arr = -coord_gal.l.wrap_at('180d').radian
+    b_arr = coord_gal.b.radian
+
+    return l_arr, b_arr
+
+
+def make_galactic_map() -> None:
+    fig, ax = setup_axes()
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_6.csv"
+    df = pd.read_csv(in_file)
+
+    l, b = calc_galactic_coordinates(df)
+    ax.scatter(l, b, **SCATTER_DICT_GALACTIC_MAP)
+
+    out_file = config.RESULTS_FIGURES_DIR / "galactic_map" / f"{in_file.stem}_gal_map.pdf"
+
+    if not out_file.parent.exists():
+        out_file.parent.mkdir()
+
+    plt.savefig(out_file)
+
+
+def main() -> None:
+    make_galactic_map()
+
+
+if __name__ == "__main__":
+    main()
