@@ -10,6 +10,7 @@ from astropy.units import Quantity
 pi = np.pi
 kpc = const.kpc.cgs.value  # parsec in cgs value
 yr = 365 * 24 * 3600  # time in a year in seconds
+rv = 3.1  # ratio of total to selected extinction
 
 # 2. Coordinates of the NGP (Reid+09)
 alpha_NGP = '12:51:26.2817'
