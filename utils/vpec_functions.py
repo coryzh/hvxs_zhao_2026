@@ -96,8 +96,8 @@ def galactic_proper_motion(ra: FloatOrIterable, dec: FloatOrIterable,
 # ============================================================
 
 def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
-                                      mu_ra_cosdec: FloatOrIterable, mu_dec: FloatOrIterable,
-                                      D: FloatOrIterable, v_r: FloatOrIterable,
+                                      pmra: FloatOrIterable, pmdec: FloatOrIterable,
+                                      dist: FloatOrIterable, v_r: FloatOrIterable,
                                       U_sun: FloatOrIterable = con.U_sun,
                                       V_sun: FloatOrIterable = con.V_sun,
                                       W_sun: FloatOrIterable = con.W_sun,
@@ -108,6 +108,7 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
     """
     This function takes equatorial coordinates, source distance (in kpc), and source radial velocity (v_r; in km/s) to
     compute Galactocentric Cartesian specific velocities.
+    pmra is the proper motion in the direction of ra including the cosdec factor.
     """
     np.random.seed(random_seed)
 
@@ -116,7 +117,7 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
     conv1 = 3600 * 1e3
 
     # Source distance
-    D_cgs = D * con.kpc
+    D_cgs = dist * con.kpc
 
     # Galactic coordinates:
     l, b = convert_to_galactic(ra, dec)
@@ -124,7 +125,7 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
     l *= conv
 
     # PMs in Galactic coordinate
-    mu_l, mu_b = galactic_proper_motion(ra, dec, mu_ra_cosdec, mu_dec, dt=0.1)
+    mu_l, mu_b = galactic_proper_motion(ra, dec, pmra, pmdec, dt=0.1)
 
     # Physical velocities
     v_b = D_cgs * (mu_b / conv1) * conv * (1e-5 / con.yr)  # in km/s
@@ -141,7 +142,7 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
     W_2 = W_1 + W_sun
 
     # R_p: Galactocentric distance to the source projected onto the Galactic plane
-    D_p = D * np.cos(b)
+    D_p = dist * np.cos(b)
     R_p = np.sqrt(R_0 ** 2 + D_p ** 2 - 2 * R_0 * D_p * np.cos(l))
 
     # Calculate sin and cos values for angel beta, which is the angle between the Sun and the source as viewed from
