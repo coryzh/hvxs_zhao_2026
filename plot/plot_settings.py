@@ -13,3 +13,6 @@ DIST_INFERENCE_COLOR_DICT = {key: color for key, color in zip(DIST_INFERENCE_KEY
 BINNING_PARAM_LABEL_AXISLABELS = [r"$d$ (kpc)", r"$v_\mathrm{pec, min, lo}\,\mathrm{(km~s^{-1})}$"]
 BINNING_PARAM_LABEL_KEYS = ["dist_med", "vpec_min_lo"]
 BINNING_PARAM_LABEL_DICT = {key: color for key, color in zip(BINNING_PARAM_LABEL_KEYS, BINNING_PARAM_LABEL_AXISLABELS)}
+
+SCATTER_DICT_GALACTIC_MAP = {'s': 12, 'fc': 'r', 'ec': 'k', 'marker': 'o', "alpha": 0.4}
+SCATTER_DICT_GALACTIC_MAP_ALL = {'s': 0.01, 'fc': 'k', 'marker': '.', 'alpha': 0.9, 'rasterized': True}
