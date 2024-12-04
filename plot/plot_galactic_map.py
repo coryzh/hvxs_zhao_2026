@@ -4,7 +4,7 @@ import numpy as np
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from typing import Tuple
-from plot_settings import SCATTER_DICT_GALACTIC_MAP
+from plot_settings import SCATTER_DICT_GALACTIC_MAP, SCATTER_DICT_GALACTIC_MAP_ALL
 import config
 
 
@@ -33,9 +33,6 @@ def setup_axes() -> Tuple[plt.Figure, plt.Axes]:
 def calc_galactic_coordinates(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
     n_df = df.index
 
-    l_arr = np.zeros(len(n_df))
-    b_arr = np.zeros(len(n_df))
-
     coord = SkyCoord(df["ra_x"], df["dec_x"], unit="deg")
 
     coord_gal = coord.galactic
@@ -46,13 +43,29 @@ def calc_galactic_coordinates(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]
     return l_arr, b_arr
 
 
+def background_histogram(ax: plt.Axes) -> None:
+    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0_unique.csv")
+    l, b = calc_galactic_coordinates(df_all)
+    h, xedges, yedges = np.histogram2d(l, b, bins=60 , density=True)
+    x_centers = 0.5 * (xedges[:-1] + xedges[1:])
+    y_centers = 0.5 * (yedges[:-1] + yedges[1:])
+    x, y = np.meshgrid(x_centers, y_centers)
+
+    c = ax.pcolormesh(x, y, h.T, shading="auto", cmap="Greens", edgecolors="face")
+
+
+def add_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
+    l, b = calc_galactic_coordinates(df)
+    ax.scatter(l, b, **SCATTER_DICT_GALACTIC_MAP)
+
+
 def make_galactic_map() -> None:
     fig, ax = setup_axes()
     in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_6.csv"
     df = pd.read_csv(in_file)
 
-    l, b = calc_galactic_coordinates(df)
-    ax.scatter(l, b, **SCATTER_DICT_GALACTIC_MAP)
+    background_histogram(ax)
+    add_sources(df, ax)
 
     out_file = config.RESULTS_FIGURES_DIR / "galactic_map" / f"{in_file.stem}_gal_map.pdf"
 
