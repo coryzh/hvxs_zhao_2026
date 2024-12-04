@@ -49,12 +49,18 @@ def extinction_correction(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_5.csv"
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0_unique.csv"
     df = pd.read_csv(in_file)
 
     # results = get_extinction(df, band="gaia_g")
     df_out = extinction_correction(df)
-    df_out.to_csv(in_file.parent / f"{in_file.stem.replace('stage_5', 'stage_6')}.csv", index=False)
+    if "stage_5" in in_file.stem:
+        out_file = in_file.parent / f"{in_file.stem.replace('stage_5', 'stage_6')}.csv"
+
+    else:
+        out_file = in_file.parent / f"{in_file.stem}_stage_6.csv"
+
+    df_out.to_csv(out_file, index=False)
 
     # print(df_out)
 
