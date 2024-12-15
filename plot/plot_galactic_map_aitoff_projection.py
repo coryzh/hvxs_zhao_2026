@@ -4,7 +4,7 @@ import numpy as np
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from typing import Tuple
-from plot_settings import SCATTER_DICT_GALACTIC_MAP, SCATTER_DICT_GALACTIC_MAP_ALL
+from plot_settings import SCATTER_DICT_GALACTIC_MAP
 import config
 
 
