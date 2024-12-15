@@ -2,7 +2,7 @@ import astropy.constants as const
 import numpy as np
 import astropy.units as u
 from dataclasses import dataclass
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, Galactocentric, CartesianDifferential
 from astropy.units import Quantity
 
 # Constants
@@ -28,10 +28,17 @@ W_sun, dW_sun = 8.9, 0.9
 Theta_0, dTheta_0 = 240.0, 8  # Galactic rotation
 R_0, dR_0 = 8.34, 0.16  # distance to the GC (in kpc)
 
+v_sun = CartesianDifferential([
+    U_sun * u.km / u.s,
+    (V_sun + Theta_0) * u.km / u.s,
+    W_sun * u.km / u.s
+])  # Velocity of the Sun relative to the Galactic centre
+
+gal_cen = Galactocentric(galcen_distance=R_0 * u.kpc, galcen_v_sun=v_sun)
+
 L = 1.97
 # Minimum distance (in kpc) used for plotting and inferring parallaxes.
 minimum_d = 1e-3
-
 
 # For integrating Galactic orbits
 class Galacticorbitintegrationconstants:
