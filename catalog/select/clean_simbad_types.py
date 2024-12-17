@@ -51,7 +51,7 @@ def _clean_df_simbad_main_type(df: pd.DataFrame, verbose: bool = False) -> pd.Da
     logger = VerboseLogger(verbose=verbose)
     logger.begin()
     logger.log(f"{df.shape[0]} rows loaded.\n")
-    _filter = ~df[ds.SimbadSchema.SIMBAD_OTYPE].apply(lambda x: any(types in x for types in unwanted_otype_patterns))
+    _filter = ~df[ds.SimbadSchema.SIMBAD_MAIN_TYPE].apply(lambda x: any(types in x for types in unwanted_otype_patterns))
     logger.log(f"{df.shape[0] - _filter.sum()} rows removed based on their main_type.\n")
     logger.end()
 
