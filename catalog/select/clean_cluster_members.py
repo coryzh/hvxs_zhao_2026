@@ -49,6 +49,8 @@ def cross_match_ids(in_file_csv: Path, verbose: bool = False) -> None:
 
     out_file = in_file_csv.parent / f"{in_file_csv.stem.replace('stage_3', 'stage_4')}.csv"
     out_file_cleaned = in_file_csv.parent / f"{in_file_csv.stem.replace('stage_3', 'stage_5')}.csv"
+    print(out_file)
+    print(out_file_cleaned)
     df_merged.to_csv(out_file, index=False)
     df_merged_clean.to_csv(out_file_cleaned, index=False)
 
