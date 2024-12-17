@@ -14,7 +14,10 @@ unwanted_otype_patterns = [
     'HIIG', 'OH/IR*', 'Supernova', 'Supernova_Candidate', 'TTauri*_Candidate', "HIIReg",
     'InteractingG', 'SXPheV*', 'BLLac_Candidate', 'Ae*_Candidate', 'Ae*', 'CataclyV*', 'GlobCluster',
     "Nova", "XrayBin", "LowMassXBin", "HighMassXBin", "Pulsar", '**', "ULX_Candidate", "alf2CVnV*",
-    "Planet_Candidate", "Cepheid", "Type2Cep", "ClassicalCep", "RSCVnV*", "LensedQ", "GravLens", "SB*"
+    "Planet_Candidate", "Cepheid", "Type2Cep", "ClassicalCep", "RSCVnV*", "LensedQ", "GravLens", "SB*",
+    "XrayBin_Candidate", "DarkNeb", "PartofCloud", "LowMassXBin_Candidate", "Bubble", "Association",
+    "Outflow_Candidate", "Outflow", "Cluster*", "Neutron*", "RSCVnV*_Candidate", "BYDraV*_Candidate",
+    "Ae*", "BlackHole_Candidate", "LensedImage", "HIshell", "LensedImage_Candidate", "Neutron*_Candidate"
 ]
 
 unwanted_otypes_patterns = [
@@ -113,8 +116,8 @@ def _clean_df_simbad_name(df: pd.DataFrame, verbose: bool = False) -> pd.DataFra
 
 
 def main() -> None:
-    in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-               / "combined_vpec_lolim_gt_150_unique_stage_2.csv")
+    in_file = (config.RESULTS_CATALOGUE_DIR / "control_sample"
+               / "control_sample_w_simbad.csv")
     df = pd.read_csv(in_file)
     df[ds.SimbadSchema.get_attribute_values()] = df[ds.SimbadSchema.get_attribute_values()].fillna("")
 
@@ -125,7 +128,7 @@ def main() -> None:
 
     df_filtered_3 = _clean_df_simbad_name(df_filtered_2, verbose=verbose)
 
-    df_filtered_3.to_csv(in_file.parent / f"{in_file.stem.replace('stage_2', 'stage_3')}.csv", index=False)
+    df_filtered_3.to_csv(in_file.parent / f"{in_file.stem.replace('w_simbad', 'simbad_cleaned')}.csv", index=False)
 
     print(f"Done!")
 
