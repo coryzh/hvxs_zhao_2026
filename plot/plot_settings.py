@@ -1,4 +1,5 @@
 import seaborn as sns
+from matplotlib.colors import LinearSegmentedColormap
 
 SURVEY_KEYS = ["csc", "xmm", "swift", "erass"]
 SURVEY_NAMES = ["CSC", "4XMM", "2SXPS", "eRASS"]
@@ -14,5 +15,9 @@ BINNING_PARAM_LABEL_AXISLABELS = [r"$d$ (kpc)", r"$v_\mathrm{pec, min, lo}\,\mat
 BINNING_PARAM_LABEL_KEYS = ["dist_med", "vpec_min_lo"]
 BINNING_PARAM_LABEL_DICT = {key: color for key, color in zip(BINNING_PARAM_LABEL_KEYS, BINNING_PARAM_LABEL_AXISLABELS)}
 
-SCATTER_DICT_GALACTIC_MAP = {'s': 12, 'fc': 'r', 'ec': 'k', 'marker': 'o', "alpha": 0.4}
+SCATTER_DICT_GALACTIC_MAP = {'s': 12, 'fc': 'r', 'ec': 'k', 'marker': 'o', "alpha": 0.2}
+SCATTER_DICT_CMD = {'s': 12, 'fc': 'r', 'ec': 'k', 'marker': 'o', "alpha": 0.2}
 SCATTER_DICT_GALACTIC_MAP_ALL = {'s': 0.01, 'fc': 'k', 'marker': '.', 'alpha': 0.9, 'rasterized': True}
+
+HEX_COLORS = ['#2F26D7', '#A344AD', '#72C3DC', '#84E296', '#FFD166', '#D72638']
+CMAP = LinearSegmentedColormap.from_list(' ', HEX_COLORS)
