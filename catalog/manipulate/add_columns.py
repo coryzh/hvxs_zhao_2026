@@ -39,7 +39,6 @@ def add_cartesian_coordinates(in_file: Path) -> None:
     df.to_csv(out_file)
 
 
-
 def add_hex_equatorial_coordinates(df: pd.DataFrame, sort: bool = False) -> pd.DataFrame:
     coords = SkyCoord(df["ra"], df["dec"], frame="icrs", unit="deg")
 
@@ -70,9 +69,9 @@ def add_erass_iauname(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> None:
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_simbad_cleaned.csv")
-    df = add_galactic_coordinates(df)
-    df.to_csv(config.RESULTS_CATALOGUE_DIR / "control_sample_simbad_cleaned.csv")
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_7.csv"
+    add_cartesian_coordinates(in_file)
+    # df.to_csv(config.RESULTS_CATALOGUE_DIR / "control_sample_simbad_cleaned.csv")
 
 
 if __name__ == "__main__":
