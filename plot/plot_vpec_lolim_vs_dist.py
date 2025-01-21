@@ -34,8 +34,8 @@ def axes_settings(ax: list[plt.Axes]) -> None:
     ax[0].set_xlim(0.01, 15)
     ax[0].set_ylim(2.5, 1400)
 
-    # ax[0].set_xticks([0.01, 0.1, 1, 10])
-    # ax[0].set_xticklabels(["0.01", "0.1", "1", "10"])
+    ax[0].set_xticks([0.01, 0.1, 1, 10])
+    ax[0].set_xticklabels(["0.01", "0.1", "1", "10"])
     ax[0].set_yticks([10, 100, 1000])
     ax[0].set_yticklabels(["10", "100", "1000"])
 
@@ -82,8 +82,8 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
         else:
             ax[0].scatter(x, y, **scatter_style[key])
 
-        ax[1].hist(x, bins=x_bins, density=True, histtype="step", **hist_style[key])
-        ax[2].hist(y, bins=y_bins, density=True, histtype="step", orientation="horizontal", **hist_style[key])
+        ax[1].hist(x, bins=x_bins, density=False, histtype="step", **hist_style[key])
+        ax[2].hist(y, bins=y_bins, density=False, histtype="step", orientation="horizontal", **hist_style[key])
 
     ax[0].axhline(y=150, ls=":", color="k")
 
@@ -101,13 +101,13 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
 
 
 def make_plot() -> None:
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_10.csv")
+    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv")
 
     fig, ax = make_figure()
     axes_settings(ax)
     add_control_and_hvxs(df_hvxs=df, ax=ax)
     # add_hvxs(df, ax[0])
-    plt.savefig(config.RESULTS_FIGURES_DIR / "dist_vs_vpec" / "vpec_lolim_gt_150_vpec_vs_dist_stage_10.pdf")
+    plt.savefig(config.RESULTS_FIGURES_DIR / "dist_vs_vpec" / "vpec_lolim_gt_150_vpec_vs_dist_stage_9.pdf")
 
 
 def main() -> None:
