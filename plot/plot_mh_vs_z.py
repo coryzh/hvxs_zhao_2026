@@ -118,7 +118,7 @@ def make_figure() -> None:
     add_data(axs)
     add_legends(fig, axs)
 
-    out_file = config.RESULTS_FIGURES_DIR / "mh_vs_z" / "test.pdf"
+    out_file = config.RESULTS_FIGURES_DIR / "mh_vs_z" / "mh_vs_z.pdf"
 
     plt.savefig(out_file)
 
