@@ -30,9 +30,10 @@ def select_prime_sample(in_file: Path, verbose: bool = False) -> None:
     df = pd.read_csv(in_file)
 
     _vpec_filter = df["vpec_min_med"] >= 1000
-    _sep_filter = df["sep_x_g"] / df["pos_x_err"] <= 1.0
+    _sep_filter = df["sep_x_g"] / df["pos_x_err"] <= 1
+    _parallax_filter = df["parallax"] / df["parallax_error"] >= 2.0
 
-    df_prime = df[_vpec_filter & _sep_filter]
+    df_prime = df[_vpec_filter & _parallax_filter & _sep_filter]
     df_prime = df_prime.sort_values(by=["from", "ra"], ascending=True)
     logger.log(f"{df_prime.shape[0]} prime sources selected.")
 
@@ -77,8 +78,8 @@ def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
                / "combined_vpec_lolim_gt_150_unique_stage_9.csv")
     # select_high_fx_fg_ratio_sources(in_file_csv=in_file, out_file=True, verbose=True)
-    # select_prime_sample(in_file, verbose=True)
-    select_control_sample(in_file, verbose=True)
+    select_prime_sample(in_file, verbose=True)
+    # select_control_sample(in_file, verbose=True)
 
 
 if __name__ == "__main__":
