@@ -24,7 +24,7 @@ def add_control_sample(axs: np.ndarray[plt.Axes]) -> None:
     """Control sample plotted in the background"""
 
     df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample"
-                         / "control_sample_stage_9.csv")
+                         / "control_sample_stage_10.csv")
     df_all = df_all[df_all.dist_med <= 1.5]
     for ax in axs.flatten():
         ax.scatter(df_all.bp_rp, df_all.fx_fg, s=0.01, color="k", marker="o", alpha=0.5,
