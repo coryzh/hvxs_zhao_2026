@@ -38,7 +38,7 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
 
     table_str = f"{table_start}{rows_str}{table_end}"
 
-    out_file = config.RESULTS_LATEX_TABLE_DIR / "prime_sample_table" / "kept_simbad_types.txt"
+    out_file = config.RESULTS_LATEX_TABLE_DIR / "prime_sample_table" / "prime_sample.txt"
     if not out_file.parent.exists():
         out_file.parent.mkdir()
 
@@ -48,7 +48,7 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
 
 def main() -> None:
     df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                     / "combined_vpec_lolim_gt_150_unique_stage_6_prime.csv")
+                     / "combined_vpec_lolim_gt_150_unique_stage_9_prime.csv")
 
     make_prime_sample_source_table(df)
 
