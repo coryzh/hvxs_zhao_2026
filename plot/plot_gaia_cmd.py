@@ -42,7 +42,7 @@ def add_sample(in_file: Path, ax: plt.Axes) -> None:
 
 
 def add_background(ax: plt.Axes) -> None:
-    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_9.csv")
+    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_10.csv")
     df_all.dropna(subset=["bp_rp", "dist_med", "phot_g_mean_mag"], inplace=True)
     df_all = df_all[df_all["distance_inference"] != "fixed_at_1"]
     bp_rp = df_all["bp_rp"]
