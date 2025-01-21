@@ -44,7 +44,9 @@ def calc_galactic_coordinates(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]
 
 
 def background_histogram(ax: plt.Axes) -> None:
-    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0_unique.csv")
+    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_10.csv")
+    _filter = df_all["dist_med"] < 1.5
+    df_all = df_all[_filter]
     l, b = calc_galactic_coordinates(df_all)
     h, xedges, yedges = np.histogram2d(l, b, bins=60 , density=True)
     x_centers = 0.5 * (xedges[:-1] + xedges[1:])
@@ -61,7 +63,7 @@ def add_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
 
 def make_galactic_map() -> None:
     fig, ax = setup_axes()
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_6.csv"
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
     df = pd.read_csv(in_file)
 
     background_histogram(ax)
