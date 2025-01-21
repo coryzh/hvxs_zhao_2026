@@ -31,12 +31,12 @@ def clean(df: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
 
 
 def main() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_8.csv"
     df = pd.read_csv(in_file)
 
     df_cleaned = clean(df, verbose=True)
 
-    df_cleaned.to_csv(in_file.parent / f"{in_file.stem}.csv".replace("stage_9", "stage_10"))
+    df_cleaned.to_csv(in_file.parent / f"{in_file.stem}.csv".replace("stage_8", "stage_8a"))
 
 
 if __name__ =="__main__":
