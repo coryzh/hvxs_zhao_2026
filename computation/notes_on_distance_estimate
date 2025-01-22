@@ -1,0 +1,6 @@
+Notes on distance_estimate.py
+
+    - For negative parallaxes (the 2nd elif statement), the condition on abs(parallax_error / parallax) is > 0.2,
+    instead of > 0.1. This will results in that sources with parallaxes very negative (<-1) or very close to 0 (between
+    -0.1 and 0.05 mas) but abs(parallax_error / parallax) between 0.1 and 0.2 will also have distance fixed at 1 kpc.
+    This only affect a very small number of sources (7 sources); so calculation can be rerun only on these 7 sources.
