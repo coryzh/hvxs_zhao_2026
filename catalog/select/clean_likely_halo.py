@@ -39,5 +39,5 @@ def main() -> None:
     df_cleaned.to_csv(in_file.parent / f"{in_file.stem}.csv".replace("stage_8", "stage_8a"))
 
 
-if __name__ =="__main__":
+if __name__ == "__main__":
     main()
