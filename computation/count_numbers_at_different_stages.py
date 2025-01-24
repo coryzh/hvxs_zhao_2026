@@ -4,9 +4,10 @@ import config
 
 def get_catalog_names(vpec_lim: float = 150, mode: str = "lolim") -> dict:
     catalog_names = {}
+    stages = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "8a", "9"]
 
-    for i in range(10):
-        key = f"stage_{i}"
+    for i, stage in enumerate(stages):
+        key = f"stage_{stage}"
         catalog_names[key] = f"combined_vpec_{mode}_gt_{vpec_lim}_unique_{key}.csv"
 
     return catalog_names
