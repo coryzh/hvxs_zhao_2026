@@ -77,7 +77,7 @@ def add_constant_distance_lines(ax: plt.Axes) -> None:
 
 def make_plot() -> None:
     df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                     / "combined_vpec_lolim_gt_150_unique_w_simbad_high_ratio_simbad_cleaned_w_cl_info.csv")
+                     / "combined_vpec_lolim_gt_150_unique_stage_5.csv")
 
     fig, ax = set_up_figure(figsize=(12, 10))
     add_hvxs(df, ax, fig)
