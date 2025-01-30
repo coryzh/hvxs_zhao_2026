@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Tuple
 from matplotlib import colors
 from plot.plot_settings import SCATTER_DICT_CMD
-from utils.process_string import wrap_sign
+from utils.process_string import get_short_id
 import plot.plot_settings as ps
 import config
 
@@ -47,13 +47,13 @@ def add_sample(in_file: Path, ax: plt.Axes) -> None:
     for i, row in df_prime.iterrows():
         bp_rp_prime = row["bp_rp"]
         g_abs_prime = row["phot_g_mean_mag"] - 5.0 * np.log10(row["dist_med"]) - 10.0
-        name = wrap_sign(row["ID_x"])
+        name = get_short_id(row["ID_x"])
         ax.scatter(bp_rp_prime, g_abs_prime, fc=ps.PRIME_SOURCE_COLOR[i], marker=ps.PRIME_SOURCE_MARKER[i],
                    label=name,
                    **ps.PRIME_SCATTER_MARKER_SETTINGS)
         # print(bp_rp_prime, row["dist_med"])
 
-    legend = ax.legend(bbox_to_anchor=[0.5, -0.1], loc="upper center", ncols=2)
+    legend = ax.legend(bbox_to_anchor=[0.65, 0.99], loc="upper left", handletextpad=0.2)
     for handle in legend.legend_handles:
         handle.set_alpha(1.0)
 
