@@ -66,7 +66,7 @@ def add_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
 def add_prime_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
     l, b = calc_galactic_coordinates(df)
     for i, row in df.iterrows():
-        name = process_string.wrap_sign(row["ID_x"])
+        name = process_string.get_short_id(row["ID_x"])
         print(name)
         ax.scatter(l[i], b[i], marker=PRIME_SOURCE_MARKER[i], fc=PRIME_SOURCE_COLOR[i], label=rf'{name}',
                    **PRIME_SCATTER_MARKER_SETTINGS)
@@ -86,7 +86,7 @@ def make_galactic_map() -> None:
     if not out_file.parent.exists():
         out_file.parent.mkdir()
 
-    legend = plt.legend(bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=2)
+    legend = plt.legend(bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=5)
     for handle in legend.legend_handles:
         handle.set_alpha(1.0)
 
