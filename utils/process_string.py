@@ -10,6 +10,18 @@ def process_name(name: str) -> str:
     return new_name
 
 
+def get_short_id(name: str) -> str:
+    # Use a regular expression to search and extract source IDs that is formatted as <SURVEY_NAME> JHHMMSS.S[+,-]DDMMSS
+    pattern = r'(J[^+-]*)'
+    match = re.search(pattern, name)
+
+    if match:
+        return match.group(1)
+
+    else:
+        print(f"No match found in {name}.")
+
+
 def wrap_sign(dec_str: str) -> str:
     pattern = r'([-+])'
     repl = r'$\1$'
