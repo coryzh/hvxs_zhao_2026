@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Tuple
 from matplotlib import colors
 from plot.plot_settings import SCATTER_DICT_CMD
+import plot.plot_settings as ps
 import config
 
 
@@ -34,14 +35,28 @@ def axes_settings(ax: plt.Axes) -> None:
 
 def add_sample(in_file: Path, ax: plt.Axes) -> None:
     df = pd.read_csv(in_file)
+    df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
+
     bp_rp = df["phot_bp_mean_mag"] - df["phot_rp_mean_mag"]
     dist = df["dist_med"]
     g_abs = df["phot_g_mean_mag"] - 5.0 * np.log10(dist) - 10.0
 
-    ax.scatter(bp_rp, g_abs, **SCATTER_DICT_CMD)
+    ax.scatter(bp_rp, g_abs, label="HVXS", **SCATTER_DICT_CMD)
+
+    for i, row in df_prime.iterrows():
+        bp_rp_prime = row["bp_rp"]
+        g_abs_prime = row["phot_g_mean_mag"] - 5.0 * np.log10(row["dist_med"]) - 10.0
+        ax.scatter(bp_rp_prime, g_abs_prime, fc=ps.PRIME_SOURCE_COLOR[i], marker=ps.PRIME_SOURCE_MARKER[i],
+                   label=row["ID_x"],
+                   **ps.PRIME_SCATTER_MARKER_SETTINGS)
+        # print(bp_rp_prime, row["dist_med"])
+
+    legend = ax.legend(bbox_to_anchor=[0.5, -0.1], loc="upper center", ncols=2)
+    for handle in legend.legend_handles:
+        handle.set_alpha(1.0)
 
 
-def add_background(ax: plt.Axes) -> None:
+def add_background(ax: plt.Axes, fig: plt.Figure) -> None:
     df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_10.csv")
     df_all.dropna(subset=["bp_rp", "dist_med", "phot_g_mean_mag"], inplace=True)
     df_all = df_all[df_all["distance_inference"] != "fixed_at_1"]
@@ -50,13 +65,17 @@ def add_background(ax: plt.Axes) -> None:
     g_abs = df_all["phot_g_mean_mag"] - 5.0 * np.log10(dist) - 10.0
     # print(min(bp_rp), max(bp_rp))
     # print(min(g_abs), max(g_abs))
-    _ = ax.hist2d(bp_rp, g_abs, bins=200, cmin=0.1, norm=colors.PowerNorm(0.5), zorder=0.5, cmap="Greens")
+    _hist = ax.hist2d(bp_rp, g_abs, bins=200, cmin=0.1, norm=colors.PowerNorm(0.5), zorder=0.5, cmap="Greens")
+    # cax = ax.inset_axes((0.55, 0.1, 0.3, 0.08))
+    # cax.set_frame_on(False)
+    # cbar = fig.colorbar(_hist[3], ax=cax, orientation="horizontal")
+    # cbar.set_label("Counts")
     # ax.scatter(bp_rp, g_abs, marker="o", s=0.1, color="k", alpha=0.4, rasterized=True, zorder=0)
 
 
 def make_cmd(in_file: Path) -> None:
     fig, ax = make_figure(use_nearby_star_cmd=False)
-    add_background(ax)
+    add_background(ax, fig)
     add_sample(in_file, ax)
     axes_settings(ax)
 
