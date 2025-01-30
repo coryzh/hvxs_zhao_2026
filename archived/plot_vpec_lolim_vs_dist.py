@@ -11,11 +11,11 @@ import matplotlib.gridspec as gridspec
 def make_figure() -> Tuple[plt.Figure, list[plt.Axes]]:
     plt.style.use("mycustomised")
     fig = plt.figure(figsize=(10, 10))
-    gs = gridspec.GridSpec(4, 4, figure=fig, hspace=0.05, wspace=0.05)
+    gs = gridspec.GridSpec(3, 4, figure=fig, hspace=0.05, wspace=0.05)
 
-    ax_main = fig.add_subplot(gs[1:4, 0:3])
+    ax_main = fig.add_subplot(gs[0:3, 0:3])
     ax_xhist = fig.add_subplot(gs[0, 0:3], sharex=ax_main)
-    ax_yhist = fig.add_subplot(gs[1:4, 3], sharey=ax_main)
+    ax_yhist = fig.add_subplot(gs[0:3, 3], sharey=ax_main)
 
     ax = [ax_main, ax_xhist, ax_yhist]
     return fig, ax
@@ -31,16 +31,16 @@ def axes_settings(ax: list[plt.Axes]) -> None:
     # ax[1].set_yscale("log")
     # ax[2].set_xscale("log")
 
-    ax[0].set_xlim(0.01, 15)
-    ax[0].set_ylim(2.5, 1400)
+    ax[0].set_xlim(0.1, 15)
+    ax[0].set_ylim(8, 1400)
 
-    ax[0].set_xticks([0.01, 0.1, 1, 10])
-    ax[0].set_xticklabels(["0.01", "0.1", "1", "10"])
+    ax[0].set_xticks([0.1, 1, 10])
+    ax[0].set_xticklabels(["0.1", "1", "10"])
     ax[0].set_yticks([10, 100, 1000])
     ax[0].set_yticklabels(["10", "100", "1000"])
 
-    ax[1].tick_params(labelleft=False, labelbottom=False)
-    ax[2].tick_params(labelbottom=False, labelleft=False)
+    # ax[1].tick_params(labelleft=False, labelbottom=False)
+    ax[1].tick_params(labelbottom=False, labelleft=False)
 
 
 def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
@@ -65,7 +65,7 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
     }
 
     scatter_style = {
-        "HVXS": {"s": 20, "ec": "k", "c": c_val, "rasterized": True, "cmap": CMAP, "norm": color_norm},
+        "HVXS": {"s": 20, "ec": "k", "c": "r", "rasterized": True, "cmap": CMAP, "norm": color_norm},
         "Control": {"s": 0.01, "c": "k", "alpha": 0.5, "rasterized": True}
     }
 
