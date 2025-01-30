@@ -49,7 +49,7 @@ def extinction_correction(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0_unique.csv"
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_5.csv"
     df = pd.read_csv(in_file)
 
     # results = get_extinction(df, band="gaia_g")
