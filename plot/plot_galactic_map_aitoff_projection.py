@@ -60,7 +60,7 @@ def background_histogram(ax: plt.Axes) -> None:
 
 def add_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
     l, b = calc_galactic_coordinates(df)
-    ax.scatter(l, b, **SCATTER_DICT_GALACTIC_MAP)
+    ax.scatter(l, b, label="HVXS", **SCATTER_DICT_GALACTIC_MAP)
 
 
 def add_prime_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
@@ -79,13 +79,16 @@ def make_galactic_map() -> None:
     df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
     background_histogram(ax)
     add_sources(df, ax)
+    add_prime_sources(df_prime, ax)
 
     out_file = config.RESULTS_FIGURES_DIR / "galactic_map" / f"{in_file.stem}_gal_map.pdf"
 
     if not out_file.parent.exists():
         out_file.parent.mkdir()
 
-    plt.legend(bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=2)
+    legend = plt.legend(bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=2)
+    for handle in legend.legend_handles:
+        handle.set_alpha(1.0)
 
     plt.savefig(out_file)
 
