@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 import config
 from catalog.select.clean_for_plotting import clean_for_fxfg_vs_bprp
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
-from matplotlib import colors
+# from matplotlib import colors
 from pathlib import Path
 from plot_settings import CMAP
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+# from mpl_toolkits.axes_grid1 import make_axes_locatable
+import plot.plot_settings as ps
+from utils.process_string import get_short_id
 
 # colors = sns.color_palette("hls", 4)
 #
@@ -34,11 +36,15 @@ def add_control_sample(axs: np.ndarray[plt.Axes]) -> None:
 def add_hvx(in_file_csv: Path, fig: plt.Figure, axs: np.ndarray[plt.Axes]) -> None:
     df = pd.read_csv(in_file_csv)
     df = clean_for_fxfg_vs_bprp(df, verbose=False)
+    df_prime = pd.read_csv(in_file_csv.parent / f"{in_file_csv.stem}_prime.csv")
+
     df["vpec_min_lolim"] = df["vpec_min_med"] - df["e_vpec_min"]
+    df_prime["vpec_min_lolim"] = df_prime["vpec_min_med"] - df_prime["e_vpec_min"]
+
     df = df.sort_values("vpec_min_lolim", ascending=True)
     color_val = df["vpec_min_lolim"]
-    color_min = color_val.min()
-    color_max = color_val.max()
+    # color_min = color_val.min()
+    # color_max = color_val.max()
     # color_norm = colors.LogNorm(vmin=color_min, vmax=color_max)
 
     # vpec_bins = np.linspace(color_val.min(), color_val.max(), 5)
@@ -75,6 +81,17 @@ def add_hvx(in_file_csv: Path, fig: plt.Figure, axs: np.ndarray[plt.Axes]) -> No
         # _cbar.ax.set_yticks([200, 300, 400, 600, 1000])
         # _cbar.ax.set_yticklabels(["200", "300", "400", "600", "1000"])
         # _cbar.set_label(r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$", fontsize=50)
+    ax_last = axs.flatten()[-1]
+    for i, row in df_prime.iterrows():
+
+        name = get_short_id(row["ID_x"])
+        ps.PRIME_SCATTER_MARKER_SETTINGS["s"] = 300
+        ps.PRIME_SCATTER_MARKER_SETTINGS["lw"] = 1.5
+        ps.PRIME_SCATTER_MARKER_SETTINGS["ec"] = "w"
+        ax_last.scatter(row["bp_rp"], row["fx_fg"], marker=ps.PRIME_SOURCE_MARKER[i],
+                        fc=ps.PRIME_SOURCE_COLOR[i], label=name, **ps.PRIME_SCATTER_MARKER_SETTINGS)
+
+    _legend = plt.legend(bbox_to_anchor=[-0.01, 0.99], loc="upper left", handletextpad=0.5)
 
 
 def add_separatrix(axs: np.ndarray[plt.Axes]) -> None:
