@@ -79,9 +79,9 @@ def make_galactic_map() -> None:
     df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
     background_histogram(ax)
     add_sources(df, ax)
-    add_prime_sources(df_prime, ax)
+    # add_prime_sources(df_prime, ax)
 
-    out_file = config.RESULTS_FIGURES_DIR / "galactic_map" / f"{in_file.stem}_gal_map.pdf"
+    out_file = config.RESULTS_FIGURES_DIR / "galactic_map" / f"{in_file.stem}_gal_map_no_prime.pdf"
 
     if not out_file.parent.exists():
         out_file.parent.mkdir()
