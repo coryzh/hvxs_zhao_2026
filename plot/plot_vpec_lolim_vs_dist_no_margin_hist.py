@@ -153,9 +153,9 @@ def make_plot() -> None:
     fig, ax = make_figure()
     axes_settings(ax)
     add_control_and_hvxs(df_hvxs=df, ax=ax)
-    add_prime_sources(df_prime, ax=ax)
+    # add_prime_sources(df_prime, ax=ax)
     # add_hvxs(df, ax[0])
-    plt.savefig(config.RESULTS_FIGURES_DIR / "dist_vs_vpec" / "vpec_lolim_gt_150_vpec_vs_dist_stage_9_new.pdf")
+    plt.savefig(config.RESULTS_FIGURES_DIR / "dist_vs_vpec" / "vpec_lolim_gt_150_vpec_vs_dist_stage_9_no_prime.pdf")
 
 
 def main() -> None:
