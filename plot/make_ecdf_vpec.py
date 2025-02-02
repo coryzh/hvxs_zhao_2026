@@ -35,7 +35,7 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
         print(f"{f_ecdf(vpec_lo_lim) * 100:.2f}% of {value} <= {vpec_lo_lim} km/s")
 
     df_xrb = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "known_co_binaries.csv")
-    xrb_types = dict(LMXB="LMXBs", PSR="PSRs", HMXB="HMXBs", NI="NIs")
+    xrb_types = dict(LMXB="LMXBs", PSR="PSRs", HMXB="HMXBs", NI="NIBs")
     for key, value in xrb_types.items():
         xrb_filter = df_xrb.Type.str.contains(key)
         df_xrb_sub = df_xrb[xrb_filter]
