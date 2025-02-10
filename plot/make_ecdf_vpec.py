@@ -59,7 +59,7 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
     ax.set_ylim(0, 1)
 
     plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=4)
-    out_file = config.RESULTS_FIGURES_DIR / "ecdf_vpec_min.pdf"
+    out_file = config.RESULTS_FIGURES_DIR / "ecdf_vpec.pdf"
     plt.savefig(out_file)
 
     logger.log(f"Figure saved to {out_file}.")
