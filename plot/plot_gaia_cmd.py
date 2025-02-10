@@ -27,8 +27,8 @@ def make_figure(use_nearby_star_cmd: bool = False) -> Tuple[plt.Figure, plt.Axes
 
 
 def axes_settings(ax: plt.Axes) -> None:
-    ax.set_xlim(-1, 5.5)
-    ax.set_ylim(15, -2.5)
+    ax.set_xlim(-0.8, 4.2)
+    ax.set_ylim(13, -0.8)
 
     ax.set_xlabel("Bp$-$Rp")
     ax.set_ylabel(r"$M_\mathrm{G}$")
