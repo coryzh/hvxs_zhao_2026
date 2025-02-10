@@ -80,11 +80,11 @@ def add_data(axs: Dict[str, plt.Axes]) -> None:
     dist_estimate.columns = ["dist_med", "e_dist", "E_dist", "distance_inference"]
     df_co_w_dist = pd.concat([df_co, dist_estimate], axis=1)
 
-    df_dict = {"Known": df_co_w_dist, "HVXSs": df_hvx, "All": df_control}
+    df_dict = {"Known": df_co_w_dist, "HVXSs": df_hvx, "Control": df_control}
     style_dict = {
         "Known": {"s": 50, "marker": "s", "ec": "w", "fc": "b", "zorder": 2, "label": "Known", "rasterized": True},
         "HVXSs": {"s": 20, "marker": "o", "ec": "w", "fc": "r", "label": "HVXSs", "rasterized": True},
-        "All": {"s": 0.1, "marker": ".", "c": "k", "fc": "k", "zorder": -9, "label": "Control", "rasterized": True}
+        "Control": {"s": 0.1, "marker": ".", "c": "k", "fc": "k", "zorder": -9, "label": "Control", "rasterized": True}
     }
 
     gc_frame = Galactocentric(galcen_distance=const.R_0 * u.kpc, z_sun=25.0 * u.pc)
