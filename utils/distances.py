@@ -1,72 +1,117 @@
 import numpy as np
 import constants
-from scipy.integrate import quad
-from scipy.interpolate import interp1d
+# from scipy.integrate import quad
+# from scipy.interpolate import interp1d
 from scipy.stats import truncnorm
+from typing import Any
+from functools import partial
+import emcee
 
 pi = np.pi
 L = constants.L
 
 
+# class ExponentialPriorModel:
+#     def __init__(self, parallax, e_parallax):
+#         self.parallax = parallax
+#         self.e_parallax = e_parallax
+#
+#     @staticmethod
+#     def prior(d):
+#         return 1 / (2 * L ** 3) * d ** 2 * np.exp(-d / L)
+#
+#     def likelihood(self, d):
+#         y = (1 / (np.sqrt(2 * pi) * self.e_parallax)) * \
+#             np.exp(- (self.parallax - 1 / d) ** 2 / (2. * self.e_parallax ** 2))
+#         return y
+#
+#     def posterior_unnorm(self, d):
+#         """
+#         This is the posterior distribution function (not normalized) of distances using
+#         the exponential prior (characterized by the scaling parameter L).
+#         The normalization constant is not considered here as it will be
+#         accounted for in the generate_distances() function.
+#         """
+#
+#         exponent = -(d / L) - (1 / (2 * self.e_parallax ** 2)) * (self.parallax - 1 / d) ** 2
+#
+#         return d ** 2 * np.exp(exponent)
+#
+#     def posterior(self, d):
+#         """
+#         Description:
+#             Posterior of distance (normalised).
+#
+#         Parameter:
+#             d: distance in kpc. Can be a single value or a np.ndarray.
+#         """
+#         results = quad(func=self.posterior_unnorm, a=constants.minimum_d, b=+np.inf)
+#
+#         # Normalisation constant for the distance posterior is optimised for very narrow PDF. When the PDF is too
+#         # narrow, i.e., when sigma_parallax is very small, we estimate the integral as the area of the rectangular
+#         # with width of 0.01 and height equals to un-normalised PDF value at 1/parallax.
+#         if np.isclose(results[0], 0, rtol=1e-6):
+#             norm = self.posterior_unnorm(1 / self.parallax) * 0.01
+#
+#         else:
+#             norm = results[0]
+#         # norm = results[0]
+#         return (1. / norm) * self.posterior_unnorm(d)
+#
+#     def sample_posterior(self, nrand):
+#         dd = 1e-3
+#         d_grid = np.arange(dd, 100, dd)
+#         d_post = self.posterior(d_grid)
+#
+#         cdf = np.cumsum(d_post * dd)
+#         inv_cdf = interp1d(cdf, d_grid, bounds_error=False, fill_value=(0, 1))
+#
+#         u_rand = np.random.rand(nrand)
+#         d_rand = inv_cdf(u_rand)
+#
+#         return d_rand
+
+
 class ExponentialPriorModel:
-    def __init__(self, parallax, e_parallax):
+    def __init__(self, parallax, parallax_error):
         self.parallax = parallax
-        self.e_parallax = e_parallax
+        self.parallax_error = parallax_error
+
+    @property
+    def parallax_over_error(self) -> float:
+        return abs(self.parallax / self.parallax_error)
 
     @staticmethod
-    def prior(d):
-        return 1 / (2 * L ** 3) * d ** 2 * np.exp(-d / L)
-
-    def likelihood(self, d):
-        y = (1 / (np.sqrt(2 * pi) * self.e_parallax)) * \
-            np.exp(- (self.parallax - 1 / d) ** 2 / (2. * self.e_parallax ** 2))
-        return y
-
-    def posterior_unnorm(self, d):
-        """
-        This is the posterior distribution function (not normalized) of distances using
-        the exponential prior (characterized by the scaling parameter L).
-        The normalization constant is not considered here as it will be
-        accounted for in the generate_distances() function.
-        """
-
-        exponent = -(d / L) - (1 / (2 * self.e_parallax ** 2)) * (self.parallax - 1 / d) ** 2
-
-        return d ** 2 * np.exp(exponent)
-
-    def posterior(self, d):
-        """
-        Description:
-            Posterior of distance (normalised).
-
-        Parameter:
-            d: distance in kpc. Can be a single value or a np.ndarray.
-        """
-        results = quad(func=self.posterior_unnorm, a=constants.minimum_d, b=+np.inf)
-
-        # Normalisation constant for the distance posterior is optimised for very narrow PDF. When the PDF is too
-        # narrow, i.e., when sigma_parallax is very small, we estimate the integral as the area of the rectangular
-        # with width of 0.01 and height equals to un-normalised PDF value at 1/parallax.
-        if np.isclose(results[0], 0, rtol=1e-6):
-            norm = self.posterior_unnorm(1 / self.parallax) * 0.01
+    def log_prior(d: float) -> float:
+        if d < 0:
+            return -np.inf
 
         else:
-            norm = results[0]
-        # norm = results[0]
-        return (1. / norm) * self.posterior_unnorm(d)
+            return 2 * np.log(d) - d / L
 
-    def sample_posterior(self, nrand):
-        dd = 1e-3
-        d_grid = np.arange(dd, 100, dd)
-        d_post = self.posterior(d_grid)
+    def log_likelihood(self, d) -> float:
+        if d < 0:
+            return -np.inf
 
-        cdf = np.cumsum(d_post * dd)
-        inv_cdf = interp1d(cdf, d_grid, bounds_error=False, fill_value=(0, 1))
+        else:
+            return -0.5 * (self.parallax - 1 / d) ** 2 / self.parallax_error ** 2
 
-        u_rand = np.random.rand(nrand)
-        d_rand = inv_cdf(u_rand)
+    def log_posterior(self, d) -> float:
+        return self.log_prior(d) + self.log_likelihood(d)
 
-        return d_rand
+    def sample_posterior(self, nwalkers: int = 4, nsteps: int = 2000,
+                         burn_in: int = 500) -> np.ndarray[Any, np.dtype[np.float64]]:
+
+        initial_distances = np.abs(np.random.normal(1 / self.parallax, 0.5, size=nwalkers))
+
+        log_prob_fn = partial(self.log_posterior)
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, ndim=1, log_prob_fn=log_prob_fn)
+
+        _run = sampler.run_mcmc(initial_distances[:, None], nsteps=nsteps, progress=False)
+
+        samples = sampler.get_chain(discard=burn_in, flat=True)[:, 0]
+
+        return samples
 
 
 class SimpleInversion:
