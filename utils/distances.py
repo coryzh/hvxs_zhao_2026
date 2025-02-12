@@ -69,7 +69,7 @@ class ExponentialPriorModel:
         return d_rand
 
 
-class simple_inversion:
+class SimpleInversion:
     """
     Distances objects typically for instances that are nearby (parallax > 4) and have well constrained parallaxes
     (e_par/par<0.2).

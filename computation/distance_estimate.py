@@ -1,4 +1,4 @@
-from utils.distances import simple_inversion, ExponentialPriorModel
+from utils.distances import SimpleInversion, ExponentialPriorModel
 from typing import Tuple, Any
 from catalog.manipulate.parallax_zeropoint_correction import correct_zp
 import numpy as np
@@ -11,7 +11,7 @@ def estimate_distance(parallax: float, parallax_error: float, n_rand: int = 1000
     if parallax >= 0.05 and (abs(parallax_error / parallax) <= 0.1):
         # For very large and/or well-constrained parallaxes, simple inversion is used to calculate the distance.
         comments = "simple_inversion"
-        model = simple_inversion(parallax, parallax_error)
+        model = SimpleInversion(parallax, parallax_error)
         dist_rand = model.gaussian_sampler(n_rand)
 
     elif parallax > 0.05 and (abs(parallax_error / parallax) > 0.1):
@@ -20,7 +20,7 @@ def estimate_distance(parallax: float, parallax_error: float, n_rand: int = 1000
         model = ExponentialPriorModel(parallax, parallax_error)
         dist_rand = model.sample_posterior(n_rand)
 
-    elif -1 <= parallax < -0.1 and (abs(parallax_error / parallax) > 0.2):
+    elif -1 <= parallax < -0.1 and (abs(parallax_error / parallax) <= 0.2):
         # For not very negative parallaxes that are not close to 0, adopt the exponential prior model.
         comments = "exp_model"
         model = ExponentialPriorModel(parallax, parallax_error)
