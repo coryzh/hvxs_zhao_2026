@@ -47,7 +47,7 @@ L = constants.L
 #         """
 #         results = quad(func=self.posterior_unnorm, a=constants.minimum_d, b=+np.inf)
 #
-#         # Normalisation constant for the distance posterior is optimised for very narrow PDF. When the PDF is too
+#         # Normalization constant for the distance posterior is optimised for very narrow PDF. When the PDF is too
 #         # narrow, i.e., when sigma_parallax is very small, we estimate the integral as the area of the rectangular
 #         # with width of 0.01 and height equals to un-normalised PDF value at 1/parallax.
 #         if np.isclose(results[0], 0, rtol=1e-6):
