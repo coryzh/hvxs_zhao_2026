@@ -23,13 +23,13 @@ def calc_v_rot(R):
     return v_rot_galpy
 
 
-r = np.arange(0.00, 100, 0.01)
-v = np.zeros(len(r))
+r_grid = np.arange(0.00, 100, 0.01)
+v_grid = np.zeros(len(r_grid))
 
-for i, r_val in enumerate(r):
+for i, r_val in enumerate(r_grid):
     if r_val < 0.01:
-        v[i] = calc_v_rot([0.01])[0]
+        v_grid[i] = calc_v_rot([0.01])[0]
     else:
-        v[i] = calc_v_rot([r_val])[0]
+        v_grid[i] = calc_v_rot([r_val])[0]
 
-v_rot = interp1d(r, v, bounds_error=False, fill_value=v[-1])
+v_rot = interp1d(r_grid, v_grid, bounds_error=False, fill_value=v_grid[-1])
