@@ -28,11 +28,14 @@ W_sun = con.W_sun
 Theta_0 = con.Theta_0
 R_0 = con.R_0
 nrand = 1000
+id_x_dict = {"csc": "name", "erass": "IAUNAME", "xmm": "iauname", "swift": "IAUName"}
 
 # Random state
 print("3. Setting random state ...\n")
 random_seed: int = 114514
 np.random.seed(random_seed)
+
+print("Beginning computation ...\n")
 
 
 @jit(nopython=True)
@@ -273,30 +276,69 @@ def get_errors(arr: np.ndarray, lolim_percentile: float = 16, uplim_percentile: 
     return median, lo_error, up_error
 
 
-def run_computation(df: pd.DataFrame, method: str = "scipy") -> None:
+def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = None, batch_size: int = 1000) -> None:
     pm_and_position_cols = ["ra", "dec", "pmra", "pmra_error", "pmdec", "pmdec_error"]
     parallax_cols = ["parallax_corr", "parallax_error"]
+    result_data = []
+    id_x = id_x_dict[survey_name]
+    n_source = df.shape[0]
+
+    cols = ["ID_x", "source_id",
+            "vpec_gamma_min_med", "e_vpec_gamma_min", "E_vpec_gamma_min",
+            "vpec_min_med", "e_vpec_min", "E_vpec_min",
+            "vspace_gamma_min_med", "e_vspace_gamma_min", "E_vspace_gamma_min",
+            "vspace_min_med", "e_vspace_min", "E_vspace_min"]
+
+    # result_df = pd.DataFrame(columns=cols)
+
+    out_file = config.RESULTS_CATALOGUE_DIR / "v_min_catalogs" / f"{survey_name}_w_v_min.csv"
+
+    if out_file.exists():
+        overwrite = input(f"{out_file} already exist. Do you want to remove it? (y/n): ")
+
+        if overwrite.lower() == "y":
+            out_file.unlink()
+            print("Existing file removed. Creating a new file ...\n")
+            pd.DataFrame(columns=cols).to_csv(out_file, mode="w", header=True, index=False)
+
+        elif overwrite.lower() == "n":
+            print("Appending to the existing file.\n")
+
     for i, row in tqdm(df.iterrows()):
+        source_name = row[id_x]
+        source_id = row["source_id"]
         pm_and_pos_args = tuple(row[colname] for colname in pm_and_position_cols)
         parallax_args = tuple(row[colname] for colname in parallax_cols)
 
         pos_and_pm_rand = get_random_astrometry(*pm_and_pos_args)
         d_rand, comment = get_random_distances(*parallax_args)
 
+        row_data = [source_name, source_id]
         for opt in ["vpec", "vspace"]:
             args = pos_and_pm_rand + (d_rand,) + (opt, method)
             v_min, gamma_min = find_v_min(*args)
 
-            v_med, v_lo_err, v_up_err = get_errors(v_min)
-            # gamma_min_med, gamma_min_lo_err, gamma_min_up_err = get_errors(gamma_min)
-            print(f"v_{opt}={v_med:.2f} +{v_up_err:.2f} -{v_lo_err:.2f}")
+            v_med, v_lo_err, v_hi_err = get_errors(v_min)
+            gamma_min_med, gamma_min_lo_err, gamma_min_hi_err = get_errors(gamma_min)
+            row_data.extend([gamma_min_med, gamma_min_lo_err, gamma_min_hi_err,
+                             v_med, v_lo_err, v_hi_err])
+
+        result_data.append(row_data)
+
+        if (i + 1) % batch_size == 0 or (i + 1) == n_source:
+            batch_df = pd.DataFrame(result_data, columns=cols)
+            batch_df.to_csv(out_file, mode="a", index=False, header=False)
+            result_data = []
 
 
 def main() -> None:
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                     / "combined_vpec_lolim_gt_150_unique_stage_9_prime.csv")
+    survey_name = "csc"
+    in_cat_dir = config.ROOT_DIR / "results" / survey_name / "catalogues" / "nway_match"
+    in_cat_file = f"{survey_name}_gaia_nway_match_for_vpec.csv"
 
-    run_computation(df, method="scipy")
+    df = pd.read_csv(in_cat_dir / in_cat_file)
+    df_sub = df.iloc[0:20]
+    run_computation(df_sub, method="scipy", survey_name=survey_name, batch_size=6)
 
 
 if __name__ == "__main__":
