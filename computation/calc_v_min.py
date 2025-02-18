@@ -283,7 +283,7 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
     id_x = id_x_dict[survey_name]
     n_source = df.shape[0]
 
-    cols = ["ID_x", "source_id",
+    cols = ["ID_x", "source_id", "dist_med", "e_dist", "E_dist", "distance_inference",
             "vpec_gamma_min_med", "e_vpec_gamma_min", "E_vpec_gamma_min",
             "vpec_min_med", "e_vpec_min", "E_vpec_min",
             "vspace_gamma_min_med", "e_vspace_gamma_min", "E_vspace_gamma_min",
@@ -291,7 +291,7 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
 
     # result_df = pd.DataFrame(columns=cols)
 
-    out_file = config.RESULTS_CATALOGUE_DIR / "v_min_catalogs" / f"{survey_name}_w_v_min.csv"
+    out_file = config.RESULTS_CATALOGUE_DIR / "v_min_catalogs" / f"{survey_name}_w_v_min_test.csv"
 
     if out_file.exists():
         overwrite = input(f"{out_file} already exist. Do you want to remove it? (y/n): ")
@@ -304,6 +304,10 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
         elif overwrite.lower() == "n":
             print("Appending to the existing file.\n")
 
+    else:
+        print("No existing file found. Creating a new one ...\n")
+        pd.DataFrame(columns=cols).to_csv(out_file, mode="w", header=True, index=False)
+
     for i, row in tqdm(df.iterrows()):
         source_name = row[id_x]
         source_id = row["source_id"]
@@ -313,7 +317,9 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
         pos_and_pm_rand = get_random_astrometry(*pm_and_pos_args)
         d_rand, comment = get_random_distances(*parallax_args)
 
-        row_data = [source_name, source_id]
+        d_med, d_lo_err, d_hi_err = get_errors(d_rand)
+
+        row_data = [source_name, source_id, d_med, d_lo_err, d_hi_err, comment]
         for opt in ["vpec", "vspace"]:
             args = pos_and_pm_rand + (d_rand,) + (opt, method)
             v_min, gamma_min = find_v_min(*args)
@@ -334,7 +340,7 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
 def main() -> None:
     survey_name = "csc"
     in_cat_dir = config.ROOT_DIR / "results" / survey_name / "catalogues" / "nway_match"
-    in_cat_file = f"{survey_name}_gaia_nway_match_for_vpec.csv"
+    in_cat_file = f"{survey_name}_gaia_nway_match_stars_only_for_vpec.csv"
 
     df = pd.read_csv(in_cat_dir / in_cat_file)
     df_sub = df.iloc[0:20]
