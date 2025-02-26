@@ -194,11 +194,7 @@ def cartesian_peculiar_velocity_components(ra: FloatOrIterable, dec: FloatOrIter
     #     return np.cos(l)
 
     if print_results:
-        print('mu_l=%.2f, mu_b=%.2f' % (mu_l, mu_b))
-        print('v_l=%.2f, v_b=%.2f' % (v_l, v_b))
-        print('U_1=%.2f, V_1=%.2f, W_1=%.2f' % (U_1, V_1, W_1))
-        print('U_2=%.2f, V_2=%.2f, W_2=%.2f' % (U_2, V_2, W_2))
-        print('U_s=%.2f, V_s=%.2f, W_s=%.2f' % (U_s, V_s, W_s))
+        print(f'U_s={U_s:.2f}, V_s={V_s:.2f}, W_s={W_s:.2f}, v_pec={v_pec:.2f}')
 
     return v_pec
     # return U_2, V_2, W_2, v_pec
