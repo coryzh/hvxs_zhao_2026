@@ -222,9 +222,9 @@ def main():
     #     print(f"{mu_l[i]: 9.7f} {my_mu_l[i]: 9.7f}, {mu_b[i]:9.7f} {my_mu_b[i]: 9.7f}")
 
     # results = cal_Galactic_PM(105.6, 34.3, 3.215, -4.367, dt=1)
-    results = galactocentric_cartesian_velocity(299.590294829041, 35.2015787651136,
-                                                -3.81238517562444, -6.30989323963554,
-                                                2.25, -5.1, print_results=True)
+    results = cartesian_peculiar_velocity_components(299.590294829041, 35.2015787651136,
+                                                     -3.81238517562444, -6.30989323963554,
+                                                     2.25, -5.1, print_results=True)
     print(results)
 
 
