@@ -94,7 +94,6 @@ def galactic_proper_motion(ra: FloatOrIterable, dec: FloatOrIterable,
 # ============================================================
 # Calculate peculiar velocities in the Galactocentric frame
 # ============================================================
-
 def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
                                       pmra: FloatOrIterable, pmdec: FloatOrIterable,
                                       dist: FloatOrIterable, v_r: FloatOrIterable,
@@ -196,8 +195,9 @@ def cartesian_peculiar_velocity_components(ra: FloatOrIterable, dec: FloatOrIter
     if print_results:
         print(f'U_s={U_s:.2f}, V_s={V_s:.2f}, W_s={W_s:.2f}, v_pec={v_pec:.2f}')
 
+    # v_galactocentric = np.sqrt(U_2 ** 2 + V_2 ** 2 + W_2 ** 2)
+    # return v_pec
     return v_pec
-    # return U_2, V_2, W_2, v_pec
 
 
 def main():
