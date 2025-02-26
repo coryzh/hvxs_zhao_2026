@@ -140,7 +140,37 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
     U_2 = U_1 + U_sun
     V_2 = V_1 + V_sun + Theta_0
     W_2 = W_1 + W_sun
+    v_space = np.sqrt(U_2 ** 2 + V_2 ** 2 + W_2 ** 2)
 
+    if print_results:
+        print('mu_l=%.2f, mu_b=%.2f' % (mu_l, mu_b))
+        print('v_l=%.2f, v_b=%.2f' % (v_l, v_b))
+        print('U_1=%.2f, V_1=%.2f, W_1=%.2f' % (U_1, V_1, W_1))
+        print('U_2=%.2f, V_2=%.2f, W_2=%.2f' % (U_2, V_2, W_2))
+
+    return U_2, V_2, W_2, v_space
+
+
+def cartesian_peculiar_velocity_components(ra: FloatOrIterable, dec: FloatOrIterable,
+                                           pmra: FloatOrIterable, pmdec: FloatOrIterable,
+                                           dist: FloatOrIterable, v_r: FloatOrIterable,
+                                           U_sun: FloatOrIterable = con.U_sun,
+                                           V_sun: FloatOrIterable = con.V_sun,
+                                           W_sun: FloatOrIterable = con.W_sun,
+                                           Theta_0: FloatOrIterable = con.Theta_0,
+                                           R_0: FloatOrIterable = con.R_0,
+                                           print_results: bool = False,
+                                           random_seed: int = 114514):
+    """
+    This function takes equatorial coordinates, source distance (in kpc), and source radial velocity (v_r; in km/s) to
+    compute Galactocentric Cartesian specific velocities.
+    pmra is the proper motion in the direction of ra including the cosdec factor.
+    """
+    np.random.seed(random_seed)
+
+    l, b = convert_to_galactic(ra, dec)
+    U_2, V_2, W_2, _v_space = galactocentric_cartesian_velocity(ra, dec, pmra, pmdec, dist, v_r,
+                                                                U_sun, V_sun, W_sun, Theta_0, R_0)
     # R_p: Galactocentric distance to the source projected onto the Galactic plane
     D_p = dist * np.cos(b)
     R_p = np.sqrt(R_0 ** 2 + D_p ** 2 - 2 * R_0 * D_p * np.cos(l))
