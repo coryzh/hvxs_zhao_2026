@@ -12,6 +12,7 @@ from scipy.optimize import minimize
 from utils.rotation_curve import v_rot
 from numba import jit
 from tqdm import tqdm
+from utils.utility_functions import get_errors
 
 # Rotation velocity curve. Gridded values used for numpy.interp
 print("Initializing ...\n")
@@ -260,20 +261,6 @@ def find_v_min(ra_rand, dec_rand, pmra_rand, pmdec_rand, dist_rand, opt: str = "
     v_min, gamma_min = zip(*results)
 
     return np.array(v_min), np.array(gamma_min)
-
-
-def get_errors(arr: np.ndarray, lolim_percentile: float = 16, uplim_percentile: float = 84):
-    median = np.median(arr)
-    lolim = np.percentile(arr, q=lolim_percentile)
-    uplim = np.percentile(arr, q=uplim_percentile)
-
-    if (lolim_percentile >= uplim_percentile) or (lolim_percentile >= 50) or (uplim_percentile <= 50):
-        raise ValueError(f"Lower-limit or upper-limit percentile not valid.")
-
-    up_error = uplim - median
-    lo_error = median - lolim
-
-    return median, lo_error, up_error
 
 
 def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = None, batch_size: int = 1000) -> None:
