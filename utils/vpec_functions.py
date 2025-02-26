@@ -105,11 +105,7 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
                                       R_0: FloatOrIterable = con.R_0,
                                       print_results: bool = False,
                                       random_seed: int = 114514):
-    """
-    This function takes equatorial coordinates, source distance (in kpc), and source radial velocity (v_r; in km/s) to
-    compute Galactocentric Cartesian specific velocities.
-    pmra is the proper motion in the direction of ra including the cosdec factor.
-    """
+
     np.random.seed(random_seed)
 
     # Constants
