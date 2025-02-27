@@ -41,10 +41,27 @@ class SwiftCoord(Schema):
     """
     RA: str = "RA"
     DE: str = "Decl"
-    Err90: str = "Err90"
+    POS_ERR: str = "Err90"
     GLON: str = "l"
     GLAT: str = "b"
     AstromType: str = "AstromType"
+
+
+class ERASSSchema(Schema):
+    RA: str = "RA"
+    DE: str = "DEC"
+    POS_ERR: str = "POS_ERR"
+
+
+class CSCSchema(Schema):
+    RA: str = "ra"
+    DE: str = "dec"
+
+
+class XMMSchema(Schema):
+    RA: str = "sc_ra"
+    DE: str = "sc_dec"
+    POS_ERR: str = "sc_poserr"
 
 
 class SwiftFlux(Schema):
