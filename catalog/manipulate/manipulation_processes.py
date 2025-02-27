@@ -14,9 +14,10 @@ def make_master(survey_name: str = "csc", id_x_col: str = "ID_x", verbose: bool 
 
     file_survey = nway_dir / f"{survey_name}_confident_point_sources.csv"
     file_astrometry = nway_dir / f"{survey_name}_gaia_nway_match_stars_only.csv"
+    file_corr_parallax = nway_dir / f"{survey_name}_gaia_nway_match_stars_only_for_vpec.csv"
     file_vmin = config.RESULTS_CATALOGUE_DIR / "v_min_catalogs" / f"{survey_name}_w_v_min.csv"
 
-    essential_files = [file_survey, file_astrometry, file_vmin]
+    essential_files = [file_survey, file_astrometry, file_corr_parallax, file_vmin]
     missing_files: List[Path] = [f for f in essential_files if not f.exists()]
 
     if missing_files:
@@ -30,6 +31,8 @@ def make_master(survey_name: str = "csc", id_x_col: str = "ID_x", verbose: bool 
     logger.log(f"Loading files to DataFrames ... \n")
     df_survey = pd.read_csv(file_survey)
     df_astrometry = pd.read_csv(file_astrometry)
+    df_corr_parallax = pd.read_csv(file_corr_parallax)
+    df_corr_parallax = df_corr_parallax[["parallax_corr", "has_valid_parallax_corr", "source_id"]]
     df_vmin = pd.read_csv(file_vmin)
 
     # Renamed the Gaia ra and dec columns to avoid duplicate naming.
@@ -43,6 +46,12 @@ def make_master(survey_name: str = "csc", id_x_col: str = "ID_x", verbose: bool 
     logger.log(f"Joining Gaia and kinematics (vmin) catalogues ...")
 
     df_merged = pd.merge(df_astrometry, df_vmin, on=ds.Gaia.source_id, how="left")
+
+    logger.log(f"Joining the resulting merged catalogue with the '_for_vpec' catalogue to get the zp-corrected "
+               f"parallaxes ... \n")
+
+    df_merged = pd.merge(df_merged, df_corr_parallax, on=ds.Gaia.source_id, how="left")
+
     logger.log(f"Merged DataFrame has {df_merged.shape[0]} rows and {df_merged.shape[1]} columns.\n")
 
     logger.log(f"Joining with the {survey_name.upper()} source catalogue ... using {id_x_col} ...")
