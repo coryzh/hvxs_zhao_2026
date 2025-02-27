@@ -48,20 +48,30 @@ class SwiftCoord(Schema):
 
 
 class ERASSSchema(Schema):
+    ID: str = "IAUNAME"
     RA: str = "RA"
     DE: str = "DEC"
     POS_ERR: str = "POS_ERR"
 
 
 class CSCSchema(Schema):
+    ID: str = "name"
     RA: str = "ra"
     DE: str = "dec"
 
 
 class XMMSchema(Schema):
+    ID: str = "iauname"
     RA: str = "sc_ra"
     DE: str = "sc_dec"
     POS_ERR: str = "sc_poserr"
+
+
+class SwiftSchema(Schema):
+    ID: str = "IAUName"
+    RA: str = "RA"
+    DE: str = "Decl"
+    POS_ERR: str = "Err90"
 
 
 class SwiftFlux(Schema):
@@ -273,3 +283,6 @@ class LX:
     @property
     def lx_lolim_colname(self) -> str:
         return f"lum_{self.band}_lolim"
+
+
+SCHEMA_DICT = {"csc": CSCSchema, "xmm": XMMSchema, "swift": SwiftSchema, "erass": ERASSSchema}
