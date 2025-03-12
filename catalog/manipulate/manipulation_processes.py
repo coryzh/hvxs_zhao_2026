@@ -65,7 +65,7 @@ def make_master(survey_name: str = "csc", id_x_col: str = "ID_x", verbose: bool 
 
     logger.log(f"Merged DataFrame has {df_merged.shape[0]} rows and {df_merged.shape[1]} columns.\n")
 
-    out_file = config.RESULTS_CATALOGUE_DIR / "master_catalogs" / f"{survey_name}_master_catalogs.csv"
+    out_file = config.RESULTS_CATALOGUE_DIR / "master_catalogs" / f"{survey_name}_master_catalog.csv"
     df_merged.to_csv(out_file, index=False)
     logger.log(f"Master catalogue of {survey_name.upper()} saved to {out_file}.\n")
     logger.end()
