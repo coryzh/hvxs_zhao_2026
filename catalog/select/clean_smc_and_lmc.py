@@ -60,8 +60,8 @@ def main() -> None:
     df_cleaned = clean(df, prob_thresh=0.002, opt="lmc", verbose=True)
     df_cleaned = clean(df_cleaned, prob_thresh=0.016, opt="smc", verbose=True)
 
-    out_file = in_file.parent / f"{in_file.stem}".replace("stage_8", "stage_9")
-    df_cleaned.to_csv(out_file)
+    out_file = in_file.with_name(in_file.name.replace("stage_8", "stage_9"))
+    df_cleaned.to_csv(out_file, index=False)
 
 
 if __name__ == "__main__":
