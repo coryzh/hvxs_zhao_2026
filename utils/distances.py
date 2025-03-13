@@ -2,9 +2,10 @@ import numpy as np
 import constants
 # from scipy.integrate import quad
 # from scipy.interpolate import interp1d
-from scipy.stats import truncnorm
+from scipy.stats import truncnorm, gamma
 from typing import Any
 from functools import partial
+from scipy.optimize import minimize, Bounds
 import emcee
 
 pi = np.pi
@@ -144,6 +145,63 @@ class SimpleInversion:
         #         counter += 1
 
         return np.array(d_rand)
+
+
+class FromLiterature:
+    def __init__(self, x_est, x_lo, x_hi, conf_level: float = 0.68):
+        self.x_est = x_est
+        self.x_lo = x_lo
+        self.x_hi = x_hi
+        self.conf_leve = conf_level
+
+        if x_lo >= x_hi:
+            raise ValueError(f"Lower limit (x_lo) must be less than the upper limit (x_hi).")
+
+        if conf_level< 0 or conf_level > 1:
+            raise ValueError(f"Confidence level must be a number between 0 and 1.")
+
+    @property
+    def x_loerr(self) -> float:
+        return self.x_est - self.x_lo
+
+    @property
+    def x_uperr(self) -> float:
+        return self.x_hi - self.x_est
+
+    @property
+    def sigma_0(self) -> float:
+        """Averaged error, which could be used as an initial guess for fitting a skewed distribution."""
+        return 0.5 * (self.x_loerr + self.x_uperr)
+
+    @property
+    def _sigma_min(self) -> float:
+        return min(self.x_loerr, self.x_loerr)
+
+    def fit_gamma(self) -> dict:
+        """Fit the literature nominal values to a gamma distribution."""
+
+        def get_gamma_distribution(sigma_x) -> dict:
+            alpha = ((2 * sigma_x + self.x_est ** 2 + np.sqrt(4 * sigma_x * self.x_est ** 2 + self.x_est ** 4))
+                     / (2 * sigma_x))
+            theta = self.x_est / (alpha - 1)
+            x_gamma = gamma(a=alpha, scale=theta)
+
+            return dict(alpha=alpha, theta=theta, distribution=x_gamma)
+
+        def difference(sigma_x) -> float:
+            _re = get_gamma_distribution(sigma_x)
+            x_gamma = _re["distribution"]
+
+            x_lo_model = x_gamma.ppf((1 - self.conf_leve) / 2)
+            x_hi_model = x_gamma.ppf((1 + self.conf_leve) / 2)
+
+            diff = np.sqrt((self.x_lo - x_lo_model) ** 2 + (self.x_hi - x_hi_model) ** 2)
+
+            return diff
+
+        results = minimize(difference, x0=self.sigma_0, bounds=Bounds(self._sigma_min / 2))
+
+        return get_gamma_distribution(results.x[0])
 
 
 def truncated_normal_distances(d_cen: float, d_std: float, nsim: int,
