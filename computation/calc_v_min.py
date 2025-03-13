@@ -291,7 +291,7 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
 
     # result_df = pd.DataFrame(columns=cols)
 
-    out_file = config.RESULTS_CATALOGUE_DIR / "v_min_catalogs" / f"{survey_name}_w_v_min_test.csv"
+    out_file = config.RESULTS_CATALOGUE_DIR / "v_min_catalogs" / f"{survey_name}_w_v_min_150000-end.csv"
 
     if out_file.exists():
         overwrite = input(f"{out_file} already exist. Do you want to remove it? (y/n): ")
@@ -338,13 +338,13 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
 
 
 def main() -> None:
-    survey_name = "csc"
+    survey_name = "erass"
     in_cat_dir = config.ROOT_DIR / "results" / survey_name / "catalogues" / "nway_match"
     in_cat_file = f"{survey_name}_gaia_nway_match_stars_only_for_vpec.csv"
 
     df = pd.read_csv(in_cat_dir / in_cat_file)
-    df_sub = df.iloc[0:20]
-    run_computation(df_sub, method="scipy", survey_name=survey_name, batch_size=6)
+    df_sub = df.iloc[150000:].reset_index(drop=True)
+    run_computation(df_sub, method="scipy", survey_name=survey_name, batch_size=10)
 
 
 if __name__ == "__main__":
