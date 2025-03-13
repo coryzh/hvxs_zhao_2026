@@ -19,7 +19,7 @@ def add_galactic_coordinates(df: pd.DataFrame) -> pd.DataFrame:
 def add_cartesian_coordinates(in_file: Path) -> None:
     df = pd.read_csv(in_file)
 
-    coords = SkyCoord(df.ra.values * u.deg, df.dec.values * u.deg, distance=df.dist_med.values * u.kpc,
+    coords = SkyCoord(df.ra_gaia.values * u.deg, df.dec_gaia.values * u.deg, distance=df.dist_med.values * u.kpc,
                       frame="icrs")
 
     coords_galcen = coords.transform_to(gal_cen)
@@ -36,7 +36,7 @@ def add_cartesian_coordinates(in_file: Path) -> None:
 
     out_file = in_file.parent / f"{in_file.stem}.csv".replace("stage_7", "stage_8")
 
-    df.to_csv(out_file)
+    df.to_csv(out_file, index=False)
 
 
 def add_hex_equatorial_coordinates(df: pd.DataFrame, sort: bool = False) -> pd.DataFrame:

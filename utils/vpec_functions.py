@@ -94,7 +94,6 @@ def galactic_proper_motion(ra: FloatOrIterable, dec: FloatOrIterable,
 # ============================================================
 # Calculate peculiar velocities in the Galactocentric frame
 # ============================================================
-
 def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
                                       pmra: FloatOrIterable, pmdec: FloatOrIterable,
                                       dist: FloatOrIterable, v_r: FloatOrIterable,
@@ -105,11 +104,7 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
                                       R_0: FloatOrIterable = con.R_0,
                                       print_results: bool = False,
                                       random_seed: int = 114514):
-    """
-    This function takes equatorial coordinates, source distance (in kpc), and source radial velocity (v_r; in km/s) to
-    compute Galactocentric Cartesian specific velocities.
-    pmra is the proper motion in the direction of ra including the cosdec factor.
-    """
+
     np.random.seed(random_seed)
 
     # Constants
@@ -140,7 +135,37 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
     U_2 = U_1 + U_sun
     V_2 = V_1 + V_sun + Theta_0
     W_2 = W_1 + W_sun
+    v_space = np.sqrt(U_2 ** 2 + V_2 ** 2 + W_2 ** 2)
 
+    if print_results:
+        print('mu_l=%.2f, mu_b=%.2f' % (mu_l, mu_b))
+        print('v_l=%.2f, v_b=%.2f' % (v_l, v_b))
+        print('U_1=%.2f, V_1=%.2f, W_1=%.2f' % (U_1, V_1, W_1))
+        print('U_2=%.2f, V_2=%.2f, W_2=%.2f' % (U_2, V_2, W_2))
+
+    return U_2, V_2, W_2, v_space
+
+
+def cartesian_peculiar_velocity_components(ra: FloatOrIterable, dec: FloatOrIterable,
+                                           pmra: FloatOrIterable, pmdec: FloatOrIterable,
+                                           dist: FloatOrIterable, v_r: FloatOrIterable,
+                                           U_sun: FloatOrIterable = con.U_sun,
+                                           V_sun: FloatOrIterable = con.V_sun,
+                                           W_sun: FloatOrIterable = con.W_sun,
+                                           Theta_0: FloatOrIterable = con.Theta_0,
+                                           R_0: FloatOrIterable = con.R_0,
+                                           print_results: bool = False,
+                                           random_seed: int = 114514):
+    """
+    This function takes equatorial coordinates, source distance (in kpc), and source radial velocity (v_r; in km/s) to
+    compute Galactocentric Cartesian specific velocities.
+    pmra is the proper motion in the direction of ra including the cosdec factor.
+    """
+    np.random.seed(random_seed)
+
+    l, b = convert_to_galactic(ra, dec)
+    U_2, V_2, W_2, _v_space = galactocentric_cartesian_velocity(ra, dec, pmra, pmdec, dist, v_r,
+                                                                U_sun, V_sun, W_sun, Theta_0, R_0)
     # R_p: Galactocentric distance to the source projected onto the Galactic plane
     D_p = dist * np.cos(b)
     R_p = np.sqrt(R_0 ** 2 + D_p ** 2 - 2 * R_0 * D_p * np.cos(l))
@@ -168,14 +193,11 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
     #     return np.cos(l)
 
     if print_results:
-        print('mu_l=%.2f, mu_b=%.2f' % (mu_l, mu_b))
-        print('v_l=%.2f, v_b=%.2f' % (v_l, v_b))
-        print('U_1=%.2f, V_1=%.2f, W_1=%.2f' % (U_1, V_1, W_1))
-        print('U_2=%.2f, V_2=%.2f, W_2=%.2f' % (U_2, V_2, W_2))
-        print('U_s=%.2f, V_s=%.2f, W_s=%.2f' % (U_s, V_s, W_s))
+        print(f'U_s={U_s:.2f}, V_s={V_s:.2f}, W_s={W_s:.2f}, v_pec={v_pec:.2f}')
 
+    # v_galactocentric = np.sqrt(U_2 ** 2 + V_2 ** 2 + W_2 ** 2)
+    # return v_pec
     return v_pec
-    # return U_2, V_2, W_2, v_pec
 
 
 def main():
@@ -200,9 +222,9 @@ def main():
     #     print(f"{mu_l[i]: 9.7f} {my_mu_l[i]: 9.7f}, {mu_b[i]:9.7f} {my_mu_b[i]: 9.7f}")
 
     # results = cal_Galactic_PM(105.6, 34.3, 3.215, -4.367, dt=1)
-    results = galactocentric_cartesian_velocity(299.590294829041, 35.2015787651136,
-                                                -3.81238517562444, -6.30989323963554,
-                                                2.25, -5.1, print_results=True)
+    results = cartesian_peculiar_velocity_components(299.590294829041, 35.2015787651136,
+                                                     -3.81238517562444, -6.30989323963554,
+                                                     2.25, -5.1, print_results=True)
     print(results)
 
 

@@ -3,12 +3,12 @@ import config
 from log.loggers import VerboseLogger
 
 column_map_csc = {"flux_aper_b": "f_x", "flux_aper_b_sym_err": "f_x_err", "lum_aper_b": "lum_x",
-                  "lum_aper_err_b": "lum_x_err",
-                  "ra_deg": "ra_x", "dec_deg": "dec_x", "name": "ID_x", "Separation_gaia_csc": "sep_x_g"}
+                  "lum_aper_err_b": "lum_x_err", "ra_deg": "ra_x", "dec_deg": "dec_x", "name": "ID_x",
+                  "Separation_gaia_csc": "sep_x_g"}
 
 column_map_xmm = {"iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x", "Separation_gaia_xmm": "sep_x_g",
-                  "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err", "sc_ep_lum_8": "lum_x",
-                  "sc_ep_lum_8_err": "lum_x_err", "sc_poserr": "pos_x_err"}
+                  "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err",
+                  "sc_ep_lum_8": "lum_x", "sc_ep_lum_8_err": "lum_x_err", "sc_poserr": "pos_x_err"}
 
 column_map_erass = {"RA": "ra_x", "DEC": "dec_x", "IAUNAME": "ID_x",
                     "ML_FLUX_1": "f_x", "ML_FLUX_ERR_1": "f_x_err", "lum_x": "lum_x", "lum_x_err": "lum_x_err",
@@ -21,10 +21,13 @@ column_map_swift = {"RA": "ra_x", "Decl": "dec_x", "IAUName": "ID_x",
 column_map_dict = {"csc": column_map_csc, "xmm": column_map_xmm, "erass": column_map_erass, "swift": column_map_swift}
 
 common_columns = [
-    "ID_x", "source_id", "ra_x", "dec_x", "pos_x_err", "ra", "dec", "sep_x_g", "ruwe", "astrometric_excess_noise",
+    "ID_x", "source_id", "ra_x", "dec_x", "pos_x_err", "ra_gaia", "dec_gaia", "sep_x_g", "ruwe",
+    "astrometric_excess_noise",
     "astrometric_excess_noise_sig", "non_single_star", "mh_gspphot", "mh_gspphot_lower", "mh_gspphot_upper",
-    "gamma_min", "parallax", "parallax_corr", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error",
-    "dist_med", "e_dist", "E_dist", "vpec_min_med", "e_vpec_min", "E_vpec_min", "distance_inference",
+    "parallax", "parallax_corr", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error",
+    "dist_med", "e_dist", "E_dist", "distance_inference",
+    "vpec_gamma_min_med", "e_vpec_gamma_min", "E_vpec_gamma_min", "vpec_min_med", "e_vpec_min", "E_vpec_min",
+    "vspace_gamma_min_med", "e_vspace_gamma_min", "E_vspace_gamma_min", "vspace_min_med", "e_vspace_min", "E_vspace_min",
     "phot_g_mean_mag", "phot_rp_mean_mag", "phot_bp_mean_mag",
     "f_x", "f_x_err", "lum_x", "lum_x_err", "fx_fg", "from"
 ]
@@ -39,8 +42,8 @@ def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim", verbose: bool = F
     # overlap_ids = None
     df_all = pd.DataFrame(columns=common_columns)
     for _name in catalogue_names:
-        cat_dir = config.ROOT_DIR / "results" / _name / "catalogues" / "nway_match"
-        cat_path = cat_dir / f"{_name}_gaia_vpec_master_catalog_w_lx_and_fxfg.csv"
+        cat_dir = config.RESULTS_CATALOGUE_DIR / "master_catalogs"
+        cat_path = cat_dir / f"{_name}_master_catalog_w_fx_fg.csv"
         df = pd.read_csv(cat_path)
 
         logger.log(f"Catalogues loaded.\n")

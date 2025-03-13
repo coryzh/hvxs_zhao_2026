@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import config
 import data_schema as ds
-from utils.vpec_functions import galactocentric_cartesian_velocity
+from utils.vpec_functions import cartesian_peculiar_velocity_components
 from typing import Tuple, Any
 from query.gaia import gaia_single_source_id_search
 from log.loggers import VerboseLogger
@@ -30,7 +30,7 @@ def get_vpec(source_id: Any, v_r: float, v_r_error: float,
     dist_grid = np.linspace(0.1, 30, 300)
     vpec_grid = np.zeros(shape=(dist_grid.shape[0], n_rand))
     for i, dist in enumerate(dist_grid):
-        vpec_grid[i, :] = galactocentric_cartesian_velocity(ra_rand, dec_rand, pmra_rand, pmdec_rand, dist, v_r_rand)
+        vpec_grid[i, :] = cartesian_peculiar_velocity_components(ra_rand, dec_rand, pmra_rand, pmdec_rand, dist, v_r_rand)
 
     return dist_grid, vpec_grid
 
