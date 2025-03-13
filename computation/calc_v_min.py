@@ -6,7 +6,7 @@ import config
 import numpy as np
 import pandas as pd
 import constants as con
-from utils.distances import ExponentialPriorModel, SimpleInversion
+from utils.distances import ExponentialPriorModel, SimpleInversion, FromLiterature
 from typing import Any, Tuple
 from scipy.optimize import minimize
 from utils.rotation_curve import v_rot
@@ -37,6 +37,27 @@ random_seed: int = 114514
 np.random.seed(random_seed)
 
 print("Beginning computation ...\n")
+
+
+def imputation_bailer_jones(df: pd.DataFrame) -> pd.DataFrame:
+    df_copy = df.copy()
+
+    df_copy["r_med_photogeo"] = df_copy["r_med_photogeo"].fillna(df_copy["r_med_geo"])
+    df_copy["r_lo_photogeo"] = df_copy["r_lo_photogeo"].fillna(df_copy["r_lo_geo"])
+    df_copy["r_hi_photogeo"] = df_copy["r_hi_photogeo"].fillna(df_copy["r_hi_geo"])
+
+    mask_lo = df_copy['r_med_photogeo'] == df_copy['r_lo_photogeo']
+    mask_hi = df_copy['r_med_photogeo'] == df_copy['r_hi_photogeo']
+
+    df_copy.loc[mask_lo, 'r_med_photogeo'] = df_copy.loc[mask_lo, 'r_med_geo']
+    df_copy.loc[mask_lo, 'r_lo_photogeo'] = df_copy.loc[mask_lo, 'r_lo_geo']
+    df_copy.loc[mask_lo, 'r_hi_photogeo'] = df_copy.loc[mask_lo, 'r_hi_geo']
+
+    df_copy.loc[mask_hi, 'r_med_photogeo'] = df_copy.loc[mask_hi, 'r_med_geo']
+    df_copy.loc[mask_hi, 'r_lo_photogeo'] = df_copy.loc[mask_hi, 'r_lo_geo']
+    df_copy.loc[mask_hi, 'r_hi_photogeo'] = df_copy.loc[mask_hi, 'r_hi_geo']
+
+    return df_copy
 
 
 @jit(nopython=True)
@@ -186,6 +207,19 @@ def cartesian_peculiar_velocity_components(ra, dec, pmra, pmdec, dist, v_r):
     return v_pec
 
 
+def get_random_distances_bailer_jones(d_med: float, d_lo: float, d_hi: float, nrand: int = nrand):
+    dist_model = FromLiterature(d_med, d_lo, d_hi)
+
+    results = dist_model.fit_gamma()
+    d_gamma = results["distribution"]
+    alpha = results["alpha"]
+    theta = results["theta"]
+
+    d_rand = d_gamma.rvs(size=nrand)
+
+    return d_rand, alpha, theta
+
+
 def get_random_distances(parallax: float, parallax_error: float) -> Tuple[np.ndarray[Any, np.dtype[np.float64]], str]:
     parallax_over_error = abs(parallax / parallax_error)
 
@@ -266,11 +300,12 @@ def find_v_min(ra_rand, dec_rand, pmra_rand, pmdec_rand, dist_rand, opt: str = "
 def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = None, batch_size: int = 1000) -> None:
     pm_and_position_cols = ["ra", "dec", "pmra", "pmra_error", "pmdec", "pmdec_error"]
     parallax_cols = ["parallax_corr", "parallax_error"]
+    bailer_jones_cols = ["r_med_photogeo", "r_lo_photogeo", "r_hi_photogeo"]
     result_data = []
     id_x = id_x_dict[survey_name]
     n_source = df.shape[0]
 
-    cols = ["ID_x", "source_id", "dist_med", "e_dist", "E_dist", "distance_inference",
+    cols = ["ID_x", "source_id", "alpha", "theta", "r_med_photogeo", "r_lo_photogeo", "r_hi_photogeo",
             "vpec_gamma_min_med", "e_vpec_gamma_min", "E_vpec_gamma_min",
             "vpec_min_med", "e_vpec_min", "E_vpec_min",
             "vspace_gamma_min_med", "e_vspace_gamma_min", "E_vspace_gamma_min",
@@ -299,14 +334,16 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
         source_name = row[id_x]
         source_id = row["source_id"]
         pm_and_pos_args = tuple(row[colname] for colname in pm_and_position_cols)
-        parallax_args = tuple(row[colname] for colname in parallax_cols)
+        # parallax_args = tuple(row[colname] for colname in parallax_cols)
+        bailer_jones_args = tuple(row[colname] for colname in bailer_jones_cols)
 
         pos_and_pm_rand = get_random_astrometry(*pm_and_pos_args)
-        d_rand, comment = get_random_distances(*parallax_args)
+        # d_rand, comment = get_random_distances(*parallax_args)
+        d_rand, alpha, theta = get_random_distances_bailer_jones(*bailer_jones_args)
+        # d_med, d_lo_err, d_hi_err = get_errors(d_rand)
 
-        d_med, d_lo_err, d_hi_err = get_errors(d_rand)
-
-        row_data = [source_name, source_id, d_med, d_lo_err, d_hi_err, comment]
+        row_data = [source_name, source_id, f"{alpha:.3f}", f"{theta:.3f}"]
+        row_data.extend(bailer_jones_args)
         for opt in ["vpec", "vspace"]:
             args = pos_and_pm_rand + (d_rand,) + (opt, method)
             v_min, gamma_min = find_v_min(*args)
@@ -315,7 +352,7 @@ def run_computation(df: pd.DataFrame, method: str = "scipy", survey_name: str = 
             gamma_min_med, gamma_min_lo_err, gamma_min_hi_err = get_errors(gamma_min)
             row_data.extend([gamma_min_med, gamma_min_lo_err, gamma_min_hi_err,
                              v_med, v_lo_err, v_hi_err])
-
+        print(row_data)
         result_data.append(row_data)
 
         if (i + 1) % batch_size == 0 or (i + 1) == n_source:
@@ -330,6 +367,7 @@ def main() -> None:
     in_cat_file = f"{survey_name}_gaia_nway_match_stars_only_for_vpec.csv"
 
     df = pd.read_csv(in_cat_dir / in_cat_file)
+    df = imputation_bailer_jones(df)
     df_sub = df.iloc[0:20]
     run_computation(df_sub, method="scipy", survey_name=survey_name, batch_size=6)
 
