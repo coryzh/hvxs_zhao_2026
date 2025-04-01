@@ -1,7 +1,9 @@
 """
 This script is used to add distance columns to a given pandas.DataFrame.
-In my previous computation of v_min, I have forgotten to include the distance columns for some of the catalogues, so
-I wrote this script to redo the MCMC sampling for distances without the need to run the whole computation script again.
+In my previous computation of v_min, I have forgotten to include the distance
+columns for some of the catalogues, so I wrote this script to redo the MCMC
+sampling for distances without the need to run the whole computation script
+again.
 """
 import pandas as pd
 import config
@@ -24,16 +26,29 @@ def get_distances(row: pd.Series) -> Tuple[str, float, float, float, str]:
 
 def run_computation() -> None:
     survey_name: str = "swift"
-    in_file_dir = config.ROOT_DIR / "results" / survey_name / "catalogues" / "nway_match"
-    in_file_path = in_file_dir / f"{survey_name}_gaia_nway_match_stars_only_for_vpec.csv"
-    in_file_vpec = config.RESULTS_CATALOGUE_DIR / "v_min_catalogs" / f"{survey_name}_w_v_min.csv"
+    in_file_dir = (
+        config.ROOT_DIR / "results" / survey_name / "catalogues" / "nway_match"
+    )
+
+    in_file_path = (
+        in_file_dir / f"{survey_name}_gaia_nway_match_stars_only_for_vpec.csv"
+    )
+
+    in_file_vpec = (
+        config.RESULTS_CATALOGUE_DIR
+        / "v_min_catalogs"
+        / f"{survey_name}_w_v_min.csv"
+    )
+
     df = pd.read_csv(in_file_path)
     df_vpec = pd.read_csv(in_file_vpec)
 
     tqdm.pandas()
     results = df.progress_apply(get_distances, axis=1, result_type="expand")
 
-    results.columns = ["ID_x", "dist_med", "e_dist", "E_dist", "distance_inference"]
+    results.columns = [
+        "ID_x", "dist_med", "e_dist", "E_dist", "distance_inference"
+    ]
 
     df_merged = pd.merge(df_vpec, results, on="ID_x", how="right")
 
