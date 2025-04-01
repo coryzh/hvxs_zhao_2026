@@ -1,6 +1,7 @@
 from pathlib import Path
 
 SURVEY_NAME = "combined"
+SURVEY_NAMES_SHORT = ["csc", "xmm", "erass", "swift"]
 
 # Path to the root of the project
 ROOT_DIR = Path(__file__).parent.parent
