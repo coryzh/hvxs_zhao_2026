@@ -15,8 +15,9 @@ class VerboseLogger:
             fixed_message = "Started"
             formatted_message = f"{fixed_message} {now}"
 
-            # Use the .center method to add '*' characters around the formatted_message
-            # total_length specifies the width of the final output string
+            # Use the .center method to add '*' characters around the
+            # formatted_message total_length specifies the width of the
+            # final output string
             output = formatted_message.center(total_length, '*')
             print(f"{output}\n")
 
@@ -26,7 +27,9 @@ class VerboseLogger:
             fixed_message = "Finished"
             formatted_message = f"{fixed_message} {now}"
 
-            # Use the .center method to add '*' characters around the formatted_message
-            # total_length specifies the width of the final output string
+            # Use the .center method to add '*' characters around the
+            # formatted_message total_length specifies the width of the final
+            # output string
+
             output = formatted_message.center(total_length, '*')
             print(f"{output}\n")
