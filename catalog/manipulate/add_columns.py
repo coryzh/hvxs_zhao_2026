@@ -19,12 +19,17 @@ def add_galactic_coordinates(df: pd.DataFrame) -> pd.DataFrame:
 def add_cartesian_coordinates(in_file: Path) -> None:
     df = pd.read_csv(in_file)
 
-    coords = SkyCoord(df.ra_gaia.values * u.deg, df.dec_gaia.values * u.deg, distance=df.dist_med.values * u.kpc,
-                      frame="icrs")
+    coords = SkyCoord(
+        df.ra_gaia.values * u.deg, df.dec_gaia.values * u.deg,
+        distance=df.dist_med.values * u.kpc,
+        frame="icrs"
+    )
 
     coords_galcen = coords.transform_to(gal_cen)
 
-    x, y, z = coords_galcen.x.value, coords_galcen.y.value, coords_galcen.z.value
+    x, y, z = (coords_galcen.x.value,
+               coords_galcen.y.value,
+               coords_galcen.z.value)
 
     coords_galcen.representation_type = "cylindrical"
     r_gc = coords_galcen.rho.value
@@ -34,16 +39,23 @@ def add_cartesian_coordinates(in_file: Path) -> None:
     for name, arr in zip(coord_cols, coord_arrs):
         df[name] = arr
 
-    out_file = in_file.parent / f"{in_file.stem}.csv".replace("stage_7", "stage_8")
+    out_file = (in_file.parent
+                / f"{in_file.stem}.csv".replace("stage_7", "stage_8"))
 
     df.to_csv(out_file, index=False)
 
 
-def add_hex_equatorial_coordinates(df: pd.DataFrame, sort: bool = False) -> pd.DataFrame:
+def add_hex_equatorial_coordinates(df: pd.DataFrame,
+                                   sort: bool = False) -> pd.DataFrame:
+
     coords = SkyCoord(df["ra"], df["dec"], frame="icrs", unit="deg")
 
-    df["ra_hex"] = coords.ra.to_string(unit=u.hourangle, sep=":", precision=3, pad=True)
-    df["dec_hex"] = coords.dec.to_string(unit="deg", precision=2, sep=":", alwayssign=True, pad=True)
+    df["ra_hex"] = coords.ra.to_string(
+        unit=u.hourangle, sep=":", precision=3, pad=True
+    )
+    df["dec_hex"] = coords.dec.to_string(
+        unit="deg", precision=2, sep=":", alwayssign=True, pad=True
+    )
 
     if sort:
         df = df.sort_values(by="ra")
@@ -54,24 +66,39 @@ def add_hex_equatorial_coordinates(df: pd.DataFrame, sort: bool = False) -> pd.D
 def add_erass_iauname(df: pd.DataFrame) -> pd.DataFrame:
     """
     Add IAUNAME based on the X-ray coordinates of eRASS
-    N.B.: the IAUNAME rendered this way may not be consistent with those in eRASS.
+    N.B.: the IAUNAME rendered this way may not be consistent with those in
+    eRASS.
     It's better to use the original IAUNAMEs to reduce confusion.
     """
 
-    coords = SkyCoord(df["ra_erass"], df["dec_erass"], frame="icrs", unit="deg")
-    ra_hex = coords.ra.to_string(unit=u.hourangle, sep="", precision=1, pad=True)
-    dec_hex = coords.dec.to_string(unit="deg", precision=0, sep="", alwayssign=True, pad=True)
+    coords = SkyCoord(
+        df["ra_erass"], df["dec_erass"], frame="icrs", unit="deg"
+    )
+    ra_hex = coords.ra.to_string(
+        unit=u.hourangle, sep="", precision=1, pad=True
+    )
+    dec_hex = coords.dec.to_string(
+        unit="deg", precision=0, sep="", alwayssign=True, pad=True
+    )
 
-    iauname = [f"1eRASS J{ra_str}{dec_str}" for ra_str, dec_str in zip(ra_hex, dec_hex)]
+    iauname = [
+        f"1eRASS J{ra_str}{dec_str}"
+        for ra_str, dec_str in zip(ra_hex, dec_hex)
+    ]
+
     df["iauname"] = iauname
 
     return df
 
 
 def main() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_7.csv"
+    in_file = (config.RESULTS_CATALOGUE_DIR
+               / "high-v_sources"
+               / "combined_vpec_lolim_gt_150_unique_stage_7.csv")
+
     add_cartesian_coordinates(in_file)
-    # df.to_csv(config.RESULTS_CATALOGUE_DIR / "control_sample_simbad_cleaned.csv")
+    # df.to_csv(config.RESULTS_CATALOGUE_DIR /
+    #  "control_sample_simbad_cleaned.csv")
 
 
 if __name__ == "__main__":
