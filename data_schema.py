@@ -258,6 +258,16 @@ class Gaia(Schema):
     astrometric_excess_noise: str = "astrometric_excess_noise"
 
 
+class BailerJonesSchema(Schema):
+    r_med_geo: str = "r_med_geo"
+    r_lo_geo: str = "r_lo_geo"
+    r_hi_geo: str = "r_hi_geo"
+    r_med_photogeo: str = "r_med_photogeo"
+    r_lo_photogeo: str = "r_lo_photogeo"
+    r_hi_photogeo: str = "r_hi_photogeo"
+    flag: str = "flag"
+
+
 class SimbadSchema(Schema):
     """Schema for the Simbad database"""
     SIMBAD_OTYPE: str = "otype"
