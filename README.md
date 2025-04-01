@@ -16,8 +16,17 @@
 #### What's New
 - Update (March 15 2025): The computation now uses the distances estimated by Bailer-Jones et al. 2022 for Gaia eDR3.
 
-### High-velocity Source Catalogues
-- **Nomenclature and processing stages
+### High-velocity Source Catalogues (high-v_sources/)
+#### What
+- Catalogues selected from the combined master catalogues based on space velocity and/or X-ray/optical ratios.
+
+#### Where
+- In config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+
+#### How
+- File names contains velocity limit and method used for selection. The method could be either "med" or "lolim", meaning that sources with median/lower-limit (1-sigma) velocity >= the given limit are selected. The "_unique" in file names means that duplicated matches have been removed from the catalogue, keeping only the closest neighbours.
+
+- File names are also suffixed by processing stages, whose meaning are as follow:
     - stage 0: Selected only based on vpec_min_lo or vpec_min_med (catalog.combine_catalog)
 
     - stage 1: Stage 0 with SIMBAD types and IDs (cross-matching done with TOPCAT)
@@ -39,6 +48,9 @@
     - stage 8a: Stage 8 with likely halo sources removed, using the Viswanathan+23 halo source catalogue.
 
     - stage 9: Stage 8 with LMC and SMC members removed (in catalog.select.clean_smc_and_lmc).
+
+#### What's New
+- The archived catalogues have not been removed and are kept in high-v_sources_old/.
 
 ## Other Updates
 ### Update on Jan 22, 2025: 
