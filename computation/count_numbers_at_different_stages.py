@@ -8,7 +8,9 @@ def get_catalog_names(vpec_lim: float = 150, mode: str = "lolim") -> dict:
 
     for i, stage in enumerate(stages):
         key = f"stage_{stage}"
-        catalog_names[key] = f"combined_vpec_{mode}_gt_{vpec_lim}_unique_{key}.csv"
+        catalog_names[key] = (
+            f"combined_vpec_{mode}_gt_{vpec_lim}_unique_{key}.csv"
+        )
 
     return catalog_names
 
@@ -30,8 +32,11 @@ def count(vpec_lim: float = 150, mode: str = "lolim") -> pd.DataFrame:
 
 def main() -> None:
     df = count()
-    df.to_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "source_counts.csv", index=False)
-    
+    df.to_csv(
+        config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "source_counts.csv",
+        index=False
+    )
+
 
 if __name__ == "__main__":
     main()
