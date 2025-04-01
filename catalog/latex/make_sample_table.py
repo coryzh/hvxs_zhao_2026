@@ -1,7 +1,7 @@
 import config
 import pandas as pd
-import astropy.units as u
-from astropy.coordinates import SkyCoord
+# import astropy.units as u
+# from astropy.coordinates import SkyCoord
 
 
 def make_prime_sample_source_table(df: pd.DataFrame) -> None:
@@ -11,7 +11,7 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
     \begin{tabular}{llcccc}
     \hline
     X-ray ID & Gaia DR3 & Separation  & \gaia\ G & d & $\vpecmin$ \\
-             &          & ($\sigma$)  &          & ($\kpc$) & $(\kms)$ \\ 
+             &          & ($\sigma$)  &          & ($\kpc$) & $(\kms)$ \\
     \hline
     """
 
@@ -28,17 +28,34 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
         id_g_str = f"{row['source_id']}"
         sep_str = f"{row['sep_x_g'] / row['pos_x_err']:.1f} "
         gmag_str = f"{row['phot_g_mean_mag']:.2f} "
-        d_str = f"${row['dist_med']:.1f}^{{+{row['E_dist']:.1f}}}_{{-{row['e_dist']:.1f}}}$"
-        vpec_str = rf"${row['vpec_min_med']:.1f}^{{+{row['E_vpec_min']:.1f}}}_{{-{row['e_vpec_min']:.1f}}}$ \\"
 
-        row_str = " & ".join([id_x_str, id_g_str, sep_str, gmag_str, d_str, vpec_str])
+        d_str = (
+            f"${row['dist_med']:.1f}"
+            f"^{{+{row['E_dist']:.1f}}}"
+            f"_{{-{row['e_dist']:.1f}}}$"
+        )
+
+        vpec_str = (
+            rf"${row['vpec_min_med']:.1f}"
+            rf"^{{+{row['E_vpec_min']:.1f}}}"
+            rf"_{{-{row['e_vpec_min']:.1f}}}$ \\"
+        )
+
+        row_str = " & ".join(
+            [id_x_str, id_g_str, sep_str, gmag_str, d_str, vpec_str]
+        )
         row_list.append(row_str)
 
     rows_str = "\n".join(row_list)
 
     table_str = f"{table_start}{rows_str}{table_end}"
 
-    out_file = config.RESULTS_LATEX_TABLE_DIR / "prime_sample_table" / "prime_sample.txt"
+    out_file = (
+        config.RESULTS_LATEX_TABLE_DIR
+        / "prime_sample_table"
+        / "prime_sample.txt"
+    )
+
     if not out_file.parent.exists():
         out_file.parent.mkdir()
 
