@@ -1,10 +1,10 @@
 ## Notes on Distance Estimate
 ### Updated method
 
-- Nominal values and point estimates
+#### Nominal values and point estimates
 Point estimates of distances (median, lower/upper limits) are taken directly from the external.gaiaedr3_distance catalogue in Gaia Archive (Bailer-Jones et al. 2021). 
 
-- Random samples
+#### Random samples
 Random samples of distances are drawn from Gamma distributions whose shape parameters "alpha" and "theta" are chosen such that the mode, (1-sigma) lower and upper limits best fit the Bailer-Jones values. For more details, check utils.distances.FromLiterature and computation.calc_v_min.get_random_distances_bailer_jones.
 
 In fact, the FromLiterature class in utils.distances can be used to model any asymmetric errors from the literature.
