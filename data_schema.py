@@ -2,19 +2,25 @@
 class Schema:
     @classmethod
     def get_attribute_values(cls):
-        return [value for key, value in cls.__dict__.items() if not key.startswith('__')]
+        return [
+            value
+            for key, value in cls.__dict__.items()
+            if not key.startswith('__')
+        ]
 
 
 class Swiftidentification(Schema):
     """
-    A schema class representing column names from the Swift Point Source Catalogue (2SXPS).
+    A schema class representing column names from the Swift Point Source
+    Catalogue (2SXPS).
 
     Attributes:
     ----------
     _2SXPS : str
         The identifier for the 2SXPS (Swift Point Source Catalogue) column.
     IAUName : str
-        The column name for the International Astronomical Union (IAU) designation of the source.
+        The column name for the International Astronomical Union (IAU)
+        designation of the source.
     """
     SourceID: str = "2SXPS_ID"
     IAUName: str = "IAUName"
@@ -22,7 +28,8 @@ class Swiftidentification(Schema):
 
 class SwiftCoord(Schema):
     """
-       A schema class representing the astrometric data columns from the Swift Point Source Catalogue (2SXPS).
+       A schema class representing the astrometric data columns from the Swift
+       Point Source Catalogue (2SXPS).
 
        Attributes:
        ----------
@@ -31,13 +38,15 @@ class SwiftCoord(Schema):
        Decl : str
            Corrected Declination of the detection in degrees (J2000 epoch).
        Err90 : str
-           90% confidence radial position uncertainty in arcseconds (90% confidence level).
+           90% confidence radial position uncertainty in arcseconds (90%
+           confidence level).
        GLON : str
            Galactic longitude of the detection in degrees.
        GLAT : str
            Galactic latitude of the detection in degrees.
        AstromType : str
-           The provenance of astrometry: 0 if from the Swift star trackers, 1 if rectified with 2MASS.
+           The provenance of astrometry: 0 if from the Swift star trackers,
+           1 if rectified with 2MASS.
     """
     RA: str = "RA"
     DE: str = "Decl"
@@ -76,7 +85,8 @@ class SwiftSchema(Schema):
 
 class SwiftFlux(Schema):
     """
-    A schema class representing flux-related columns from the Swift Point Source Catalogue (2SXPS).
+    A schema class representing flux-related columns from the Swift Point
+    Source Catalogue (2SXPS).
 
     Attributes:
     ----------
@@ -93,7 +103,8 @@ class SwiftFlux(Schema):
     PowUnabsFlux_neg : str
         Negative error on the unabsorbed flux using the power-law model.
     APECFlux : str
-        Observed flux using an APEC (Astrophysical Plasma Emission Code) model (0.3–10 keV) in erg/cm²/s.
+        Observed flux using an APEC (Astrophysical Plasma Emission Code) model
+        (0.3–10 keV) in erg/cm²/s.
     APECFlux_pos : str
         Positive error on the observed flux using the APEC model.
     APECFlux_neg : str
@@ -121,21 +132,27 @@ class SwiftFlux(Schema):
 
 class SwiftFlag(Schema):
     """
-    A schema class representing various warning and flag columns from the Swift Point Source Catalogue (2SXPS).
+    A schema class representing various warning and flag columns from the
+    Swift Point Source Catalogue (2SXPS).
 
     Attributes:
     ----------
     DetFlag : str
-        Detection flag indicating the status or reliability of the source detection.
+        Detection flag indicating the status or reliability of the source
+        detection.
     Fieldflag : str
-        Field flag providing information about the observation field, such as its quality or conditions.
+        Field flag providing information about the observation field, such as
+        its quality or conditions.
     OpticalLoadingWarning : str
-        Flag indicating a warning for potential optical loading, where bright optical sources may affect the X-ray
+        Flag indicating a warning for potential optical loading, where bright
+        optical sources may affect the X-ray
         detection.
     StrayLightWarning : str
-        Warning flag indicating that stray light may have impacted the detection or measurement.
+        Warning flag indicating that stray light may have impacted the
+        detection or measurement.
     NearBrightSourceWarning : str
-        Warning flag indicating proximity to a bright source, which could influence the accuracy of the detection.
+        Warning flag indicating proximity to a bright source, which could
+        influence the accuracy of the detection.
     """
     DetFlag: str = "DetFlag"
     Fieldflag: str = "FieldFlag"
@@ -159,7 +176,8 @@ class Gaia(Schema):
         pmra_error (str): Error in proper motion in Right Ascension.
         pmdec (str): Proper motion in Declination.
         pmdec_error (str): Error in proper motion in Declination.
-        astrometric_params_solved (str): Number of astrometric parameters solved.
+        astrometric_params_solved (str): Number of astrometric parameters
+        solved.
         pseudocolour (str): Pseudocolour.
         pseudocolour_error (str): Error in pseudocolour.
         ipd_frac_multi_peak (str): IPD fraction of multi-peak solutions.
@@ -176,8 +194,10 @@ class Gaia(Schema):
         radial_velocity (str): Radial velocity.
         radial_velocity_error (str): Error in radial velocity.
         rv_nb_transits (str): Number of radial velocity transits.
-        rv_expected_sig_to_noise (str): Expected signal-to-noise ratio of radial velocity.
-        rv_renormalised_gof (str): Renormalised goodness of fit of radial velocity.
+        rv_expected_sig_to_noise (str): Expected signal-to-noise ratio of
+        radial velocity.
+        rv_renormalised_gof (str): Renormalised goodness of fit of radial
+        velocity.
         rv_chisq_pvalue (str): Chi-square p-value of radial velocity.
         phot_variable_flag (str): Photometric variability flag.
         l (str): Galactic longitude.
@@ -295,4 +315,9 @@ class LX:
         return f"lum_{self.band}_lolim"
 
 
-SCHEMA_DICT = {"csc": CSCSchema, "xmm": XMMSchema, "swift": SwiftSchema, "erass": ERASSSchema}
+SCHEMA_DICT = {
+    "csc": CSCSchema,
+    "xmm": XMMSchema,
+    "swift": SwiftSchema,
+    "erass": ERASSSchema
+}
