@@ -1,0 +1,9 @@
+**/__pycache__/*
+
+# Ignore IDE configuration files
+.idea/
+.vscode/
+.env
+*.iml
+*.xml
+.DS_Store
