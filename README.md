@@ -1,4 +1,6 @@
-## Some notes on how combined catalogues are made
+## Notes on Distance Estimate
+
+## Notes on Catalogues
 
 ### Catalogues with minimum space velocities (v_min_catalogs)
 Catalogues in config.RESULTS_CATALOGUE_DIR / "v_min_catalogs"
@@ -14,7 +16,7 @@ Catalogues in config.RESULTS_CATALOGUE_DIR / "v_min_catalogs"
     Update March 15 2025: Distances used in computation are now 
 
 
-### High-velocity Sources
+### High-velocity Source Catalogues
 - **Nomenclature and processing stages
     - stage 0: Selected only based on vpec_min_lo or vpec_min_med (catalog.combine_catalog)
 
