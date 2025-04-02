@@ -23,7 +23,9 @@ def get_reddening(df: pd.DataFrame) -> np.ndarray:
     pos_cols = ["ra", "dec"]
     has_all_pos_col_names = all([item in df.columns for item in pos_cols])
     if not has_all_pos_col_names:
-        df_temp.rename(columns={"ra_gaia": "ra", "dec_gaia": "dec"}, inplace=True)
+        df_temp.rename(
+            columns={"ra_gaia": "ra", "dec_gaia": "dec"}, inplace=True
+        )
 
     coord = SkyCoord(df_temp.ra, df_temp.dec, frame="icrs", unit="deg")
     csfd = CSFDQuery()
