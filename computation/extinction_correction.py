@@ -4,8 +4,6 @@ import config
 from dustmaps.csfd import CSFDQuery
 from astropy.coordinates import SkyCoord
 from utils.gal_extinction import gal_extinction_vec
-from typing import Tuple
-
 
 phot_name_dict = {
     "gaia_g": "phot_g_mean_mag",
@@ -55,20 +53,26 @@ def extinction_correction(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_5.csv"
+    in_file = (
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources"
+        / "combined_vpec_lolim_gt_150_unique_stage_5.csv"
+    )
+
     df = pd.read_csv(in_file)
 
     # results = get_extinction(df, band="gaia_g")
     df_out = extinction_correction(df)
     if "stage_5" in in_file.stem:
-        out_file = in_file.parent / f"{in_file.stem.replace('stage_5', 'stage_6')}.csv"
+        out_file = (
+            in_file.parent
+            / f"{in_file.stem.replace('stage_5', 'stage_6')}.csv"
+        )
 
     else:
         out_file = in_file.parent / f"{in_file.stem}_stage_6.csv"
 
     df_out.to_csv(out_file, index=False)
-
-    # print(df_out)
 
 
 if __name__ == "__main__":
