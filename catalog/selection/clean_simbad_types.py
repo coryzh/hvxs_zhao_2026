@@ -151,7 +151,7 @@ def _clean_df_simbad_name(
         )
 
     logger.log(
-        "{df.shape[0] - _filter.sum()} rows removed based on their "
+        f"{df.shape[0] - _filter.sum()} rows removed based on their "
         "SIMBAD names.\n"
     )
 
