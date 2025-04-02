@@ -46,7 +46,7 @@ common_columns = [
     "mh_gspphot", "mh_gspphot_lower", "mh_gspphot_upper",
     "parallax", "parallax_corr", "parallax_error",
     "pmra", "pmra_error", "pmdec", "pmdec_error",
-    "dist_med", "e_dist", "E_dist", "distance_inference",
+    "dist_med", "e_dist", "E_dist",
     "vpec_gamma_min_med", "e_vpec_gamma_min", "E_vpec_gamma_min",
     "vpec_min_med", "e_vpec_min", "E_vpec_min",
     "vspace_gamma_min_med", "e_vspace_gamma_min", "E_vspace_gamma_min",
