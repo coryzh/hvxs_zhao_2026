@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import config
-from catalog.select.clean_for_plotting import clean_for_fxfg_vs_bprp
+from catalog.selection.clean_for_plotting import clean_for_fxfg_vs_bprp
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 # from matplotlib import colors
 from pathlib import Path
