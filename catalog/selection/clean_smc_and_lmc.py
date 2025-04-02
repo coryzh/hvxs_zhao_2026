@@ -60,8 +60,8 @@ def clean(
     _filter = (df_merged["P"] <= prob_thresh) | (df_merged["P"].isna())
     n_member = df.shape[0] - _filter.sum()
     logger.log(
-        f"{n_member} matches are considered {opt.upper()}"
-        f"embers (prob>={prob_thresh:.1e}).\n"
+        f"{n_member} matches are considered {opt.upper()} "
+        f"members (prob>={prob_thresh:.1e}).\n"
     )
 
     df_filtered = df_merged[_filter]
