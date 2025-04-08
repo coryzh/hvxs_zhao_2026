@@ -52,7 +52,7 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
         cmap="Greens", ec="k", norm=color_norm
     )
 
-    # Get the positions of the top and bottom subplots to calculate the 
+    # Get the positions of the top and bottom subplots to calculate the
     # colorbar's height
     box = ax.get_position()  # Get the position of the top-right subplot
 
