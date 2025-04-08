@@ -6,7 +6,7 @@ import numpy as np
 import astropy.units as u
 from typing import Tuple
 from matplotlib.ticker import ScalarFormatter
-from matplotlib.colors import LogNorm, PowerNorm
+from matplotlib.colors import LogNorm
 from plot_settings import CMAP
 
 
@@ -18,7 +18,10 @@ def set_up_figure(**kwargs_subplots) -> Tuple[plt.Figure, plt.Axes]:
 
 
 def axis_settings(ax: plt.Axes) -> None:
-    ax.set_xlabel(r"Semi-major axis estimate, $\sqrt{2}\epsilon d\,(\mathrm{AU})$")
+    ax.set_xlabel(
+        r"Semi-major axis estimate, "
+        r"$\sqrt{2}\epsilon d\,(\mathrm{AU})$"
+    )
     ax.set_ylabel(r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$")
 
     ax.set_xscale("log")
@@ -36,17 +39,34 @@ def axis_settings(ax: plt.Axes) -> None:
 
 
 def add_control(ax: plt.Axes) -> None:
-    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_9.csv")
-    df_all.dropna(subset=["astrometric_excess_noise", "dist_med", "vpec_min_med", "e_vpec_min"], inplace=True)
+    df_all = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "control_sample" / "control_sample_stage_9.csv"
+    )
+    df_all.dropna(
+        subset=[
+            "astrometric_excess_noise", "dist_med", "vpec_min_med",
+            "e_vpec_min"
+        ], inplace=True
+    )
     df_all = df_all[df_all["distance_inference"] != "fixed_at_1"]
 
     aen = df_all["astrometric_excess_noise"].values
-    x = np.sqrt(2) * (aen * u.mas).to(u.rad).value * df_all["dist_med"].values * u.kpc
+    x = (
+        np.sqrt(2) * (aen * u.mas).to(u.rad).value
+        * df_all["dist_med"].values * u.kpc
+    )
+
     x = x.to(u.AU).value
     y = df_all["vpec_min_med"] - df_all["e_vpec_min"]
 
-    _ = ax.scatter(x, y, s=0.1, marker=".", zorder=0.5, color="k", rasterized=True)
-    # ax.scatter(bp_rp, g_abs, marker="o", s=0.1, color="k", alpha=0.4, rasterized=True, zorder=0)
+    _ = ax.scatter(
+        x, y, s=0.1, marker=".", zorder=0.5, color="k",
+        rasterized=True
+    )
+
+    # ax.scatter(bp_rp, g_abs, marker="o", s=0.1, color="k", alpha=0.4,
+    # rasterized=True, zorder=0)
 
 
 def add_hvxs(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
@@ -56,7 +76,10 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
     df_filtered = df_filtered.sort_values("dist_med", ascending=False)
 
     aen = df_filtered[ds.Gaia.astrometric_excess_noise].values
-    x = np.sqrt(2) * (aen * u.mas).to(u.rad).value * df_filtered["dist_med"].values * u.kpc
+    x = (
+        np.sqrt(2) * (aen * u.mas).to(u.rad).value
+        * df_filtered["dist_med"].values * u.kpc
+    )
     x = x.to(u.AU).value
     y = df_filtered["vpec_min_med"] - df_filtered["e_vpec_min"]
     dist = df_filtered["dist_med"]
@@ -66,9 +89,13 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
     color_min = 0.1
     color_max = 20.0
     color_norm = LogNorm(vmin=color_min, vmax=color_max)
-    scatter = ax.scatter(x, y, s=20, marker="o", c=dist, cmap=CMAP, ec="k", norm=color_norm, alpha=0.8)
+    scatter = ax.scatter(
+        x, y, s=20, marker="o", c=dist, cmap=CMAP, ec="k",
+        norm=color_norm, alpha=0.8
+    )
 
-    # Get the positions of the top and bottom subplots to calculate the colorbar's height
+    # Get the positions of the top and bottom subplots to calculate the
+    # colorbar's height
     box = ax.get_position()  # Get the position of the top-right subplot
 
     # Calculate the position and dimensions for the colorbar
@@ -93,7 +120,10 @@ def make_plot() -> None:
     add_control(ax)
     axis_settings(ax)
 
-    plt.savefig(config.RESULTS_FIGURES_DIR / "excess_noise" / "aen_vs_vpec_vpec_lolim_gt_150.pdf")
+    plt.savefig(
+        config.RESULTS_FIGURES_DIR
+        / "excess_noise" / "aen_vs_vpec_vpec_lolim_gt_150.pdf"
+    )
 
 
 if __name__ == "__main__":
