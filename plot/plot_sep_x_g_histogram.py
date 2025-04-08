@@ -1,5 +1,4 @@
 import numpy as np
-
 import config
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -24,20 +23,27 @@ def axes_settings(ax: plt.Axes) -> None:
 
 def add_histogram(ax: plt.Axes, from_catalog: str) -> None:
     # for key, val in SURVEY_COLOR_DICT.items():
-    in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0_all.csv")
+    in_file = (
+        config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+        / "combined_vpec_med_gt_0_all.csv"
+    )
 
     df = pd.read_csv(in_file)
-    sep_sigma_all = df["sep_x_g"] / df["pos_x_err"]
-    bins = np.linspace(sep_sigma_all.min(), sep_sigma_all.max(), 100)
+    # sep_sigma_all = df["sep_x_g"] / df["pos_x_err"]
+    # bins = np.linspace(sep_sigma_all.min(), sep_sigma_all.max(), 100)
     df_filtered = df[df["from"] == from_catalog]
     sep = df_filtered["sep_x_g"] / df_filtered["pos_x_err"]
 
     kde = gaussian_kde(sep)
     sep_range = np.arange(0, max(sep), 0.01)
 
-    ax.plot(sep_range, kde(sep_range), lw=2.0, color=SURVEY_COLOR_DICT[from_catalog],
-            label=SURVEY_NAME_DICT[from_catalog])
-    # _ = ax.hist(sep, bins=bins, density=True, histtype="step", ec=SURVEY_COLOR_DICT[from_catalog],
+    ax.plot(
+        sep_range, kde(sep_range), lw=2.0,
+        color=SURVEY_COLOR_DICT[from_catalog],
+        label=SURVEY_NAME_DICT[from_catalog]
+    )
+    # _ = ax.hist(sep, bins=bins, density=True, histtype="step",
+    # ec=SURVEY_COLOR_DICT[from_catalog],
     #             label=SURVEY_NAME_DICT[from_catalog], lw=1.5)
 
 

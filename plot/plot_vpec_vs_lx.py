@@ -20,7 +20,11 @@ def make_figure() -> None:
     plt.style.use("mycustomised")
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_gt_200.csv")
+    df = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources" / "combined_vpec_gt_200.csv"
+    )
+
     for key, val in color_dict.items():
         _filter = df["from"] == key
         df_filtered = df[_filter]
@@ -28,10 +32,16 @@ def make_figure() -> None:
         x = df_filtered["vpec_min_med"] - df_filtered["e_vpec_min"]
         y = df_filtered["lum_x"]
 
-        ax.scatter(x, y, s=70, fc=color_dict[key], ec="k", marker="o", label=label_dict[key], alpha=0.8)
+        ax.scatter(
+            x, y, s=70, fc=color_dict[key], ec="k", marker="o",
+            label=label_dict[key], alpha=0.8
+        )
 
     for i in range(1, len(lum_x_grid)):
-        _filter_lum_x = (df["lum_x"] >= lum_x_grid[i - 1]) & (df["lum_x"] <= lum_x_grid[i])
+        _filter_lum_x = (
+            (df["lum_x"] >= lum_x_grid[i - 1]) & (df["lum_x"] <= lum_x_grid[i])
+        )
+
         df = df.dropna(subset=["lum_x_err"])
         df_filtered_lum_x = df[_filter_lum_x]
         mean_lx_err = np.median(df_filtered_lum_x.lum_x_err.values)
@@ -42,7 +52,11 @@ def make_figure() -> None:
 
     ax.set_yscale("log")
     ax.set_xscale("log")
-    ax.set_xlabel(r"1 σ lower limit on $v_\mathrm{pec, min}\,(\mathrm{km~s^{-1}}$)")
+    ax.set_xlabel(
+        r"1 σ lower limit on "
+        r"$v_\mathrm{pec, min}\,(\mathrm{km~s^{-1}}$)"
+    )
+    
     ax.set_ylabel(r"$L_X\,(\mathrm{erg~s^{-1}})$")
 
     ax.get_xaxis().set_major_formatter(ScalarFormatter())

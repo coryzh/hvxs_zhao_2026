@@ -34,23 +34,34 @@ def add_sources(df: pd.DataFrame, ax: np.ndarray[plt.Axes]) -> None:
 
 
 def background_histogram(ax: np.ndarray[plt.Axes]) -> None:
-    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_med_gt_0_unique_stage_8.csv")
+    df_all = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources" / "combined_vpec_med_gt_0_unique_stage_8.csv"
+    )
+
     df_all = df_all[df_all["distance_inference"] != "fixed_at_1"]
+
     ax[0].hist2d(-df_all["x"], df_all["y"], bins=50,
                  cmin=0.1, norm=colors.LogNorm(), zorder=0.5, cmap="Greens")
+
     ax[1].hist2d(df_all["r_gc"], np.abs(df_all["z"]), bins=50,
                  cmin=0.1, norm=colors.LogNorm(), zorder=0.5, cmap="Greens")
 
 
 def make_galactic_map() -> None:
-    df_hvx = pd.read_csv(config.RESULTS_CATALOGUE_DIR /
-                         "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_8.csv")
+    df_hvx = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR /
+        "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_8.csv"
+    )
     fig, ax = setup_axes()
     axes_settings(ax)
     background_histogram(ax)
     add_sources(df_hvx, ax)
 
-    plt.savefig(config.RESULTS_FIGURES_DIR / "high-v_sources" / "galactic_map_cartesian.pdf")
+    plt.savefig(
+        config.RESULTS_FIGURES_DIR
+        / "high-v_sources" / "galactic_map_cartesian.pdf"
+    )
 
 
 def main() -> None:

@@ -34,7 +34,9 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes) -> None:
     vspace_lolim = (df["vspace_min_med"] - df["e_vspace_min"]).values
     r = df["r_gc"].values
 
-    ax.scatter(r, vspace_lolim, marker="o", s=1, fc="r", ec="k", rasterized=True)
+    ax.scatter(
+        r, vspace_lolim, marker="o", s=1, fc="r", ec="k", rasterized=True
+    )
 
 
 def plot() -> None:

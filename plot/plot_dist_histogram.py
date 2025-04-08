@@ -39,7 +39,10 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
 
         hist = ax.hist(dist, bins=bins, histtype="step", ec=val, lw=1.5)
 
-        ax.step(bin_centers, hist[0], color=val, where="mid", label=label_names[key])
+        ax.step(
+            bin_centers, hist[0],
+            color=val, where="mid", label=label_names[key]
+        )
 
 
 def add_control(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
@@ -52,8 +55,18 @@ def add_control(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
 
 
 def make_figure() -> None:
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv")
-    df_control = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_9.csv")
+    df = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources"
+        / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+    )
+
+    df_control = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "control_sample"
+        / "control_sample_stage_9.csv"
+    )
+    
     fig, ax = set_up_figure()
     add_hvxs(df, ax, fig)
     add_control(df_control, ax, fig)

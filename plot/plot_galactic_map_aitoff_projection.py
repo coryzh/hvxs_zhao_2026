@@ -4,8 +4,10 @@ import numpy as np
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from typing import Tuple
-from plot_settings import (SCATTER_DICT_GALACTIC_MAP, PRIME_SOURCE_MARKER, PRIME_SOURCE_COLOR,
-                           PRIME_SCATTER_MARKER_SETTINGS)
+from plot_settings import (
+    SCATTER_DICT_GALACTIC_MAP, PRIME_SOURCE_MARKER, PRIME_SOURCE_COLOR,
+    PRIME_SCATTER_MARKER_SETTINGS
+)
 import config
 from utils import process_string
 
@@ -32,9 +34,9 @@ def setup_axes() -> Tuple[plt.Figure, plt.Axes]:
     return fig, ax
 
 
-def calc_galactic_coordinates(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
-    # n_df = df.index
-
+def calc_galactic_coordinates(
+        df: pd.DataFrame
+) -> Tuple[np.ndarray, np.ndarray]:
     coord = SkyCoord(df["ra_x"], df["dec_x"], unit="deg")
 
     coord_gal = coord.galactic
@@ -46,7 +48,10 @@ def calc_galactic_coordinates(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]
 
 
 def background_histogram(ax: plt.Axes) -> None:
-    df_all = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_10.csv")
+    df_all = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "control_sample" / "control_sample_stage_10.csv"
+    )
     _filter = df_all["dist_med"] < 1.5
     df_all = df_all[_filter]
     l, b = calc_galactic_coordinates(df_all)
@@ -55,7 +60,9 @@ def background_histogram(ax: plt.Axes) -> None:
     y_centers = 0.5 * (yedges[:-1] + yedges[1:])
     x, y = np.meshgrid(x_centers, y_centers)
 
-    _c = ax.pcolormesh(x, y, h.T, shading="auto", cmap="Greens", edgecolors="face")
+    _ = ax.pcolormesh(
+        x, y, h.T, shading="auto", cmap="Greens", edgecolors="face"
+    )
 
 
 def add_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
@@ -68,25 +75,37 @@ def add_prime_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
     for i, row in df.iterrows():
         name = process_string.get_short_id(row["ID_x"])
         print(name)
-        ax.scatter(l[i], b[i], marker=PRIME_SOURCE_MARKER[i], fc=PRIME_SOURCE_COLOR[i], label=rf'{name}',
-                   **PRIME_SCATTER_MARKER_SETTINGS)
+        ax.scatter(
+            l[i], b[i], marker=PRIME_SOURCE_MARKER[i],
+            fc=PRIME_SOURCE_COLOR[i], label=rf'{name}',
+            **PRIME_SCATTER_MARKER_SETTINGS
+        )
 
 
 def make_galactic_map() -> None:
     fig, ax = setup_axes()
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+    in_file = (
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+    )
     df = pd.read_csv(in_file)
+
     df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
     background_histogram(ax)
     add_sources(df, ax)
-    # add_prime_sources(df_prime, ax)
+    add_prime_sources(df_prime, ax)
 
-    out_file = config.RESULTS_FIGURES_DIR / "galactic_map" / f"{in_file.stem}_gal_map_no_prime.pdf"
+    out_file = (
+        config.RESULTS_FIGURES_DIR
+        / "galactic_map" / f"{in_file.stem}_gal_map_no_prime.pdf"
+    )
 
     if not out_file.parent.exists():
         out_file.parent.mkdir()
 
-    legend = plt.legend(bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=5)
+    legend = plt.legend(
+        bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=5
+    )
     for handle in legend.legend_handles:
         handle.set_alpha(1.0)
 

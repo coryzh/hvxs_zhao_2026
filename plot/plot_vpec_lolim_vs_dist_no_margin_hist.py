@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import config
 import plot.plot_settings as ps
-from utils.process_string import wrap_sign, get_short_id
+from utils.process_string import get_short_id
 from typing import Tuple
-from plot.plot_settings import DIST_INFERENCE_COLOR_DICT, DIST_INFERENCE_LINESTYLE_DICT
+from plot.plot_settings import DIST_INFERENCE_COLOR_DICT
 
 
 def make_figure() -> Tuple[plt.Figure, list[plt.Axes]]:
@@ -53,22 +53,33 @@ def add_prime_sources(df_prime: pd.DataFrame, ax: list[plt.Axes]) -> None:
         x = row["dist_med"]
         y = row["vpec_min_med"] - row["e_vpec_min"]
         name = get_short_id(row["ID_x"])
-        ax_scatter.scatter(x, y, marker=ps.PRIME_SOURCE_MARKER[i], fc=ps.PRIME_SOURCE_COLOR[i], label=name,
-                           **ps.PRIME_SCATTER_MARKER_SETTINGS)
+        ax_scatter.scatter(
+            x, y, marker=ps.PRIME_SOURCE_MARKER[i], 
+            fc=ps.PRIME_SOURCE_COLOR[i], label=name,
+            **ps.PRIME_SCATTER_MARKER_SETTINGS
+        )
 
-    legend = ax[0].legend(bbox_to_anchor=[0.02, 0.99], loc="upper left", fontsize=15)
+    legend = ax[0].legend(
+        bbox_to_anchor=[0.02, 0.99], loc="upper left", fontsize=15
+    )
     for handle in legend.legend_handles:
         handle.set_alpha(1.0)
 
 
 def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
-    df_control = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "control_sample" / "control_sample_stage_9.csv")
+    df_control = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "control_sample" / "control_sample_stage_9.csv"
+    )
     _filter = df_control["distance_inference"] != "fixed_at_1"
     df_control = df_control[_filter]
 
     min_aen_val = 1e-3
     df_hvxs = df_hvxs.sort_values("astrometric_excess_noise", ascending=True)
-    df_hvxs["astrometric_excess_noise"] = df_hvxs["astrometric_excess_noise"].replace(0, min_aen_val)
+    df_hvxs["astrometric_excess_noise"] = (
+        df_hvxs["astrometric_excess_noise"]
+        .replace(0, min_aen_val)
+    )
     n_hvxs = df_hvxs[df_hvxs["distance_inference"] != "fixed_at_1"].shape[0]
 
     dist = df_hvxs["dist_med"]
@@ -83,8 +94,14 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
     # }
 
     scatter_style = {
-        "HVXS": {"s": 20, "ec": "k", "c": "r", "alpha": 0.5, "rasterized": True, "label": "HVXS"},
-        "Control": {"s": 0.01, "c": "k", "alpha": 0.2, "rasterized": True, "label": "Control"}
+        "HVXS": {
+            "s": 20, "ec": "k", "c": "r", "alpha": 0.5, "rasterized": True,
+            "label": "HVXS"
+        },
+        "Control": {
+            "s": 0.01, "c": "k", "alpha": 0.2, "rasterized": True,
+            "label": "Control"
+        }
     }
 
     df_dict = {
@@ -112,21 +129,28 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
 
         dist = df_sub["dist_med"]
 
-        hist = ax[1].hist(dist, bins=dist_bins, histtype="stepfilled", ec="k", lw=2.0, alpha=0.7,
-                          label=dist_hist_label_names[key], zorder=-2 + i)
+        hist = ax[1].hist(
+            dist, bins=dist_bins, histtype="stepfilled", ec="k",
+            lw=2.0, alpha=0.7, label=dist_hist_label_names[key], 
+            zorder=-2 + i
+        )
 
         mode_index = np.argmax(hist[0])
 
-        ax[1].text(x=dist_bins[mode_index], y=1.5, s=f"{percentage:.1f}%", color="w", fontsize=18,
-                   va="center", ha="left")
+        ax[1].text(
+            x=dist_bins[mode_index], y=1.5, s=f"{percentage:.1f}%", color="w",
+            fontsize=18, va="center", ha="left"
+        )
 
-        # ax[1].step(dist_bin_centres, hist[0], color="k", where="mid", lw=2.0, zorder=-2 + i)
-
-    df_control_filtered = df_control[df_control["distance_inference"] != "fixed_at_1"]
+    df_control_filtered = (
+        df_control[df_control["distance_inference"] != "fixed_at_1"]
+    )
 
     dist_control = df_control_filtered["dist_med"]
-    ax[1].hist(dist_control, bins=dist_bins, color="k", label="Control", alpha=0.5, ec="k", lw=2.0,
-               histtype="stepfilled")
+    ax[1].hist(
+        dist_control, bins=dist_bins, color="k", label="Control", alpha=0.5,
+        ec="k", lw=2.0, histtype="stepfilled"
+    )
 
     ax[0].axhline(y=150, ls=":", color="k")
 
@@ -146,16 +170,22 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
 
 
 def make_plot() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+    in_file = (
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+    )
     df = pd.read_csv(in_file)
     df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
 
     fig, ax = make_figure()
     axes_settings(ax)
     add_control_and_hvxs(df_hvxs=df, ax=ax)
-    # add_prime_sources(df_prime, ax=ax)
-    # add_hvxs(df, ax[0])
-    plt.savefig(config.RESULTS_FIGURES_DIR / "dist_vs_vpec" / "vpec_lolim_gt_150_vpec_vs_dist_stage_9_no_prime.pdf")
+    add_prime_sources(df_prime, ax=ax)
+    plt.savefig(
+        config.RESULTS_FIGURES_DIR
+        / "dist_vs_vpec"
+        / "vpec_lolim_gt_150_vpec_vs_dist_stage_9_no_prime.pdf"
+    )
 
 
 def main() -> None:
