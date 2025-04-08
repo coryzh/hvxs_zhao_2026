@@ -7,3 +7,12 @@
 *.iml
 *.xml
 .DS_Store
+notebooks/test_astroplan.ipynb
+notebooks/test_calc_vpec_and_vspace_min.ipynb
+notebooks/test_color_maps.ipynb
+.gitignore
+notebooks/test_distances.ipynb
+notebooks/test_emcee_sampler.ipynb
+notebooks/test_plot_fxfopt_vs_bp_rp.ipynb
+notebooks/test_skewed_normal_for_bailer_jones_distances.ipynb
+notebooks/test_space_velocity_astropy.ipynb
