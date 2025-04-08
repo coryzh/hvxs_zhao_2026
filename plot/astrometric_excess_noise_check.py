@@ -37,16 +37,23 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes, fig: plt.Figure) -> None:
     _epsilon_filter = df[ds.Gaia.astrometric_excess_noise] > 0
     df_filtered = df[_epsilon_filter]
     x = df_filtered[ds.Gaia.astrometric_excess_noise].values
-    y = np.sqrt(2) * (x * u.mas).to(u.rad).value * df_filtered["dist_med"].values * u.kpc
+    y = (
+        np.sqrt(2) * (x * u.mas).to(u.rad).value
+        * df_filtered["dist_med"].values * u.kpc
+    )
     y = y.to(u.AU).value
     vpec_min_lo = df_filtered["vpec_min_med"] - df_filtered["e_vpec_min"]
 
     color_min = vpec_min_lo.min()
     color_max = vpec_min_lo.max()
     color_norm = LogNorm(vmin=color_min, vmax=color_max)
-    scatter = ax.scatter(x, y, s=40, marker="o", c=vpec_min_lo, cmap="Greens", ec="k", norm=color_norm)
+    scatter = ax.scatter(
+        x, y, s=40, marker="o", c=vpec_min_lo,
+        cmap="Greens", ec="k", norm=color_norm
+    )
 
-    # Get the positions of the top and bottom subplots to calculate the colorbar's height
+    # Get the positions of the top and bottom subplots to calculate the 
+    # colorbar's height
     box = ax.get_position()  # Get the position of the top-right subplot
 
     # Calculate the position and dimensions for the colorbar
@@ -66,11 +73,16 @@ def add_constant_distance_lines(ax: plt.Axes) -> None:
     d_list = [d * u.kpc for d in [0.5, 5.0, 30.0]]
     d_ls = [":", "--", "-."]
     epsilon_min, epsilon_max = ax.get_xlim()
-    epsilon_range = np.logspace(np.log10(epsilon_min), np.log10(epsilon_max), 100) * u.mas
+    epsilon_range = np.logspace(
+        np.log10(epsilon_min), np.log10(epsilon_max), 100
+    ) * u.mas
 
     for i, dist in enumerate(d_list):
         y = (dist * epsilon_range.to(u.rad).value).to(u.AU).value
-        ax.plot(epsilon_range, y, lw=1.5, ls=d_ls[i], color="r", label=fr"$d={dist.value:.1f}$ kpc")
+        ax.plot(
+            epsilon_range, y, lw=1.5, ls=d_ls[i], color="r",
+            label=fr"$d={dist.value:.1f}$ kpc"
+        )
 
     ax.legend(loc="best")
 
@@ -84,7 +96,10 @@ def make_plot() -> None:
     axis_settings(ax)
     add_constant_distance_lines(ax)
 
-    plt.savefig(config.RESULTS_FIGURES_DIR / "excess_noise" / "aen_vs_semi_major_axis.pdf")
+    plt.savefig(
+        config.RESULTS_FIGURES_DIR
+        / "excess_noise" / "aen_vs_semi_major_axis.pdf"
+    )
 
 
 if __name__ == "__main__":
