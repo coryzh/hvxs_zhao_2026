@@ -56,7 +56,7 @@ def make_figure() -> None:
         r"1 σ lower limit on "
         r"$v_\mathrm{pec, min}\,(\mathrm{km~s^{-1}}$)"
     )
-    
+
     ax.set_ylabel(r"$L_X\,(\mathrm{erg~s^{-1}})$")
 
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
