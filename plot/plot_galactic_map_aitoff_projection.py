@@ -50,7 +50,7 @@ def calc_galactic_coordinates(
 def background_histogram(ax: plt.Axes) -> None:
     df_all = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_10.csv"
+        / "control_sample" / "control_sample_stage_9.csv"
     )
     _filter = df_all["dist_med"] < 1.5
     df_all = df_all[_filter]
@@ -90,14 +90,14 @@ def make_galactic_map() -> None:
     )
     df = pd.read_csv(in_file)
 
-    df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
+    # df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
     background_histogram(ax)
     add_sources(df, ax)
-    add_prime_sources(df_prime, ax)
+    # add_prime_sources(df_prime, ax)
 
     out_file = (
         config.RESULTS_FIGURES_DIR
-        / "galactic_map" / f"{in_file.stem}_gal_map_no_prime.pdf"
+        / "galactic_map" / "galactic_map.pdf"
     )
 
     if not out_file.parent.exists():
