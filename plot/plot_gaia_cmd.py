@@ -38,8 +38,8 @@ def make_figure(
 
 
 def axes_settings(ax: plt.Axes) -> None:
-    ax.set_xlim(-0.8, 4.2)
-    ax.set_ylim(13, -0.8)
+    ax.set_xlim(-1.1, 4.5)
+    ax.set_ylim(15, -2.5)
 
     ax.set_xlabel("Bp$-$Rp")
     ax.set_ylabel(r"$M_\mathrm{G}$")
@@ -94,31 +94,16 @@ def add_background(ax: plt.Axes, fig: plt.Figure) -> None:
 
     df_all = preprocessing(df_all)
 
-    # df_all.dropna(
-    #     subset=["bp_rp", "dist_med", "phot_g_mean_mag"], inplace=True
-    # )
-
-    # df_all = df_all[df_all["distance_inference"] != "fixed_at_1"]
-
     bp_rp = df_all["bp_rp"] - df_all["ebpminrp_gspphot"]
     dist = df_all["dist_med"]
     g_abs = (
         df_all["phot_g_mean_mag"]
         - df_all["ag_gspphot"] - 5.0 * np.log10(dist) - 10.0
     )
-
-    # print(min(bp_rp), max(bp_rp))
-    # print(min(g_abs), max(g_abs))
     _ = ax.hist2d(
-        bp_rp, g_abs, bins=200, cmin=0.1, norm=colors.PowerNorm(0.5),
+        bp_rp, g_abs, bins=180, cmin=0.1, norm=colors.PowerNorm(0.3),
         zorder=0.5, cmap="Greens"
     )
-    # cax = ax.inset_axes((0.55, 0.1, 0.3, 0.08))
-    # cax.set_frame_on(False)
-    # cbar = fig.colorbar(_hist[3], ax=cax, orientation="horizontal")
-    # cbar.set_label("Counts")
-    # ax.scatter(bp_rp, g_abs, marker="o", s=0.1, color="k", alpha=0.4,
-    # rasterized=True, zorder=0)
 
 
 def make_cmd(in_file: Path) -> None:
