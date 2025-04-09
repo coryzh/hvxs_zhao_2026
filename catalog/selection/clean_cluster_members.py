@@ -171,8 +171,8 @@ def cross_match_astrometry(
 
 
 def main() -> None:
-    in_file = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-               / "combined_vpec_lolim_gt_150_unique_stage_3.csv")
+    in_file = (config.RESULTS_CATALOGUE_DIR / "control_sample"
+               / "control_sample_stage_3.csv")
 
     # cross_match_astrometry(in_file_csv=in_file, verbose=True,
     # radius_type="r50")

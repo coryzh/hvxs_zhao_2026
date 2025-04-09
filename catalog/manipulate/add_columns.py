@@ -93,8 +93,8 @@ def add_erass_iauname(df: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR
-               / "high-v_sources"
-               / "combined_vpec_lolim_gt_150_unique_stage_7.csv")
+               / "control_sample"
+               / "control_sample_stage_7.csv")
 
     add_cartesian_coordinates(in_file)
     # df.to_csv(config.RESULTS_CATALOGUE_DIR /
