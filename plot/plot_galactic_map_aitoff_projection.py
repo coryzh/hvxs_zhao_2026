@@ -61,13 +61,16 @@ def background_histogram(ax: plt.Axes) -> None:
     x, y = np.meshgrid(x_centers, y_centers)
 
     _ = ax.pcolormesh(
-        x, y, h.T, shading="auto", cmap="Greens", edgecolors="face"
+        x, y, h.T, shading="auto", cmap="Greens", edgecolors="face", 
+        rasterized=True
     )
 
 
 def add_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
     l, b = calc_galactic_coordinates(df)
-    ax.scatter(l, b, label="HVXS", **SCATTER_DICT_GALACTIC_MAP)
+    ax.scatter(
+        l, b, label="HVXS", rasterized=True, **SCATTER_DICT_GALACTIC_MAP
+    )
 
 
 def add_prime_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
