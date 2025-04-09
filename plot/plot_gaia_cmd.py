@@ -6,9 +6,19 @@ from pathlib import Path
 from typing import Tuple
 from matplotlib import colors
 from plot.plot_settings import SCATTER_DICT_CMD
-from utils.process_string import get_short_id
-import plot.plot_settings as ps
+# from utils.process_string import get_short_id
+# import plot.plot_settings as ps
 import config
+
+
+def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
+    cols_to_imputate = ["ebpminrp_gspphot", "ag_gspphot"]
+    cols_to_dropna = ["bp_rp", "phot_g_mean_mag", "dist_med"]
+    df[cols_to_imputate] = df[cols_to_imputate].fillna(0)
+
+    df = df.dropna(subset=cols_to_dropna, how="any")
+
+    return df
 
 
 def make_figure(
@@ -39,46 +49,63 @@ def add_sample(in_file: Path, ax: plt.Axes) -> None:
     df = pd.read_csv(in_file)
     df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
 
-    bp_rp = df["phot_bp_mean_mag"] - df["phot_rp_mean_mag"]
+    df = preprocessing(df)
+    df_prime = preprocessing(df_prime)
+
+    bp_rp = (
+        df["phot_bp_mean_mag"]
+        - df["phot_rp_mean_mag"]
+        - df["ebpminrp_gspphot"]
+    )
+
     dist = df["dist_med"]
-    g_abs = df["phot_g_mean_mag"] - 5.0 * np.log10(dist) - 10.0
+    g_abs = (
+        df["phot_g_mean_mag"]
+        - df["ag_gspphot"]
+        - 5.0 * np.log10(dist) - 10.0
+    )
 
     ax.scatter(bp_rp, g_abs, label="HVXS", **SCATTER_DICT_CMD)
 
-    for i, row in df_prime.iterrows():
-        bp_rp_prime = row["bp_rp"]
-        g_abs_prime = (
-            row["phot_g_mean_mag"] - 5.0 * np.log10(row["dist_med"]) - 10.0
-        )
-        name = get_short_id(row["ID_x"])
-        ax.scatter(
-            bp_rp_prime, g_abs_prime, fc=ps.PRIME_SOURCE_COLOR[i],
-            marker=ps.PRIME_SOURCE_MARKER[i], label=name,
-            **ps.PRIME_SCATTER_MARKER_SETTINGS
-        )
+    # for i, row in df_prime.iterrows():
+    #     bp_rp_prime = row["bp_rp"]
+    #     g_abs_prime = (
+    #         row["phot_g_mean_mag"] - 5.0 * np.log10(row["dist_med"]) - 10.0
+    #     )
+    #     name = get_short_id(row["ID_x"])
+    #     ax.scatter(
+    #         bp_rp_prime, g_abs_prime, fc=ps.PRIME_SOURCE_COLOR[i],
+    #         marker=ps.PRIME_SOURCE_MARKER[i], label=name,
+    #         **ps.PRIME_SCATTER_MARKER_SETTINGS
+    #     )
 
-    legend = ax.legend(
-        bbox_to_anchor=[0.65, 0.99], loc="upper left", handletextpad=0.2
-    )
-    for handle in legend.legend_handles:
-        handle.set_alpha(1.0)
+    # legend = ax.legend(
+    #     bbox_to_anchor=[0.65, 0.99], loc="upper left", handletextpad=0.2
+    # )
+    # for handle in legend.legend_handles:
+    #     handle.set_alpha(1.0)
 
 
 def add_background(ax: plt.Axes, fig: plt.Figure) -> None:
     df_all = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR / "control_sample"
-        / "control_sample_stage_10.csv"
+        / "control_sample_stage_9.csv"
     )
 
-    df_all.dropna(
-        subset=["bp_rp", "dist_med", "phot_g_mean_mag"], inplace=True
-    )
+    df_all = preprocessing(df_all)
 
-    df_all = df_all[df_all["distance_inference"] != "fixed_at_1"]
+    # df_all.dropna(
+    #     subset=["bp_rp", "dist_med", "phot_g_mean_mag"], inplace=True
+    # )
 
-    bp_rp = df_all["bp_rp"]
+    # df_all = df_all[df_all["distance_inference"] != "fixed_at_1"]
+
+    bp_rp = df_all["bp_rp"] - df_all["ebpminrp_gspphot"]
     dist = df_all["dist_med"]
-    g_abs = df_all["phot_g_mean_mag"] - 5.0 * np.log10(dist) - 10.0
+    g_abs = (
+        df_all["phot_g_mean_mag"]
+        - df_all["ag_gspphot"] - 5.0 * np.log10(dist) - 10.0
+    )
 
     # print(min(bp_rp), max(bp_rp))
     # print(min(g_abs), max(g_abs))
@@ -102,7 +129,7 @@ def make_cmd(in_file: Path) -> None:
 
     out_file = (
         config.RESULTS_FIGURES_DIR
-        / "high-v_sources" / f"{in_file.stem}_gaia_cmd.pdf"
+        / "gaia_cmd" / f"{in_file.stem}_gaia_cmd.pdf"
     )
 
     plt.savefig(out_file)
