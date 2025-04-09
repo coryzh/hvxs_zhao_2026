@@ -61,7 +61,7 @@ def background_histogram(ax: plt.Axes) -> None:
     x, y = np.meshgrid(x_centers, y_centers)
 
     _ = ax.pcolormesh(
-        x, y, h.T, shading="auto", cmap="Greens", edgecolors="face", 
+        x, y, h.T, shading="auto", cmap="Greens", edgecolors="face",
         rasterized=True
     )
 
