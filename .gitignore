@@ -16,3 +16,7 @@ notebooks/test_emcee_sampler.ipynb
 notebooks/test_plot_fxfopt_vs_bp_rp.ipynb
 notebooks/test_skewed_normal_for_bailer_jones_distances.ipynb
 notebooks/test_space_velocity_astropy.ipynb
+notebooks/compile_known_binaries.ipynb
+notebooks/metallicity_comparison.ipynb
+notebooks/compile_known_binaries.ipynb
+notebooks/test_check_simbad_cleaning_results.ipynb
