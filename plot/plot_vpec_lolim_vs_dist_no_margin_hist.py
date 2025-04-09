@@ -54,7 +54,7 @@ def add_prime_sources(df_prime: pd.DataFrame, ax: list[plt.Axes]) -> None:
         y = row["vpec_min_med"] - row["e_vpec_min"]
         name = get_short_id(row["ID_x"])
         ax_scatter.scatter(
-            x, y, marker=ps.PRIME_SOURCE_MARKER[i], 
+            x, y, marker=ps.PRIME_SOURCE_MARKER[i],
             fc=ps.PRIME_SOURCE_COLOR[i], label=name,
             **ps.PRIME_SCATTER_MARKER_SETTINGS
         )
@@ -131,7 +131,7 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
 
         hist = ax[1].hist(
             dist, bins=dist_bins, histtype="stepfilled", ec="k",
-            lw=2.0, alpha=0.7, label=dist_hist_label_names[key], 
+            lw=2.0, alpha=0.7, label=dist_hist_label_names[key],
             zorder=-2 + i
         )
 
