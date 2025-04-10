@@ -39,7 +39,7 @@ def select_prime_sample(in_file: Path, verbose: bool = False) -> None:
     df = pd.read_csv(in_file)
 
     _vpec_filter = df["vpec_min_med"] >= 1000
-    _sep_filter = df["sep_x_g"] / df["pos_x_err"] <= 1
+    _sep_filter = df["sep_x_g"] / df["pos_x_err"] <= 2
     _parallax_filter = df["parallax"] / df["parallax_error"] >= 2.0
 
     df_prime = df[_vpec_filter & _parallax_filter & _sep_filter]
