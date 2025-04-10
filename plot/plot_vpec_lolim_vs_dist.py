@@ -188,10 +188,16 @@ def add_right_panel(
         "Control": df_control
     }
 
+    df_hvxs["parallax_over_error"] = (
+        abs(df_hvxs["parallax_corr"]) / df_hvxs["parallax_error"]
+    )
+
+    c = df_hvxs["parallax_over_error"].values
+
     scatter_style = {
         "HVXS": {
-            "s": 30, "ec": "k", "c": "r", "alpha": 0.8, "rasterized": True,
-            "label": "HVXS"
+            "s": 30, "ec": "k", "c": c, "alpha": 0.8, "rasterized": True,
+            "label": "HVXS", "cmap": ps.CMAP, "norm": colors.LogNorm()
         },
         "Control": {
             "s": 0.1, "c": "k", "alpha": 0.5, "rasterized": True,
