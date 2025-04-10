@@ -6,44 +6,63 @@ import numpy as np
 from utils.process_string import get_short_id
 from matplotlib import colors
 from typing import Tuple
+from astropy.units import Unit
 
 
 def make_figure() -> Tuple[plt.Figure, dict]:
     plt.style.use("mycustomised")
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(18, 10))
 
     gs = fig.add_gridspec(
         2, 2,
-        width_ratios=[4, 1], height_ratios=[1, 4],
+        width_ratios=[4, 4], height_ratios=[1, 4],
         left=0.1, right=0.9, bottom=0.1, top=0.9,
         wspace=0.03, hspace=0.03
     )
 
     ax_main = fig.add_subplot(gs[1, 0])
+    ax_right = fig.add_subplot(gs[1, 1], sharey=ax_main)
     ax_top = fig.add_subplot(gs[0, 0], sharex=ax_main)
 
     ax_dict = {
         "main": ax_main,
+        "right": ax_right,
         "top": ax_top
     }
 
     return fig, ax_dict
 
 
-def axes_settings(ax: list[plt.Axes]) -> None:
-    ax.set_xlabel(r"$d$ (kpc)")
-    ax.set_ylabel(r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$")
+def axes_settings(ax_dict: dict) -> None:
 
-    ax.set_xscale("log")
-    ax.set_yscale("log")
+    ax_main = ax_dict["main"]
+    ax_right = ax_dict["right"]
+    ax_top = ax_dict["top"]
 
-    ax.set_xlim(0.1, 42)
-    ax.set_ylim(8, 2200)
+    ax_main.set_xlabel(r"$d$ (kpc)")
+    ax_main.set_ylabel(r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$")
 
-    ax.set_xticks([0.1, 1, 10, 20, 40])
-    ax.set_xticklabels(["0.1", "1", "10", "20", "40"])
-    ax.set_yticks([10, 100, 1000, 2000])
-    ax.set_yticklabels(["10", "100", "1000", "2000"])
+    ax_main.set_xscale("log")
+    ax_main.set_yscale("log")
+
+    ax_main.set_xlim(0.1, 42)
+    ax_main.set_ylim(8, 2200)
+
+    ax_main.set_xticks([0.1, 1, 10, 20, 40])
+    ax_main.set_xticklabels(["0.1", "1", "10", "20", "40"])
+    ax_main.set_yticks([10, 100, 1000, 2000])
+    ax_main.set_yticklabels(["10", "100", "1000", "2000"])
+
+    ax_right.set_xscale("log")
+
+    ax_top.tick_params(axis='x', bottom=False, labelbottom=False)
+    ax_top.tick_params(axis='y', labelleft=False)
+
+    ax_right.set_xlabel(r"$\sqrt{2}d\epsilon$ (AU)")
+    ax_right.tick_params(axis='y', left=False, labelleft=False)
+    ax_right.set_xlim(5e-4, 300)
+    ax_right.set_xticks([0.001, 0.01, 0.1, 1, 10, 100])
+    ax_right.set_xticklabels([r"$10^{-3}$", "0.01", "0.1", "1", "10", "100"])
 
 
 def add_prime_sources(df_prime: pd.DataFrame, ax: list[plt.Axes]) -> None:
@@ -70,7 +89,7 @@ def add_control_and_hvxs(
         ax: plt.Axes, fig: plt.Figure,
         df_hvxs: pd.DataFrame, df_control: pd.DataFrame) -> None:
 
-    min_aen_val = 1e-3
+    # min_aen_val = 1e-3
     df_hvxs["parallax_over_error"] = (
         abs(df_hvxs["parallax_corr"]) / df_hvxs["parallax_error"]
     )
@@ -79,10 +98,10 @@ def add_control_and_hvxs(
     #     ascending=False
     # )
 
-    df_hvxs["astrometric_excess_noise"] = (
-        df_hvxs["astrometric_excess_noise"]
-        .replace(0, min_aen_val)
-    )
+    # df_hvxs["astrometric_excess_noise"] = (
+    #     df_hvxs["astrometric_excess_noise"]
+    #     .replace(0, min_aen_val)
+    # )
 
     c = df_hvxs["parallax_over_error"]
 
@@ -127,8 +146,6 @@ def add_control_and_hvxs(
 def add_top_hist(
         ax_top: plt.Axes, df_hvxs: pd.DataFrame, df_control: pd.DataFrame
 ) -> None:
-    ax_top.tick_params(axis='x', bottom=False, labelbottom=False)
-    ax_top.tick_params(axis='y', labelleft=False)
     bins = np.logspace(
         np.log10(min(df_hvxs["dist_med"].min(), df_control["dist_med"].min())),
         np.log10(max(df_hvxs["dist_med"].max(), df_control["dist_med"].max())),
@@ -162,6 +179,40 @@ def add_top_hist(
     ax_top.legend(loc="best", fontsize=14)
 
 
+def add_right_panel(
+        ax_right: plt.Axes, df_hvxs: pd.DataFrame, df_control: pd.DataFrame
+) -> None:
+
+    df_dict = {
+        "HVXS": df_hvxs,
+        "Control": df_control
+    }
+
+    scatter_style = {
+        "HVXS": {
+            "s": 30, "ec": "k", "c": "r", "alpha": 0.8, "rasterized": True,
+            "label": "HVXS"
+        },
+        "Control": {
+            "s": 0.1, "c": "k", "alpha": 0.5, "rasterized": True,
+            "label": "Control"
+        }
+    }
+
+    for key, df in df_dict.items():
+        x = (
+            np.sqrt(2)
+            * df["dist_med"].values
+            * Unit("kpc") * df["astrometric_excess_noise"].values
+            * 1e-3 * (1. / 3600) * (np.pi / 180.)
+        ).to(Unit("AU"))
+
+        y = df["vpec_min_med"] - df["e_vpec_min"]
+
+        ax_right.scatter(x, y, **scatter_style[key])
+    ax_right.axhline(y=150, ls=":", color="k")
+
+
 def make_plot() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
@@ -174,13 +225,17 @@ def make_plot() -> None:
     )
 
     fig, ax_dict = make_figure()
-    axes_settings(ax_dict["main"])
+    axes_settings(ax_dict)
     add_control_and_hvxs(
         df_hvxs=df_hvxs, df_control=df_control, ax=ax_dict["main"], fig=fig
     )
 
     add_top_hist(
         ax_dict["top"], df_hvxs=df_hvxs, df_control=df_control
+    )
+
+    add_right_panel(
+        ax_dict["right"], df_hvxs=df_hvxs, df_control=df_control
     )
 
     plt.savefig(
