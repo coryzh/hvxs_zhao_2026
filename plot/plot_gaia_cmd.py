@@ -89,7 +89,7 @@ def add_sample(in_file: Path, ax: plt.Axes) -> None:
 def add_background(ax: plt.Axes, fig: plt.Figure) -> None:
     df_all = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR / "control_sample"
-        / "control_sample_stage_9.csv"
+        / "control_sample_stage_10.csv"
     )
 
     df_all = preprocessing(df_all)

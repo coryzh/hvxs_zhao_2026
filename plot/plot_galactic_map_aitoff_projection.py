@@ -50,7 +50,7 @@ def calc_galactic_coordinates(
 def background_histogram(ax: plt.Axes) -> None:
     df_all = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_9.csv"
+        / "control_sample" / "control_sample_stage_10.csv"
     )
     _filter = df_all["dist_med"] < 1.5
     df_all = df_all[_filter]
