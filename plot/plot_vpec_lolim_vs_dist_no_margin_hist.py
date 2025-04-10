@@ -131,7 +131,7 @@ def add_control_and_hvxs(df_hvxs: pd.DataFrame, ax: list[plt.Axes]) -> None:
 
         hist = ax[1].hist(
             dist, bins=dist_bins, histtype="stepfilled", ec="k",
-            lw=2.0, alpha=0.7, label=dist_hist_label_names[key],
+            lw=2.0, alpha=0.7, label=dist_hist_label_names[key], 
             zorder=-2 + i
         )
 
