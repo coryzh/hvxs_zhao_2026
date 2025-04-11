@@ -51,7 +51,13 @@ SCATTER_DICT_GALACTIC_MAP = {
 }
 
 SCATTER_DICT_CMD = {
-    's': 12, 'fc': 'r', 'ec': 'k', 'marker': 'o', "alpha": 0.2
+    's': 12, 'fc': 'r', 'ec': 'k', 'marker': 'o', "alpha": 0.2,
+    'rasterized': True
+}
+
+SCATTER_DICT_CONTROL_CMD = {
+    's': 0.1, 'fc': 'k', 'ec': 'k', 'marker': '.', 'alpha': 0.3,
+    'zorder': -1, 'rasterized': True
 }
 
 SCATTER_DICT_GALACTIC_MAP_ALL = {
