@@ -7,7 +7,7 @@ from typing import Tuple
 from matplotlib import colors
 from plot.plot_settings import SCATTER_DICT_CMD
 # from utils.process_string import get_short_id
-# import plot.plot_settings as ps
+import plot.plot_settings as ps
 import config
 
 
@@ -45,7 +45,7 @@ def axes_settings(ax: plt.Axes) -> None:
     ax.set_ylabel(r"$M_\mathrm{G}$")
 
 
-def add_sample(in_file: Path, ax: plt.Axes) -> None:
+def add_hvxs(in_file: Path, ax: plt.Axes) -> None:
     df = pd.read_csv(in_file)
     df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
 
@@ -106,15 +106,33 @@ def add_background(ax: plt.Axes, fig: plt.Figure) -> None:
     )
 
 
+def add_control(ax: plt.Axes, df_control: pd.DataFrame) -> None:
+    bp_rp = df_control["bp_rp"] - df_control["ebpminrp_gspphot"]
+    dist = df_control["dist_med"]
+    g_abs = (
+        df_control["phot_g_mean_mag"]
+        - df_control["ag_gspphot"] - 5.0 * np.log10(dist) - 10.0
+    )
+
+    ax.scatter(
+        bp_rp, g_abs, **ps.SCATTER_DICT_CONTROL_CMD,
+    )
+
+
 def make_cmd(in_file: Path) -> None:
     fig, ax = make_figure(use_nearby_star_cmd=False)
-    add_background(ax, fig)
-    add_sample(in_file, ax)
+    df_control = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "control_sample"
+        / "control_sample_stage_10.csv"
+    )
+    add_control(ax, df_control=df_control)
+    add_hvxs(in_file, ax)
     axes_settings(ax)
 
     out_file = (
         config.RESULTS_FIGURES_DIR
-        / "gaia_cmd" / f"{in_file.stem}_gaia_cmd.pdf"
+        / "gaia_cmd" / "gaia_cmd.pdf"
     )
 
     plt.savefig(out_file)
