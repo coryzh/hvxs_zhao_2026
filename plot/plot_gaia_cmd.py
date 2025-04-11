@@ -5,10 +5,11 @@ import numpy as np
 from pathlib import Path
 from typing import Tuple
 from matplotlib import colors
-from plot.plot_settings import SCATTER_DICT_CMD
+# from plot.plot_settings import SCATTER_DICT_CMD
 # from utils.process_string import get_short_id
 import plot.plot_settings as ps
 import config
+from matplotlib import cm
 
 
 def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
@@ -39,13 +40,13 @@ def make_figure(
 
 def axes_settings(ax: plt.Axes) -> None:
     ax.set_xlim(-1.1, 4.5)
-    ax.set_ylim(15, -2.5)
+    ax.set_ylim(12, -3.5)
 
     ax.set_xlabel("Bp$-$Rp")
     ax.set_ylabel(r"$M_\mathrm{G}$")
 
 
-def add_hvxs(in_file: Path, ax: plt.Axes) -> None:
+def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
     df = pd.read_csv(in_file)
     df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
 
@@ -65,7 +66,17 @@ def add_hvxs(in_file: Path, ax: plt.Axes) -> None:
         - 5.0 * np.log10(dist) - 10.0
     )
 
-    ax.scatter(bp_rp, g_abs, label="HVXS", **SCATTER_DICT_CMD)
+    df["vpec_min_lolim"] = df["vpec_min_med"] - df["e_vpec_min"]
+    df = df.sort_values(by="vpec_min_lolim", ascending=True)
+    c = df["vpec_min_lolim"]
+    sm = cm.ScalarMappable(
+        norm=colors.PowerNorm(gamma=0.3), cmap=ps.CMAP
+    )
+
+    ax.scatter(
+        bp_rp, g_abs, c=c, label="HVXS", ec="k", s=25,
+        cmap=sm.cmap, alpha=0.6, norm=sm.norm
+    )
 
     # for i, row in df_prime.iterrows():
     #     bp_rp_prime = row["bp_rp"]
@@ -84,6 +95,8 @@ def add_hvxs(in_file: Path, ax: plt.Axes) -> None:
     # )
     # for handle in legend.legend_handles:
     #     handle.set_alpha(1.0)
+
+    return sm
 
 
 def add_background(ax: plt.Axes, fig: plt.Figure) -> None:
@@ -119,6 +132,20 @@ def add_control(ax: plt.Axes, df_control: pd.DataFrame) -> None:
     )
 
 
+def add_cbar(ax: plt.Axes, fig: plt.Figure, sm: cm.ScalarMappable) -> None:
+    cax = ax.inset_axes([0.5, 0.85, 0.45, 0.05])
+    cbar = fig.colorbar(sm, cax=cax, orientation="horizontal")
+    cbar.set_label(
+        r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$",
+        labelpad=10, size=20
+    )
+    cbar.ax.xaxis.set_label_position("top")
+    cbar.ax.set_xscale('log')
+
+    cbar.set_ticks([200, 500, 1000])
+    cbar.set_ticklabels(["200", "500", "1000"], size=18)
+
+
 def make_cmd(in_file: Path) -> None:
     fig, ax = make_figure(use_nearby_star_cmd=False)
     df_control = pd.read_csv(
@@ -127,9 +154,9 @@ def make_cmd(in_file: Path) -> None:
         / "control_sample_stage_10.csv"
     )
     add_control(ax, df_control=df_control)
-    add_hvxs(in_file, ax)
+    sm = add_hvxs(in_file, ax)
     axes_settings(ax)
-
+    add_cbar(ax, fig, sm)
     out_file = (
         config.RESULTS_FIGURES_DIR
         / "gaia_cmd" / "gaia_cmd.pdf"
