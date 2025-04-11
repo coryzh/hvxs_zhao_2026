@@ -281,7 +281,7 @@ def make_plot() -> None:
     plt.savefig(
         config.RESULTS_FIGURES_DIR
         / "dist_vs_vpec"
-        / "dist_vs_vpec.pdf"
+        / "dist_vs_vpec_min_lolim.pdf"
     )
 
 
