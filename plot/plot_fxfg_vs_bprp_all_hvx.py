@@ -8,8 +8,8 @@ from matplotlib.ticker import ScalarFormatter
 from pathlib import Path
 from plot_settings import CMAP
 # from mpl_toolkits.axes_grid1 import make_axes_locatable
-import plot.plot_settings as ps
-from utils.process_string import get_short_id
+# import plot.plot_settings as ps
+# from utils.process_string import get_short_id
 
 # colors = sns.color_palette("hls", 4)
 #
@@ -34,7 +34,7 @@ def add_control_sample(axs: np.ndarray[plt.Axes]) -> None:
     for ax in axs.flatten():
         ax.scatter(
             df_all.bp_rp, df_all.fx_fg, s=0.01, color="k",
-            marker="o", alpha=0.5, zorder=-1, rasterized=True
+            marker="o", alpha=1.0, zorder=-1, rasterized=True
         )
 
 
@@ -69,7 +69,7 @@ def add_hvx(
         color_val_sub = df_sub["vpec_min_lolim"]
         scatter = ax.scatter(
             df_sub.bp_rp, df_sub.fx_fg, s=30, marker="o", ec="k",
-            c=color_val_sub, cmap=CMAP, zorder=1, rasterized=False
+            c=color_val_sub, cmap=CMAP, zorder=1, rasterized=False, alpha=0.8
         )
 
         # ax.text(x=0.60, y=0.1, s=rf"$[{vpec_bins[i]:.0f}, {vpec_bins[i+1]:
@@ -98,18 +98,18 @@ def add_hvx(
         # _cbar.ax.set_yticklabels(["200", "300", "400", "600", "1000"])
         # _cbar.set_label(r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$",
         # fontsize=50)
-    ax_last = axs.flatten()[-1]
-    for i, row in df_prime.iterrows():
+    # ax_last = axs.flatten()[-1]
+    # for i, row in df_prime.iterrows():
 
-        name = get_short_id(row["ID_x"])
-        ps.PRIME_SCATTER_MARKER_SETTINGS["s"] = 300
-        ps.PRIME_SCATTER_MARKER_SETTINGS["lw"] = 1.5
-        ps.PRIME_SCATTER_MARKER_SETTINGS["ec"] = "w"
-        ax_last.scatter(
-            row["bp_rp"], row["fx_fg"], marker=ps.PRIME_SOURCE_MARKER[i],
-            fc=ps.PRIME_SOURCE_COLOR[i], label=name,
-            **ps.PRIME_SCATTER_MARKER_SETTINGS
-        )
+    #     name = get_short_id(row["ID_x"])
+    #     ps.PRIME_SCATTER_MARKER_SETTINGS["s"] = 300
+    #     ps.PRIME_SCATTER_MARKER_SETTINGS["lw"] = 1.5
+    #     ps.PRIME_SCATTER_MARKER_SETTINGS["ec"] = "w"
+    #     ax_last.scatter(
+    #         row["bp_rp"], row["fx_fg"], marker=ps.PRIME_SOURCE_MARKER[i],
+    #         fc=ps.PRIME_SOURCE_COLOR[i], label=name,
+    #         **ps.PRIME_SCATTER_MARKER_SETTINGS
+    #     )
 
     # _legend = plt.legend(bbox_to_anchor=[-0.01, 0.99], loc="upper left",
     # handletextpad=0.5)
@@ -162,7 +162,7 @@ def make_figure() -> None:
     plt.subplots_adjust(hspace=0.01, wspace=0.01, right=0.90)
     plt.savefig(
         config.RESULTS_FIGURES_DIR
-        / "high-v_sources" / f"{in_file_csv.stem}_bprp_vs_fxfg.pdf"
+        / "fxfg_vs_bprp" / "fxfg_vs_bprp.pdf"
     )
 
 
