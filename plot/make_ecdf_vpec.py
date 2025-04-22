@@ -11,11 +11,12 @@ import seaborn as sns
 colors = sns.color_palette("hls", 4)
 
 
-def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
+def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 200.0) -> None:
     source_types = {
         "as": "Active stars",
         "ab": "Active binaries",
-        "yso": "YSOs", "cv": "CVs"
+        "yso": "YSOs",
+        "cv": "CVs"
     }
 
     color_dict = {
@@ -35,8 +36,8 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
 
     for key, value in source_types.items():
         in_file = (
-            config.ROOT_DIR / "results" / key
-            / "catalogues" / f"{key}_gaia_w_vpec.csv"
+            config.RESULTS_CATALOGUE_DIR / "v_catalogs_contaminants"
+            / f"{key}_w_vpec_and_vspace.csv"
         )
         df = pd.read_csv(in_file)
 
@@ -57,13 +58,17 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
             f" <= {vpec_lo_lim} km/s"
         )
 
-    in_file_xrb = config.RESULTS_CATALOGUE_DIR / "known_co_binaries.csv"
+    in_file_xrb = (
+        config.RESULTS_CATALOGUE_DIR / "v_catalogs_contaminants"
+        / "known_cobs_w_vpec_and_vspace.csv"
+    )
+
     df_xrb = pd.read_csv(in_file_xrb)
     xrb_types = dict(LMXB="LMXBs", PSR="PSRs", HMXB="HMXBs", NI="NICOBs")
     for key, value in xrb_types.items():
         xrb_filter = df_xrb.Type.str.contains(key)
         df_xrb_sub = df_xrb[xrb_filter]
-        vpec_med = df_xrb_sub.vpec
+        vpec_med = df_xrb_sub["vpec_med"]
         plot_ecdf(
             vpec_med, ax=ax, color=color_dict[key], lw=2.0,
             normalised=True, label=value
@@ -89,7 +94,7 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
     ax.set_ylim(0, 1)
 
     plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=4)
-    out_file = config.RESULTS_FIGURES_DIR / "ecdf_vpec.pdf"
+    out_file = config.RESULTS_FIGURES_DIR / "ecdfs" / "ecdf_vpec.pdf"
     plt.savefig(out_file)
 
     logger.log(f"Figure saved to {out_file}.")
@@ -97,7 +102,7 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 150.0) -> None:
 
 
 def main() -> None:
-    make_ecdf(verbose=True, vpec_lo_lim=150)
+    make_ecdf(verbose=True, vpec_lo_lim=200)
 
 
 if __name__ == "__main__":
