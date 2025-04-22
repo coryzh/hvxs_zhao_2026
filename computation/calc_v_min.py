@@ -40,7 +40,9 @@ Theta_0 = con.Theta_0
 R_0 = con.R_0
 nrand = 1000
 id_x_dict = {
-    "csc": "name", "erass": "IAUNAME", "xmm": "iauname", "swift": "IAUName"
+    "csc": "name", "erass": "IAUNAME", "xmm": "iauname", "swift": "IAUName",
+    "cv": "Name", "as": "UID", "ab": "Name", "yso": "source_id_dr2",
+    "known_cobs": "Name"
 }
 
 # Random state
@@ -400,7 +402,7 @@ def run_computation(
     out_file = (
         config.RESULTS_CATALOGUE_DIR
         / "v_min_catalogs"
-        / f"{survey_name}_w_v_min_150000-end.csv"
+        / f"{survey_name}_w_v_min.csv"
     )
 
     if out_file.exists():
@@ -459,7 +461,7 @@ def run_computation(
                     v_med, v_lo_err, v_hi_err
                 ]
             )
-        print(row_data)
+
         result_data.append(row_data)
 
         if (i + 1) % batch_size == 0 or (i + 1) == n_source:
@@ -477,13 +479,13 @@ def main() -> None:
         / "catalogues"
         / "nway_match"
     )
-    in_cat_file = f"{survey_name}_gaia_nway_match_stars_only_for_vpec.csv"
+    in_cat_file = f"catalog_{survey_name}_for_vpec.csv"
 
     df = pd.read_csv(in_cat_dir / in_cat_file)
     df = imputation_bailer_jones(df)
-    df_sub = df.iloc[0:20]
+    # df_sub = df.iloc[0:20]
     run_computation(
-        df_sub, method="scipy", survey_name=survey_name, batch_size=6
+        df, method="scipy", survey_name=survey_name, batch_size=6
     )
 
 
