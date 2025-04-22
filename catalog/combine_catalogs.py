@@ -201,4 +201,4 @@ def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim",
 
 
 if __name__ == "__main__":
-    combine_catalogs(vpec_lim=150, mode="lolim", verbose=True)
+    combine_catalogs(vpec_lim=200, mode="lolim", verbose=True)

@@ -76,8 +76,8 @@ def clean(
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample"
-        / "control_sample_stage_8.csv"
+        / "high-v_sources"
+        / "combined_vpec_lolim_gt_200_unique_stage_8.csv"
     )
 
     df = pd.read_csv(in_file)

@@ -163,8 +163,8 @@ def _clean_df_simbad_name(
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample"
-        / "control_sample_stage_2.csv"
+        / "high-v_sources"
+        / "combined_vpec_lolim_gt_200_unique_stage_2.csv"
     )
 
     df = pd.read_csv(in_file)
