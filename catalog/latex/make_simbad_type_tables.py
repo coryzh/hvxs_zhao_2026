@@ -56,8 +56,7 @@ def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
         / "high-v_sources"
-        / "combined_vpec_lolim_gt_150_unique_w_simbad_high_"
-        "ratio_simbad_cleaned_cleaned_cl_members.csv"
+        / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
     )
     df = pd.read_csv(in_file)
     remained_simbad_type_table(df)
