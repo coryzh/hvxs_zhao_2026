@@ -153,7 +153,7 @@ def make_figure() -> None:
                            sharex=True, sharey=True)
 
     in_file_csv = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                   / "combined_vpec_lolim_gt_150_unique_stage_9.csv")
+                   / "combined_vpec_lolim_gt_200_unique_stage_9.csv")
 
     axes_settings(fig, ax)
     add_control_sample(ax)

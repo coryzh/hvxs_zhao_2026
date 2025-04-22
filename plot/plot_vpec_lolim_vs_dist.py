@@ -132,7 +132,7 @@ def add_control_and_hvxs(
         else:
             ax.scatter(x, y, **scatter_style[key])
 
-    ax.axhline(y=150, ls=":", color="k")
+    ax.axhline(y=200, ls=":", color="k")
 
 
 def add_top_hist(
@@ -209,7 +209,7 @@ def add_right_panel(
             ax_right.scatter(x, y, **scatter_style[key])
         else:
             ax_right.scatter(x, y, **scatter_style[key])
-    ax_right.axhline(y=150, ls=":", color="k")
+    ax_right.axhline(y=200, ls=":", color="k")
 
 
 def add_cbar(ax: plt.Axes, fig: plt.Figure, df: pd.DataFrame,
@@ -224,10 +224,10 @@ def add_cbar(ax: plt.Axes, fig: plt.Figure, df: pd.DataFrame,
 
     _cbar.ax.set_xscale('log')
 
-    _cbar.set_ticks([1e-4, 0.001, 0.01, 0.1, 1, 10])
+    _cbar.set_ticks([0.001, 0.01, 0.1, 1, 10])
     _cbar.set_ticklabels(
         [
-            r"$10^{-4}$", "0.001", "0.01", "0.1", "1", "10"
+            "0.001", "0.01", "0.1", "1", "10"
         ], size=18
     )
 
@@ -242,7 +242,7 @@ def add_cbar(ax: plt.Axes, fig: plt.Figure, df: pd.DataFrame,
 def make_plot() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
     )
     df_hvxs = pd.read_csv(in_file)
     df_control = pd.read_csv(

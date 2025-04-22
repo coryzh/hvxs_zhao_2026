@@ -168,7 +168,7 @@ def make_cmd(in_file: Path) -> None:
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
     )
     make_cmd(in_file)
 
