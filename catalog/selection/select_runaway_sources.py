@@ -15,10 +15,7 @@ def select_runaway(in_file: Path) -> None:
 
     v_space_min_lolim = df["vspace_min_med"] - df["e_vspace_min"]
 
-    _filter = (
-        (v_space_min_lolim >= v_escape.value)
-        & (df["distance_inference"] != "fixed_at_10")
-    )
+    _filter = v_space_min_lolim >= v_escape.value
 
     df_filtered = df[_filter]
 
@@ -34,7 +31,7 @@ def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
         / "high-v_sources"
-        / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+        / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
     )
     select_runaway(in_file)
 
