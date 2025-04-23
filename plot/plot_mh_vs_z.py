@@ -6,7 +6,6 @@ import constants as const
 import astropy.units as u
 import matplotlib.gridspec as gridspec
 import gdr3apcal
-from computation.distance_estimate_old import estimate_distances_df
 from astropy.coordinates import SkyCoord, Galactocentric
 from typing import Tuple, Dict
 
@@ -72,12 +71,14 @@ def add_data(axs: Dict[str, plt.Axes]) -> None:
     ax_yhist = axs["yhist"]
 
     df_co = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "known_co_binaries_zp_corrected.csv"
+        config.RESULTS_CATALOGUE_DIR
+        / "v_catalogs_contaminants"
+        / "known_cobs_w_gspphot_params.csv"
     )
 
     df_hvx = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_9.csv"
+        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
     )
 
     df_control = pd.read_csv(
@@ -85,17 +86,18 @@ def add_data(axs: Dict[str, plt.Axes]) -> None:
         / "control_sample" / "control_sample_stage_10.csv"
     )
 
-    dist_estimate = df_co.apply(
-        estimate_distances_df, axis=1, result_type="expand"
-    )
+    print("Catalogues loaded!")
+    # dist_estimate = df_co.apply(
+    #     estimate_distances_df, axis=1, result_type="expand"
+    # )
 
-    dist_estimate.columns = [
-        "dist_med", "e_dist", "E_dist", "distance_inference"
-    ]
+    # dist_estimate.columns = [
+    #     "dist_med", "e_dist", "E_dist", "distance_inference"
+    # ]
 
-    df_co_w_dist = pd.concat([df_co, dist_estimate], axis=1)
+    # df_co_w_dist = pd.concat([df_co, dist_estimate], axis=1)
 
-    df_dict = {"Known": df_co_w_dist, "HVXSs": df_hvx, "Control": df_control}
+    df_dict = {"Known": df_co, "HVXSs": df_hvx, "Control": df_control}
     style_dict = {
         "Known": {
             "s": 50, "marker": "s", "ec": "w", "fc": "b", "zorder": 2,
@@ -127,7 +129,13 @@ def add_data(axs: Dict[str, plt.Axes]) -> None:
     bins_y = np.linspace(0, 10, 25)
 
     for key, val in style_dict.items():
+        print(f"Working on {key}... \n")
         df_indiv = df_dict[key]
+        if any(item in df_indiv.columns for item in ["ra_gaia", "dec_gaia"]):
+            df_indiv = df_indiv.rename(
+                columns={"ra_gaia": "ra", "dec_gaia": "dec"}
+            )
+
         coords = SkyCoord(
             df_indiv.ra.values * u.deg, df_indiv.dec.values * u.deg,
             distance=df_indiv.dist_med.values * u.kpc, frame="icrs"
