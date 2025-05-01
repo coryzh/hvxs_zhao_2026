@@ -38,12 +38,19 @@ def select_prime_sample(in_file: Path, verbose: bool = False) -> None:
     logger = VerboseLogger(verbose=verbose)
     df = pd.read_csv(in_file)
 
-    _vpec_filter = df["vpec_min_med"] >= 1000
-    _sep_filter = df["sep_x_g"] / df["pos_x_err"] <= 1
-    # _parallax_filter = df["parallax"] / df["parallax_error"] >= 2.0
+    _vpec_filter = df["vpec_min_med"] - df["e_vpec_min"] >= 500
+    _sep_filter = df["sep_x_g"] / df["pos_x_err"] <= 1.0
+    _parallax_filter = df["parallax"] / df["parallax_error"] >= 3.25
 
-    df_prime = df[_vpec_filter & _sep_filter]
-    df_prime = df_prime.sort_values(by=["from", "ra_x"], ascending=True)
+    df_prime = df[_vpec_filter & _sep_filter & _parallax_filter]
+    # df_prime = df_prime.sort_values(by=["from", "ra_x"], ascending=True)
+    df_prime["fom"] = (
+        np.log(df_prime["vpec_min_med"] - df_prime["e_vpec_min"])
+        + np.log(df_prime["fx_fg"])
+        + np.log(df_prime["parallax"] / df_prime["parallax_error"])
+    )
+
+    df_prime = df_prime.sort_values(by="fom", ascending=False)
     logger.log(f"{df_prime.shape[0]} prime sources selected.")
 
     out_file = in_file.parent / f"{in_file.stem}_prime.csv"
@@ -102,16 +109,53 @@ def select_control_sample(in_file: Path, verbose: bool = False) -> None:
     )
 
 
+def select_prime_sample_by_fom(
+        in_file: Path, top: int = 30, verbose: bool = False) -> None:
+    logger = VerboseLogger(verbose=verbose)
+    logger.begin()
+    df = pd.read_csv(in_file)
+    logger.log(f"{df.shape[0]} sources loaded.\n")
+
+    vpec_min_lo = df["vpec_min_med"] - df["e_vpec_min"]
+    fx_fg_lo = df["fx_fg"] - df["fx_fg_err"]
+    sep_x_g = df["sep_x_g"] / df["pos_x_err"]
+    parallax_snr = df["parallax_corr"] / df["parallax_error"]
+    g_flux_snr = df["phot_g_mean_flux_over_error"]
+
+    # Figure of merit
+    logger.log("Adding a Figure of Merit (fom) column to the DataFrame ...\n")
+    # df["fom"] = (vpec_min_lo ** 1.5 * parallax_snr) / (dist * sep_x_g)
+    df["fom"] = (
+        1.5 * np.log10(vpec_min_lo) + np.log10(parallax_snr)
+        - 1.2 * np.log10(sep_x_g)
+        + 0.7 * np.log10(fx_fg_lo)
+        + 0.5 * np.log10(g_flux_snr)
+    )
+
+    df = df.sort_values(by="fom", ascending=False)
+
+    logger.log(f"Top {top} sources selected as prime sources.\n")
+    df_prime = df.head(top)
+    out_file = (
+        config.RESULTS_CATALOGUE_DIR
+        / "prime_catalogs" / f"{in_file.stem}_prime_by_fom.csv"
+    )
+    df_prime.to_csv(out_file, index=False)
+    logger.log(f"Prime catalogue saved to {out_file}.\n")
+    logger.end()
+
+
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
         / "high-v_sources"
-        / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
+        / "combined_vpec_lolim_gt_200_unique_stage_9b.csv"
     )
     # select_high_fx_fg_ratio_sources(
     #     in_file_csv=in_file, out_file=True, verbose=True
     # )
-    select_prime_sample(in_file, verbose=True)
+    # select_prime_sample(in_file, verbose=True)
+    select_prime_sample_by_fom(in_file, verbose=True, top=50)
     # select_control_sample(in_file, verbose=True)
 
 
