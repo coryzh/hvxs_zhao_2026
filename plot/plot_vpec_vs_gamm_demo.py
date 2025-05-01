@@ -4,34 +4,41 @@ import config
 import matplotlib.pyplot as plt
 import numpy as np
 from utils.vpec_functions import cartesian_peculiar_velocity_components
-from utils.distances import SimpleInversion
+from utils.distances import FromLiterature
+from utils.process_string import wrap_sign
 
 
 def axes_settings(ax: plt.Axes) -> None:
     ax.set_xlabel(r"$\gamma\,(\mathrm{km~s^{-1}})$")
     ax.set_ylabel(r"$v_\mathrm{pec}\,(\mathrm{km~s^{-1}})$")
-    ax.set_xlim(-200, 200)
+    ax.set_xlim(-1000, 1000)
 
 
 def get_vpec(source_id: int, n_sim: int = 1000) -> dict:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_200.0_unique.csv"
+        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
     )
 
     df = pd.read_csv(in_file, index_col="source_id")
+    df = df.rename(columns={"ra_gaia": "ra", "dec_gaia": "dec"})
     row = df.loc[source_id]
 
     pos_colnames = ["ra", "dec"]
     pm_colnames = ["pmra", "pmdec"]
 
     arg_dict = {}
+    d_med = row["dist_med"]
+    d_hi = d_med + row["E_dist"]
+    d_lo = d_med - row["e_dist"]
+    dist = FromLiterature(x_est=d_med, x_hi=d_hi, x_lo=d_lo, conf_level=0.68)
+    # dist = SimpleInversion(row["parallax_corr"], row["parallax_error"])
+    fit_results = dist.fit_gamma()
+    d_gamma_dist = fit_results["distribution"]
 
-    dist = SimpleInversion(row["parallax"], row["parallax_error"])
-    dist_rand = dist.gaussian_sampler(nrand=n_sim)
-    arg_dict["dist"] = dist_rand
+    arg_dict["dist"] = d_gamma_dist.rvs(n_sim)
 
-    gamma_grid = np.linspace(-200, 200, 1000)
+    gamma_grid = np.linspace(-1000, 1000, 10000)
 
     for par_name in pos_colnames:
         par_arr = np.full(shape=n_sim, fill_value=row[par_name])
@@ -87,20 +94,22 @@ def make_figure(source_id: int, n_sim: int = 1000) -> None:
     ax.plot(x_min, y1_min, "ro", ms=14, mec="k", mew=1.5)
     ax.plot(x_min, min(y), marker="s", mfc="w", ms=14, mec="k", mew=1.5)
 
+    id_x = wrap_sign(vpec_dict["id_x"])
     ax.text(
-        0.05, 0.9, s=vpec_dict["id_x"], transform=ax.transAxes, ha="left",
+        0.05, 0.9, s=id_x, transform=ax.transAxes, ha="left",
         va="bottom", fontsize=24
     )
 
     axes_settings(ax)
 
     plt.savefig(
-        config.RESULTS_FIGURES_DIR / f"{source_id}_vpec_vs_gamma.pdf"
+        config.RESULTS_FIGURES_DIR / "vpec_vs_gamma"
+        / f"{source_id}_vpec_vs_gamma.pdf"
     )
 
 
 def main() -> None:
-    make_figure(source_id=295373903197621504)
+    make_figure(source_id=6144988832000052096)
 
 
 if __name__ == "__main__":
