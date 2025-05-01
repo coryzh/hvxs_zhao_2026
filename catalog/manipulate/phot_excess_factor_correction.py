@@ -1,4 +1,5 @@
 import pandas as pd
+import config
 from numpy.polynomial import Polynomial
 
 
@@ -41,3 +42,22 @@ def correct_bp_rp_excess_factor(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return df
+
+
+def main() -> None:
+    in_files = [
+        config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+        / "hvxs_vpec_lo_gt_200.csv",
+        config.RESULTS_CATALOGUE_DIR / "control_sample"
+        / "control_sample_stage_10.csv"
+    ]
+
+    for _file in in_files:
+        df = pd.read_csv(_file)
+
+        df = correct_bp_rp_excess_factor(df)
+        df.to_csv(_file, index=False)
+
+
+if __name__ == "__main__":
+    main()
