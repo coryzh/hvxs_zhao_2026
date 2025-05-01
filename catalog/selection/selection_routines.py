@@ -149,7 +149,7 @@ def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
         / "high-v_sources"
-        / "combined_vpec_lolim_gt_200_unique_stage_9b.csv"
+        / "hvxs_vpec_lo_gt_200.csv"
     )
     # select_high_fx_fg_ratio_sources(
     #     in_file_csv=in_file, out_file=True, verbose=True
