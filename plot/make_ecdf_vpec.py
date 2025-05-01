@@ -64,7 +64,7 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 200.0) -> None:
     )
 
     df_xrb = pd.read_csv(in_file_xrb)
-    xrb_types = dict(LMXB="LMXBs", PSR="PSRs", HMXB="HMXBs", NI="NICOBs")
+    xrb_types = dict(LMXB="LMXBs", PSR="BPSRs", HMXB="HMXBs", NI="NICOBs")
     for key, value in xrb_types.items():
         xrb_filter = df_xrb.Type.str.contains(key)
         df_xrb_sub = df_xrb[xrb_filter]
