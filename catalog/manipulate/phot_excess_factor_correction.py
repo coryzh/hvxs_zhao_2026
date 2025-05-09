@@ -30,7 +30,7 @@ def correct_bp_rp_excess_factor(df: pd.DataFrame) -> pd.DataFrame:
         "phot_bp_rp_excess_factor"
     ]
     missing_cols = set(necessary_columns) - set(df.columns)
-    print(missing_cols)
+
     if missing_cols:
         raise KeyError(
             "The input pandas.DataFrame object is missing the following "
