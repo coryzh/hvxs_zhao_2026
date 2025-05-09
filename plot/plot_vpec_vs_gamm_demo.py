@@ -11,7 +11,8 @@ from utils.process_string import wrap_sign
 def axes_settings(ax: plt.Axes) -> None:
     ax.set_xlabel(r"$\gamma\,(\mathrm{km~s^{-1}})$")
     ax.set_ylabel(r"$v_\mathrm{pec}\,(\mathrm{km~s^{-1}})$")
-    ax.set_xlim(-1000, 1000)
+    ax.set_xlim(-500, 500)
+    ax.set_ylim(None, 900)
 
 
 def get_vpec(source_id: int, n_sim: int = 1000) -> dict:
@@ -96,7 +97,8 @@ def make_figure(source_id: int, n_sim: int = 1000) -> None:
 
     id_x = wrap_sign(vpec_dict["id_x"])
     ax.text(
-        0.05, 0.9, s=id_x, transform=ax.transAxes, ha="left",
+        0.05, 0.85, s=f"X-ray ID: {id_x}\nGaia: {source_id}",
+        transform=ax.transAxes, ha="left",
         va="bottom", fontsize=24
     )
 
@@ -109,7 +111,7 @@ def make_figure(source_id: int, n_sim: int = 1000) -> None:
 
 
 def main() -> None:
-    make_figure(source_id=6144988832000052096)
+    make_figure(source_id=5946634735330650752)
 
 
 if __name__ == "__main__":
