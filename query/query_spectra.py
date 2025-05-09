@@ -2,6 +2,7 @@ import config
 import pandas as pd
 import astropy.units as u
 from astroquery.sdss import SDSS
+# from astroquery.esasky import ESASky
 from log.loggers import VerboseLogger
 from astropy.coordinates import SkyCoord
 
@@ -27,9 +28,14 @@ def query_sdss(df: pd.DataFrame, verbose: bool = False, download_spectra: bool =
     logger.end()
 
 
+def query_lamost(df: pd.DataFrame, verbose: bool = False, download_spectra: bool = False) -> None:
+    coords = SkyCoord(df.ra, df.dec, frame="icrs", unit="deg")
+    pass
+
+
 def main() -> None:
     df_targets = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                             / "vlt_p115" / "vlt_p115_targets_w_observability.csv")
+                             / "vlt_p115" / "vlt_p115_targets_curated.csv")
 
     query_sdss(df_targets, verbose=True)
 

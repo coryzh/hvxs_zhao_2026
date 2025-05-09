@@ -17,7 +17,7 @@ def select_targets(verbose: bool = False) -> None:
     _filter_combined = _filter_gmag & _filter_fxfg
 
     df_filtered = df[_filter_combined]
-    out_file = in_file.parent / "palomar" / "sources_gmag_lt_16_fxfg.csv"
+    out_file = in_file.parent / "kmos_public_survey" / "sources_gmag_lt_16_fxfg_vpec_lolim_gt_150.csv"
     df_filtered.to_csv(out_file, index=False)
 
     logger.log(f"{df_filtered.shape[0]} sources selected.")

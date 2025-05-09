@@ -116,25 +116,31 @@ def select_prime_sample_by_fom(
     df = pd.read_csv(in_file)
     logger.log(f"{df.shape[0]} sources loaded.\n")
 
+    sep_x_g = df["sep_x_g"] / df["pos_x_err"]
+    _filter = (sep_x_g <= 1) & (df.dist_med <= 10) & (df.parallax_corr > 0)
+    df = df[_filter]
+
     vpec_min_lo = df["vpec_min_med"] - df["e_vpec_min"]
     fx_fg_lo = df["fx_fg"] - df["fx_fg_err"]
-    sep_x_g = df["sep_x_g"] / df["pos_x_err"]
+    aen_sig = df["astrometric_excess_noise_sig"]
     parallax_snr = df["parallax_corr"] / df["parallax_error"]
-    g_flux_snr = df["phot_g_mean_flux_over_error"]
+    # g_flux_snr = df["phot_g_mean_flux_over_error"]
 
+    df["astrometric_excess_noise_sig"].fillna(1e-2, inplace=True)
     # Figure of merit
     logger.log("Adding a Figure of Merit (fom) column to the DataFrame ...\n")
     # df["fom"] = (vpec_min_lo ** 1.5 * parallax_snr) / (dist * sep_x_g)
     df["fom"] = (
-        1.5 * np.log10(vpec_min_lo) + np.log10(parallax_snr)
-        - 1.2 * np.log10(sep_x_g)
-        + 0.7 * np.log10(fx_fg_lo)
-        + 0.5 * np.log10(g_flux_snr)
+        1.2 * np.log10(parallax_snr)
+        + 1.0 * np.log10(aen_sig)
+        + 1.0 * np.log10(fx_fg_lo)
+        + 1.0 * np.log10(vpec_min_lo)
     )
 
     df = df.sort_values(by="fom", ascending=False)
 
-    logger.log(f"Top {top} sources selected as prime sources.\n")
+    logger.log(f"Top {top} sources specified, and {df.shape[0]} sources "
+               "selected\n")
     df_prime = df.head(top)
     out_file = (
         config.RESULTS_CATALOGUE_DIR
@@ -148,14 +154,14 @@ def select_prime_sample_by_fom(
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200.csv"
+        / "runaway_sources"
+        / "hvxs_vpec_lo_gt_200_runaway.csv"
     )
     # select_high_fx_fg_ratio_sources(
     #     in_file_csv=in_file, out_file=True, verbose=True
     # )
     # select_prime_sample(in_file, verbose=True)
-    select_prime_sample_by_fom(in_file, verbose=True, top=50)
+    select_prime_sample_by_fom(in_file, verbose=True, top=212)
     # select_control_sample(in_file, verbose=True)
 
 

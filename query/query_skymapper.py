@@ -7,7 +7,7 @@ from astropy.units import Quantity
 from tqdm import tqdm
 
 
-def get_image_table(df: pd.DataFrame, erass_id: str, size: Quantity, out_root: Path = None) -> None:
+def get_image_table(df: pd.DataFrame, id_x: str, size: Quantity, out_root: Path = None) -> None:
     """
     Query the SkyMapper image database for a given ERASS ID and save the image table to a CSV file.
     Parameters
@@ -15,8 +15,8 @@ def get_image_table(df: pd.DataFrame, erass_id: str, size: Quantity, out_root: P
     df : pd.DataFrame
         The DataFrame containing the ERASS catalogue.
 
-    erass_id : str
-        The ERASS ID ("DETUID") of the target.
+    id_x : str
+        The X-ray source ID of the target.
 
     size : Quantity
         The size of the image to query, which should be an astropy.units.Quantity object.
@@ -29,10 +29,10 @@ def get_image_table(df: pd.DataFrame, erass_id: str, size: Quantity, out_root: P
     None
     """
     df_copy = df.copy()
-    df_copy.set_index("DETUID", inplace=True)
-    row = df_copy.loc[erass_id]
-    ra = row["ra_erass"]
-    dec = row["dec_erass"]
+    df_copy.set_index("ID_x", inplace=True)
+    row = df_copy.loc[id_x]
+    ra = row["ra_x"]
+    dec = row["dec_x"]
 
     centre = SkyCoord(ra, dec, unit="deg")
 
@@ -42,8 +42,8 @@ def get_image_table(df: pd.DataFrame, erass_id: str, size: Quantity, out_root: P
     df_img = pd.read_csv(table_url)
     # print(f"A total of {df_img.shape[0]} images returned.\n")
 
-    out_image_table_path = out_root / erass_id / f"image_table.csv"
-    out_image_max_exptime_table_path = out_root / erass_id / f"max_exptime_table.csv"
+    out_image_table_path = out_root / id_x / f"image_table.csv"
+    out_image_max_exptime_table_path = out_root / id_x / f"max_exptime_table.csv"
     if not out_image_table_path.parent.exists():
         out_image_table_path.parent.mkdir(parents=True, exist_ok=True)
 
