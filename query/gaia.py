@@ -1,6 +1,10 @@
 from astroquery.gaia import Gaia
 from typing import List
 from astropy.table import Table
+from astropy.coordinates import SkyCoord
+from astropy.units import Quantity
+import pandas as pd
+import numpy as np
 
 
 Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source"
@@ -31,3 +35,24 @@ def gaia_single_source_id_search(source_id: int,
     results = job.get_results()
 
     return results
+
+
+def check_neighbours(df: pd.DataFrame) -> pd.DataFrame:
+    n_neighbours = np.zeros(df.shape[0])
+    for i, row in df.iterrows():
+        id_x = row["ID_x"]
+        ra = row["ra_x"]
+        dec = row["dec_x"]
+        pos_x_err = row["pos_x_err"]
+        coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
+
+        r_search = Quantity(2 * pos_x_err, "arcsec")
+
+        print(f"Working on {id_x} ...")
+        j = Gaia.cone_search_async(coord, radius=r_search)
+
+        tab = j.get_results()
+        n_neighbours[i] = len(tab) - 1
+
+    df["n_neighbours"] = n_neighbours
+    return df
