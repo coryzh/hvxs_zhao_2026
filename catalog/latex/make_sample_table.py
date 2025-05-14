@@ -1,5 +1,6 @@
 import config
 import pandas as pd
+from utils.process_string import wrap_sign
 # import astropy.units as u
 # from astropy.coordinates import SkyCoord
 
@@ -8,16 +9,16 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
     table_start = r"""
     \begin{table*}
     \centering
-    \begin{tabular}{llcccc}
+    \begin{tabular}{llccccc}
     \hline
-    X-ray ID & Gaia DR3 & Separation  & \gaia\ G & d & $\vpecmin$ \\
-             &          & ($\sigma$)  &          & ($\kpc$) & $(\kms)$ \\
+    X-ray ID & Gaia DR3 & Separation  & \gaia\ G & d & $\vpecmin$ & $\vspacemin$ \\
+             &          & ($\sigma$)  &          & ($\kpc$) & $(\kms)$ & $(\kms)$ \\
     \hline
     """
 
     table_end = r"""
         \hline
-        \caption{A sample table of sources with $\vpecmin\geq 1000\,\kms$.}
+        \caption{A sample table of curated runaway sources (see Sect \ref{sec:prime-sample}).}
         \end{tabular}
         \label{tab:sample-table-hvxs}
     \end{table*}
@@ -29,6 +30,7 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
         sep_str = f"{row['sep_x_g'] / row['pos_x_err']:.1f} "
         gmag_str = f"{row['phot_g_mean_mag']:.2f} "
 
+        id_x_str = wrap_sign(id_x_str)
         d_str = (
             f"${row['dist_med']:.1f}"
             f"^{{+{row['E_dist']:.1f}}}"
@@ -38,11 +40,20 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
         vpec_str = (
             rf"${row['vpec_min_med']:.1f}"
             rf"^{{+{row['E_vpec_min']:.1f}}}"
-            rf"_{{-{row['e_vpec_min']:.1f}}}$ \\"
+            rf"_{{-{row['e_vpec_min']:.1f}}}$"
+        )
+
+        vspace_str = (
+            rf"${row['vspace_min_med']:.1f}"
+            rf"^{{+{row['E_vspace_min']:.1f}}}"
+            rf"_{{-{row['e_vspace_min']:.1f}}}$ \\"
         )
 
         row_str = " & ".join(
-            [id_x_str, id_g_str, sep_str, gmag_str, d_str, vpec_str]
+            [
+                id_x_str, id_g_str, sep_str, gmag_str, d_str,
+                vpec_str, vspace_str
+            ]
         )
         row_list.append(row_str)
 
@@ -52,8 +63,8 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
 
     out_file = (
         config.RESULTS_LATEX_TABLE_DIR
-        / "prime_sample_table"
-        / "prime_sample.txt"
+        / "gold_sample_table"
+        / "gold_sample.txt"
     )
 
     if not out_file.parent.exists():
@@ -64,8 +75,9 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-                     / "combined_vpec_lolim_gt_150_unique_stage_9_prime.csv")
+    df = pd.read_csv(config.RESULTS_CATALOGUE_DIR
+                     / "prime_sample"
+                     / "hvxs_vpec_lo_gt_200_prime_curated.csv")
 
     make_prime_sample_source_table(df)
 
