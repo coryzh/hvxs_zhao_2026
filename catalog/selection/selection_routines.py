@@ -38,11 +38,11 @@ def select_prime_sample(in_file: Path, verbose: bool = False) -> None:
     logger = VerboseLogger(verbose=verbose)
     df = pd.read_csv(in_file)
 
-    _vpec_filter = df["vpec_min_med"] - df["e_vpec_min"] >= 500
+    # _vpec_filter = df["vpec_min_med"] - df["e_vpec_min"] >= 500
     _sep_filter = df["sep_x_g"] / df["pos_x_err"] <= 1.0
-    _parallax_filter = df["parallax"] / df["parallax_error"] >= 3.25
+    _parallax_filter = df["parallax_corr"] / df["parallax_error"] >= 5
 
-    df_prime = df[_vpec_filter & _sep_filter & _parallax_filter]
+    df_prime = df[_sep_filter & _parallax_filter]
     # df_prime = df_prime.sort_values(by=["from", "ra_x"], ascending=True)
     df_prime["fom"] = (
         np.log(df_prime["vpec_min_med"] - df_prime["e_vpec_min"])
@@ -154,14 +154,14 @@ def select_prime_sample_by_fom(
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "runaway_sources"
-        / "hvxs_vpec_lo_gt_200_runaway.csv"
+        / "high-v_sources"
+        / "hvxs_vpec_lo_gt_200.csv"
     )
     # select_high_fx_fg_ratio_sources(
     #     in_file_csv=in_file, out_file=True, verbose=True
     # )
-    # select_prime_sample(in_file, verbose=True)
-    select_prime_sample_by_fom(in_file, verbose=True, top=212)
+    select_prime_sample(in_file, verbose=True)
+    # select_prime_sample_by_fom(in_file, verbose=True, top=212)
     # select_control_sample(in_file, verbose=True)
 
 
