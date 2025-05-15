@@ -114,7 +114,7 @@ def add_control_and_hvxs(
             "norm": sm.norm
         },
         "Control": {
-            "s": 0.1, "c": "k", "alpha": 0.5, "rasterized": True,
+            "s": 0.01, "c": "k", "alpha": 0.4, "rasterized": True,
             "label": "Control"
         }
     }
