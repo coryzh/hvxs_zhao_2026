@@ -77,7 +77,7 @@ def make_prime_sample_source_table(df: pd.DataFrame) -> None:
 def main() -> None:
     df = pd.read_csv(config.RESULTS_CATALOGUE_DIR
                      / "prime_sample"
-                     / "hvxs_vpec_lo_gt_200_prime_curated.csv")
+                     / "gold_sample_150525.csv")
 
     make_prime_sample_source_table(df)
 
