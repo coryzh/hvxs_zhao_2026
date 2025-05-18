@@ -46,12 +46,39 @@ def axes_settings(ax: plt.Axes) -> None:
     ax.set_ylabel(r"$M_\mathrm{G}$")
 
 
-def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
-    df = pd.read_csv(in_file)
-    df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
+def add_gold(ax: plt.Axes) -> None:
+    in_file_gold = (
+        config.RESULTS_CATALOGUE_DIR / "prime_sample"
+        / "gold_sample_150525_curated.csv"
+    )
+    df = pd.read_csv(in_file_gold)
 
     df = preprocessing(df)
-    df_prime = preprocessing(df_prime)
+
+    bp_rp = (
+        df["phot_bp_mean_mag"]
+        - df["phot_rp_mean_mag"]
+        - df["ebpminrp_gspphot"]
+    )
+
+    dist = df["dist_med"]
+    g_abs = (
+        df["phot_g_mean_mag"]
+        - df["ag_gspphot"]
+        - 5.0 * np.log10(dist) - 10.0
+    )
+
+    ax.plot(
+        bp_rp, g_abs, marker="o", mfc="green", mec="k", ms=5, ls="none"
+    )
+
+
+def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
+    df = pd.read_csv(in_file)
+    # df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
+
+    df = preprocessing(df)
+    # df_prime = preprocessing(df_prime)
 
     bp_rp = (
         df["phot_bp_mean_mag"]
@@ -68,14 +95,15 @@ def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
 
     df["vpec_min_lolim"] = df["vpec_min_med"] - df["e_vpec_min"]
     df = df.sort_values(by="vpec_min_lolim", ascending=True)
-    c = df["vpec_min_lolim"]
+    # c = df["vpec_min_lolim"]
     sm = cm.ScalarMappable(
         norm=colors.PowerNorm(gamma=0.3), cmap=ps.CMAP
     )
 
     ax.scatter(
-        bp_rp, g_abs, c=c, label="HVXS", ec="k", s=25,
-        cmap=sm.cmap, alpha=0.6, norm=sm.norm
+        bp_rp, g_abs, c="r", label="HVXS", ec="r", s=1.0,
+        alpha=0.2, rasterized=True
+        # norm=sm.norm, cmap=sm.cmap
     )
 
     # for i, row in df_prime.iterrows():
@@ -154,9 +182,10 @@ def make_cmd(in_file: Path) -> None:
         / "control_sample_stage_10.csv"
     )
     add_control(ax, df_control=df_control)
-    sm = add_hvxs(in_file, ax)
+    _ = add_hvxs(in_file, ax)
+    add_gold(ax)
     axes_settings(ax)
-    add_cbar(ax, fig, sm)
+    # add_cbar(ax, fig, sm)
     out_file = (
         config.RESULTS_FIGURES_DIR
         / "gaia_cmd" / "gaia_cmd.pdf"
