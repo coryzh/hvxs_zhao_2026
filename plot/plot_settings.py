@@ -60,6 +60,11 @@ SCATTER_DICT_CMD = {
     'rasterized': True
 }
 
+SCATTER_DICT_HVXS = {
+    's': 1, 'fc': "orange", "ec": "orange", 'marker': "o", "alpha": 0.2,
+    "rasterized": True
+}
+
 SCATTER_DICT_CONTROL_CMD = {
     's': 0.1, 'fc': 'k', 'ec': 'k', 'marker': '.', 'alpha': 0.3,
     'zorder': -1, 'rasterized': True
