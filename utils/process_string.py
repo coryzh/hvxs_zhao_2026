@@ -11,7 +11,8 @@ def process_name(name: str) -> str:
 
 
 def get_short_id(name: str) -> str:
-    # Use a regular expression to search and extract source IDs that is formatted as <SURVEY_NAME> JHHMMSS.S[+,-]DDMMSS
+    # Use a regular expression to search and extract source IDs that is
+    # formatted as <SURVEY_NAME> JHHMMSS.S[+,-]DDMMSS
     pattern = r'(J[^+-]*)'
     match = re.search(pattern, name)
 
