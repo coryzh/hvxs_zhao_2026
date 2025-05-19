@@ -2,7 +2,7 @@ from astroquery.gaia import Gaia
 from typing import List
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
-from astropy.units import Quantity
+from astropy.units import Quantity, Unit
 import pandas as pd
 import numpy as np
 
@@ -56,3 +56,33 @@ def check_neighbours(df: pd.DataFrame) -> pd.DataFrame:
 
     df["n_neighbours"] = n_neighbours
     return df
+
+
+def cone_search_closest_neighbour(df: pd.DataFrame, id_col: str = "ID",
+                                  ra_col: str = "ra",
+                                  dec_col: str = "dec") -> pd.DataFrame:
+
+    closest_rows = []
+    for i, row in df.iterrows():
+        ra = row[ra_col]
+        dec = row[dec_col]
+        coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
+        j = Gaia.cone_search_async(coord, radius=Quantity(1, "arcmin"))
+
+        tab = j.get_results()
+        if len(tab) > 0:
+            df_gaia = tab.to_pandas()
+            df_gaia["dist"] = df_gaia["dist"] * 3600  # in arcsec
+            df_gaia = df_gaia.sort_values(by="dist", ascending=True)
+            closest = df_gaia.iloc[0].to_dict()
+            closest[id_col] = row[id_col]
+            closest_rows.append(closest)
+
+        else:
+            closest_rows.append(
+                {id_col: row[id_col]}
+            )
+    df_closest = pd.DataFrame(closest_rows)
+    df_results = pd.merge(df, df_closest, how="left", on=id_col)
+
+    return df_results
