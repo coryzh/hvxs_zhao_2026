@@ -1,5 +1,9 @@
 import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
+from itertools import product
+
 
 SURVEY_KEYS = ["csc", "xmm", "swift", "erass"]
 
@@ -75,3 +79,62 @@ PRIME_SOURCE_MARKER = ["o", "s", "D", "H", "X"]
 PRIME_SOURCE_COLOR = sns.color_palette("deep", 8)
 
 PRIME_SCATTER_MARKER_SETTINGS = {"s": 160, "ec": "k", "zorder": 5, "lw": 2}
+
+
+def generate_marker_styles(n, generate_for: str = "plot"):
+    """
+    Generate unique marker styles and colors for plotting.
+
+    Parameters:
+    - n (int): The number of unique marker styles and colors to generate.
+    - generate_for (str): The style dictionary is generate for either
+    matplotlib scatter (where the marker color is controlled by fc), or plot
+    object where the marker color is controlled by mfc.
+
+    Returns:
+    - dict: A dictionary with keys 'marker' and 'color', each containing a
+    list of styles and colors.
+    """
+
+    if generate_for == "scatter":
+        color_key = "fc"
+
+    elif generate_for == "plot":
+        color_key = "mfc"
+
+    else:
+        raise ValueError(
+            "Invalid option for generate_for. Must be either 'mfc' or 'fc'."
+        )
+
+    # Available marker styles and colors
+    # Not that triangular shapes are ignored here because they could be
+    # sometimes confused with upper/lower limits.
+    marker_styles = [
+        'o', 's', 'D', 'P',
+        '*', 'X', 'h', 'H',
+        '+', 'x'
+    ]
+    color_palette = plt.cm.tab20(np.linspace(0, 1, 5))
+
+    # The maximum number of markers. Too many individually distinguished
+    # markers might make the plot look too messy.
+    max_n = len(color_palette) * len(marker_styles)
+    if n > max_n:
+        raise ValueError(
+            f"Too many pairs to generate.The maximum is {max_n}, but got {n}."
+        )
+
+    combinations = list(product(color_palette, marker_styles))[:n]
+    styles = [{'marker': m, color_key: c} for c, m in combinations]
+
+    return styles
+
+
+def main() -> None:
+    test = generate_marker_styles(5, generate_for="plot")
+    print(test)
+
+
+if __name__ == "__main__":
+    main()
