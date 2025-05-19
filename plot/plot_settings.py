@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 from itertools import product
+import seaborn as sns
 
 
 SURVEY_KEYS = ["csc", "xmm", "swift", "erass"]
@@ -112,10 +113,9 @@ def generate_marker_styles(n, generate_for: str = "plot"):
     # sometimes confused with upper/lower limits.
     marker_styles = [
         'o', 's', 'D', 'P',
-        '*', 'X', 'h', 'H',
-        '+', 'x'
+        'X'
     ]
-    color_palette = plt.cm.tab20(np.linspace(0, 1, 5))
+    color_palette = sns.color_palette("hls", 4)
 
     # The maximum number of markers. Too many individually distinguished
     # markers might make the plot look too messy.
@@ -125,8 +125,8 @@ def generate_marker_styles(n, generate_for: str = "plot"):
             f"Too many pairs to generate.The maximum is {max_n}, but got {n}."
         )
 
-    combinations = list(product(color_palette, marker_styles))[:n]
-    styles = [{'marker': m, color_key: c} for c, m in combinations]
+    combinations = list(product(marker_styles, color_palette))[:n]
+    styles = [{'marker': m, color_key: c} for m, c in combinations]
 
     return styles
 
