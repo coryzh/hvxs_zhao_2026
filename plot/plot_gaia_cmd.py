@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Tuple
 from matplotlib import colors
 # from plot.plot_settings import SCATTER_DICT_CMD
-# from utils.process_string import get_short_id
+from utils.process_string import get_short_id
 import plot.plot_settings as ps
 import config
 from matplotlib import cm
@@ -39,8 +39,8 @@ def make_figure(
 
 
 def axes_settings(ax: plt.Axes) -> None:
-    ax.set_xlim(-1.1, 4.5)
-    ax.set_ylim(12, -3.5)
+    ax.set_xlim(-0.1, 3.1)
+    ax.set_ylim(10.5, 1.1)
 
     ax.set_xlabel("Bp$-$Rp")
     ax.set_ylabel(r"$M_\mathrm{G}$")
@@ -68,9 +68,15 @@ def add_gold(ax: plt.Axes) -> None:
         - 5.0 * np.log10(dist) - 10.0
     )
 
-    ax.plot(
-        bp_rp, g_abs, marker="o", mfc="green", mec="k", ms=5, ls="none"
-    )
+    marker_styles = ps.generate_marker_styles(df.shape[0])
+
+    for i, row in df.iterrows():
+        name = row["ID_x"]
+        name_short = get_short_id(name)
+        ax.plot(
+            bp_rp[i], g_abs[i], mec="k", ms=8, ls="none", label=name_short,
+            **marker_styles[i]
+        )
 
 
 def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
@@ -101,8 +107,7 @@ def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
     )
 
     ax.scatter(
-        bp_rp, g_abs, c="r", label="HVXS", ec="r", s=1.0,
-        alpha=0.2, rasterized=True
+        bp_rp, g_abs, zorder=1, label="HVXS", **ps.SCATTER_DICT_HVXS
         # norm=sm.norm, cmap=sm.cmap
     )
 
@@ -191,6 +196,7 @@ def make_cmd(in_file: Path) -> None:
         / "gaia_cmd" / "gaia_cmd.pdf"
     )
 
+    ax.legend(loc="upper right", fontsize=12)
     plt.savefig(out_file)
 
 
