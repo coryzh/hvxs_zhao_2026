@@ -33,7 +33,7 @@ def make_figure(
         ax = GaiaCMDAxis(fig)
 
     else:
-        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+        fig, ax = plt.subplots(1, 1, figsize=(8, 10))
 
     return fig, ax
 
@@ -180,7 +180,7 @@ def add_cbar(ax: plt.Axes, fig: plt.Figure, sm: cm.ScalarMappable) -> None:
 
 
 def make_cmd(in_file: Path) -> None:
-    fig, ax = make_figure(use_nearby_star_cmd=False)
+    fig, ax = make_figure(use_nearby_star_cmd=True)
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
         / "control_sample"
@@ -193,10 +193,13 @@ def make_cmd(in_file: Path) -> None:
     # add_cbar(ax, fig, sm)
     out_file = (
         config.RESULTS_FIGURES_DIR
-        / "gaia_cmd" / "gaia_cmd.pdf"
+        / "gaia_cmd" / "gaia_cmd_w_nearby.pdf"
     )
 
-    ax.legend(loc="upper right", fontsize=12)
+    legend = plt.legend(loc="center left", bbox_to_anchor=[1.0, 0.5])
+    for handle in legend.legend_handles:
+        handle.set_alpha(1.0)
+
     plt.savefig(out_file)
 
 

@@ -5,8 +5,7 @@ import astropy.units as u
 from astropy.coordinates import SkyCoord
 from typing import Tuple
 from plot_settings import (
-    SCATTER_DICT_GALACTIC_MAP, PRIME_SOURCE_MARKER, PRIME_SOURCE_COLOR,
-    PRIME_SCATTER_MARKER_SETTINGS
+    SCATTER_DICT_GALACTIC_MAP, generate_marker_styles
 )
 import config
 from utils import process_string
@@ -47,7 +46,7 @@ def calc_galactic_coordinates(
     return l_arr, b_arr
 
 
-def background_histogram(ax: plt.Axes) -> None:
+def add_control(ax: plt.Axes) -> None:
     df_all = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
         / "control_sample" / "control_sample_stage_10.csv"
@@ -61,27 +60,33 @@ def background_histogram(ax: plt.Axes) -> None:
     x, y = np.meshgrid(x_centers, y_centers)
 
     _ = ax.pcolormesh(
-        x, y, h.T, shading="auto", cmap="Greens", edgecolors="face",
+        x, y, h.T, shading="auto", cmap="Greys", edgecolors="face",
         rasterized=True
     )
 
 
-def add_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
+def add_hvxs(df: pd.DataFrame, ax: plt.Axes) -> None:
     l, b = calc_galactic_coordinates(df)
     ax.scatter(
-        l, b, label="HVXS", rasterized=True, **SCATTER_DICT_GALACTIC_MAP
+        l, b, label="HVXS", rasterized=False, **SCATTER_DICT_GALACTIC_MAP
     )
 
 
-def add_prime_sources(df: pd.DataFrame, ax: plt.Axes) -> None:
+def add_gold(ax: plt.Axes) -> None:
+    in_file_gold = (
+        config.RESULTS_CATALOGUE_DIR / "prime_sample"
+        / "gold_sample_150525_curated.csv"
+    )
+    df = pd.read_csv(in_file_gold)
+
+    marker_styles = generate_marker_styles(df.shape[0], generate_for="scatter")
+
     l, b = calc_galactic_coordinates(df)
     for i, row in df.iterrows():
         name = process_string.get_short_id(row["ID_x"])
-        print(name)
         ax.scatter(
-            l[i], b[i], marker=PRIME_SOURCE_MARKER[i],
-            fc=PRIME_SOURCE_COLOR[i], label=rf'{name}',
-            **PRIME_SCATTER_MARKER_SETTINGS
+            l[i], b[i], label=rf'{name}', zorder=2, lw=2, s=160, ec="k",
+            **marker_styles[i]
         )
 
 
@@ -93,10 +98,9 @@ def make_galactic_map() -> None:
     )
     df = pd.read_csv(in_file)
 
-    # df_prime = pd.read_csv(in_file.parent / f"{in_file.stem}_prime.csv")
-    background_histogram(ax)
-    add_sources(df, ax)
-    # add_prime_sources(df_prime, ax)
+    add_control(ax)
+    add_hvxs(df, ax)
+    add_gold(ax)
 
     out_file = (
         config.RESULTS_FIGURES_DIR

@@ -49,7 +49,7 @@ BINNING_PARAM_LABEL_DICT = {
 }
 
 SCATTER_DICT_GALACTIC_MAP = {
-    's': 12, 'fc': 'r', 'ec': 'k', 'marker': 'o', "alpha": 0.2
+    's': 15, 'fc': 'green', 'marker': 'x', "alpha": 0.3
 }
 
 SCATTER_DICT_CMD = {
@@ -58,8 +58,8 @@ SCATTER_DICT_CMD = {
 }
 
 SCATTER_DICT_HVXS = {
-    's': 1, 'fc': "orange", "ec": "orange", 'marker': "o", "alpha": 0.2,
-    "rasterized": True
+    's': 10, 'fc': "g", "ec": "g", 'marker': "x", "alpha": 0.2,
+    "rasterized": False
 }
 
 SCATTER_DICT_CONTROL_CMD = {
