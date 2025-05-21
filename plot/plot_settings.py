@@ -1,11 +1,18 @@
 import seaborn as sns
+import config
 from matplotlib.colors import LinearSegmentedColormap
 from itertools import product
 
 
-SURVEY_KEYS = ["csc", "xmm", "swift", "erass"]
+IMAGE_DIR = config.DATA_DIR / "images" / "gold_sample"
 
-SURVEY_NAMES = ["CSC", "4XMM", "2SXPS", "eRASS"]
+SURVEY_KEYS = [
+    "csc", "xmm", "swift", "erass", "panstarrs", "desi", "skymapper"
+]
+
+SURVEY_NAMES = [
+    "CSC", "4XMM", "2SXPS", "eRASS", "PanSTARRS DR1", "DESI-DR10", "SkyMapper"
+]
 
 cblind_palette = sns.color_palette("colorblind", 5)
 
