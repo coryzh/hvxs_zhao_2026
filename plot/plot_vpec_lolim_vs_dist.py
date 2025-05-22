@@ -4,11 +4,12 @@ import config
 import plot.plot_settings as ps
 import numpy as np
 from utils.process_string import get_short_id
-from typing import Tuple
+from typing import Tuple, Any
 from astropy.units import Unit
 from matplotlib.ticker import LogLocator
 from matplotlib.colors import LogNorm
 from matplotlib import cm
+from matplotlib.lines import Line2D
 
 
 def make_figure() -> Tuple[plt.Figure, dict]:
@@ -51,7 +52,7 @@ def axes_settings(ax_dict: dict) -> None:
     ax_main.set_yscale("log")
 
     ax_main.set_xlim(0.1, 42)
-    ax_main.set_ylim(8, 2200)
+    ax_main.set_ylim(8, None)
 
     ax_main.set_xticks([0.1, 1, 10, 20, 40])
     ax_main.set_xticklabels(["0.1", "1", "10", "20", "40"])
@@ -80,42 +81,63 @@ def axes_settings(ax_dict: dict) -> None:
     )
 
 
-def add_prime_sources(df_prime: pd.DataFrame, ax: list[plt.Axes]) -> None:
-    ax_scatter = ax
-
+def add_prime_sources(df_prime: pd.DataFrame, axs: dict[plt.Axes]) -> Any:
+    marker_styles = ps.generate_marker_styles(
+        df_prime.shape[0], generate_for="scatter"
+    )
     for i, row in df_prime.iterrows():
-        x = row["dist_med"]
-        y = row["vpec_min_med"] - row["e_vpec_min"]
+        x_left = row["dist_med"]
+        y_left = row["vpec_min_med"] - row["e_vpec_min"]
+        # x_err_left = [[row["e_dist"]], [row["E_dist"]]]
         name = get_short_id(row["ID_x"])
-        ax_scatter.scatter(
-            x, y, marker=ps.PRIME_SOURCE_MARKER[i],
-            fc=ps.PRIME_SOURCE_COLOR[i], label=name,
-            **ps.PRIME_SCATTER_MARKER_SETTINGS
+        axs["main"].scatter(
+            x_left, y_left, label=name, s=100, ec="k", zorder=2,
+            **marker_styles[i]
         )
 
-    legend = ax.legend(
-        bbox_to_anchor=[0.02, 0.99], loc="upper left", fontsize=15
-    )
-    for handle in legend.legend_handles:
-        handle.set_alpha(1.0)
+        # axs["main"].errorbar(
+        #     x_left, y_left, xerr=x_err_left, ecolor="k", capsize=4.0,
+        #     ls="none", elinewidth=2.5, zorder=1
+        # )
+        x_right = (
+            np.sqrt(2)
+            * row["dist_med"]
+            * Unit("kpc") * row["astrometric_excess_noise"]
+            * 1e-3 * (1. / 3600) * (np.pi / 180.)
+        ).to(Unit("AU"))
+
+        
+        axs["right"].scatter(
+            x_right, y_left, label=name, s=100, ec="k", zorder=2,
+            **marker_styles[i]
+        )
+
+    handles, labels = axs["main"].get_legend_handles_labels()
+
+    return handles, labels
+
+    # legend = ax.legend(
+    #     bbox_to_anchor=[0.02, 0.99], loc="upper left", fontsize=15
+    # )
+    # for handle in legend.legend_handles:
+    #     handle.set_alpha(1.0)
 
 
 def add_control_and_hvxs(
         ax: plt.Axes, fig: plt.Figure,
         df_hvxs: pd.DataFrame, df_control: pd.DataFrame, sm: cm.ScalarMappable
-) -> None:
+):
 
-    c = df_hvxs["parallax_over_error"]
+    # c = df_hvxs["parallax_over_error"]
 
     scatter_style = {
         "HVXS": {
-            "s": 30, "ec": "k", "c": c, "alpha": 0.8, "rasterized": True,
-            "label": "HVXS", "cmap": sm.cmap,
-            "norm": sm.norm
+            "s": 10, "c": "green", "alpha": 0.6, "rasterized": True,
+            "marker": "x"
+            # "cmap": sm.cmap, "norm": sm.norm, "ec": "k"
         },
         "Control": {
-            "s": 0.01, "c": "k", "alpha": 0.4, "rasterized": True,
-            "label": "Control"
+            "s": 0.01, "c": "k", "alpha": 0.4, "rasterized": True
         }
     }
 
@@ -152,7 +174,7 @@ def add_top_hist(
     }
 
     ec_dict = {
-        "HVXS": "r",
+        "HVXS": "green",
         "Control": "k"
     }
 
@@ -181,17 +203,17 @@ def add_right_panel(
         "Control": df_control
     }
 
-    c = df_hvxs["parallax_over_error"].values
+    # c = df_hvxs["parallax_over_error"].values
 
     scatter_style = {
         "HVXS": {
-            "s": 30, "ec": "k", "c": c, "alpha": 0.8, "rasterized": True,
-            "label": "HVXS", "cmap": sm.cmap,
-            "norm": sm.norm
+            "s": 10, "c": "green", "alpha": 0.8, "rasterized": True,
+            "marker": "x"
+            # "cmap": sm.cmap,
+            # "norm": sm.norm, "ec": "k",
         },
         "Control": {
-            "s": 0.1, "c": "k", "alpha": 0.5, "rasterized": True,
-            "label": "Control"
+            "s": 0.1, "c": "k", "alpha": 0.5, "rasterized": True
         }
     }
 
@@ -239,12 +261,30 @@ def add_cbar(ax: plt.Axes, fig: plt.Figure, df: pd.DataFrame,
     # )  # Optional: Format minor tick labels
 
 
+def add_legend(axs: dict[plt.Axes], handles: list, labels: list) -> None:
+    handle_HVXS = Line2D([0], [0], marker="x", color="green", ms=10,
+                         ls="none", lw=1.5)
+    labels_HVXS = "HVXS"
+
+    handles.insert(0, handle_HVXS)
+    labels.insert(0, labels_HVXS)
+
+    axs["cbar"].legend(
+        handles, labels, loc="upper left", bbox_to_anchor=(0, 1.0),
+        ncols=3, handletextpad=0.01, columnspacing=0.6, borderaxespad=0.0,
+        fontsize=20, frameon=False
+    )
+
+
 def make_plot() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
+        / "high-v_sources" / "hvxs_vpec_lo_gt_200.csv"
     )
     df_hvxs = pd.read_csv(in_file)
+    df_gold = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR / "prime_sample"/ "gold_sample_210525.csv"
+    )
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
         / "control_sample" / "control_sample_stage_10.csv"
@@ -272,11 +312,15 @@ def make_plot() -> None:
         sm=sm_lognorm
     )
 
-    add_cbar(ax=ax_dict["cbar"], df=df_hvxs, fig=fig, sm=sm_lognorm)
+    # add_cbar(ax=ax_dict["cbar"], df=df_hvxs, fig=fig, sm=sm_lognorm)
 
     add_top_hist(
         ax_dict["top"], df_hvxs=df_hvxs, df_control=df_control
     )
+
+    handles, labels = add_prime_sources(df_prime=df_gold, axs=ax_dict)
+
+    add_legend(axs=ax_dict, handles=handles, labels=labels)
 
     plt.savefig(
         config.RESULTS_FIGURES_DIR
