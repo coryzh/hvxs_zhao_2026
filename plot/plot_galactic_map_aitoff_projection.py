@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import astropy.units as u
 from astropy.coordinates import SkyCoord
-from typing import Tuple
+from typing import Tuple, Any
 from plot_settings import (
     SCATTER_DICT_GALACTIC_MAP, generate_marker_styles
 )
 import config
 from utils import process_string
+from matplotlib.lines import Line2D
 
 
 def setup_axes() -> Tuple[plt.Figure, plt.Axes]:
@@ -72,12 +73,13 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes) -> None:
     )
 
 
-def add_gold(ax: plt.Axes) -> None:
+def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
         config.RESULTS_CATALOGUE_DIR / "prime_sample"
         / "gold_sample_150525_curated.csv"
     )
     df = pd.read_csv(in_file_gold)
+    df = df.sort_values(by="ra_x")
 
     marker_styles = generate_marker_styles(df.shape[0], generate_for="scatter")
 
@@ -88,6 +90,8 @@ def add_gold(ax: plt.Axes) -> None:
             l[i], b[i], label=rf'{name}', zorder=2, lw=2, s=160, ec="k",
             **marker_styles[i]
         )
+    handles, labels = ax.get_legend_handles_labels()
+    return handles, labels
 
 
 def make_galactic_map() -> None:
@@ -100,7 +104,15 @@ def make_galactic_map() -> None:
 
     add_control(ax)
     add_hvxs(df, ax)
-    add_gold(ax)
+    handles, labels = add_gold(ax)
+
+    handle_HVXS = Line2D([0], [0], marker="x", color="green", ms=10,
+                         ls="none", mew=2)
+    handles[0] = handle_HVXS
+    plt.legend(
+        handles, labels,
+        bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=5
+    )
 
     out_file = (
         config.RESULTS_FIGURES_DIR
@@ -109,12 +121,6 @@ def make_galactic_map() -> None:
 
     if not out_file.parent.exists():
         out_file.parent.mkdir()
-
-    legend = plt.legend(
-        bbox_to_anchor=[0.5, -0.05], loc="upper center", ncols=5
-    )
-    for handle in legend.legend_handles:
-        handle.set_alpha(1.0)
 
     plt.savefig(out_file)
 
