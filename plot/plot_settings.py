@@ -65,7 +65,7 @@ SCATTER_DICT_CMD = {
 }
 
 SCATTER_DICT_HVXS = {
-    's': 10, 'fc': "g", "ec": "g", 'marker': "x", "alpha": 0.1,
+    's': 10, 'fc': "g", "ec": "g", 'marker': "x", "alpha": 0.3,
     "rasterized": False
 }
 

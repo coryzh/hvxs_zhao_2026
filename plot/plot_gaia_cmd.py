@@ -3,13 +3,14 @@ from gaia_cmd_plotter.gaia_cmd_axis import GaiaCMDAxis
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Any
 from matplotlib import colors
 # from plot.plot_settings import SCATTER_DICT_CMD
 from utils.process_string import get_short_id
 import plot.plot_settings as ps
 import config
 from matplotlib import cm
+from matplotlib.lines import Line2D
 
 
 def preprocessing(df: pd.DataFrame) -> pd.DataFrame:
@@ -46,13 +47,13 @@ def axes_settings(ax: plt.Axes) -> None:
     ax.set_ylabel(r"$M_\mathrm{G}$")
 
 
-def add_gold(ax: plt.Axes) -> None:
+def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
         config.RESULTS_CATALOGUE_DIR / "prime_sample"
         / "gold_sample_150525_curated.csv"
     )
     df = pd.read_csv(in_file_gold)
-
+    df = df.sort_values(by="ra_x", ascending=True)
     df = preprocessing(df)
 
     bp_rp = (
@@ -77,6 +78,8 @@ def add_gold(ax: plt.Axes) -> None:
             bp_rp[i], g_abs[i], mec="k", ms=8, ls="none", label=name_short,
             **marker_styles[i]
         )
+    handles, labels = ax.get_legend_handles_labels()
+    return handles, labels
 
 
 def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
@@ -180,7 +183,7 @@ def add_cbar(ax: plt.Axes, fig: plt.Figure, sm: cm.ScalarMappable) -> None:
 
 
 def make_cmd(in_file: Path) -> None:
-    fig, ax = make_figure(use_nearby_star_cmd=True)
+    fig, ax = make_figure(use_nearby_star_cmd=False)
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
         / "control_sample"
@@ -188,15 +191,20 @@ def make_cmd(in_file: Path) -> None:
     )
     add_control(ax, df_control=df_control)
     _ = add_hvxs(in_file, ax)
-    add_gold(ax)
+    handles, labels = add_gold(ax)
+    handle_HVXS = Line2D([0], [0], marker="x", color="green", ms=10,
+                         ls="none", mew=2.0)
+    handles[0] = handle_HVXS
     axes_settings(ax)
     # add_cbar(ax, fig, sm)
     out_file = (
         config.RESULTS_FIGURES_DIR
-        / "gaia_cmd" / "gaia_cmd_w_nearby.pdf"
+        / "gaia_cmd" / "gaia_cmd.pdf"
     )
 
-    legend = plt.legend(loc="center left", bbox_to_anchor=[1.0, 0.5])
+    legend = plt.legend(
+        handles, labels, loc="center left", bbox_to_anchor=[1.0, 0.5]
+    )
     for handle in legend.legend_handles:
         handle.set_alpha(1.0)
 
