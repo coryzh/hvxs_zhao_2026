@@ -106,7 +106,6 @@ def add_prime_sources(df_prime: pd.DataFrame, axs: dict[plt.Axes]) -> Any:
             * 1e-3 * (1. / 3600) * (np.pi / 180.)
         ).to(Unit("AU"))
 
-        
         axs["right"].scatter(
             x_right, y_left, label=name, s=100, ec="k", zorder=2,
             **marker_styles[i]
@@ -263,7 +262,7 @@ def add_cbar(ax: plt.Axes, fig: plt.Figure, df: pd.DataFrame,
 
 def add_legend(axs: dict[plt.Axes], handles: list, labels: list) -> None:
     handle_HVXS = Line2D([0], [0], marker="x", color="green", ms=10,
-                         ls="none", lw=1.5)
+                         ls="none", mew=2.0)
     labels_HVXS = "HVXS"
 
     handles.insert(0, handle_HVXS)
@@ -283,7 +282,8 @@ def make_plot() -> None:
     )
     df_hvxs = pd.read_csv(in_file)
     df_gold = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "prime_sample"/ "gold_sample_210525.csv"
+        config.RESULTS_CATALOGUE_DIR / "prime_sample"
+        / "gold_sample_210525.csv"
     )
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
