@@ -82,6 +82,7 @@ def axes_settings(ax_dict: dict) -> None:
 
 
 def add_prime_sources(df_prime: pd.DataFrame, axs: dict[plt.Axes]) -> Any:
+    df_prime = df_prime.sort_values(by="ra_x", ascending=True)
     marker_styles = ps.generate_marker_styles(
         df_prime.shape[0], generate_for="scatter"
     )
