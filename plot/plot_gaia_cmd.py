@@ -75,7 +75,7 @@ def add_gold(ax: plt.Axes) -> Any:
         name = row["ID_x"]
         name_short = get_short_id(name)
         ax.plot(
-            bp_rp[i], g_abs[i], mec="k", ms=8, ls="none", label=name_short,
+            bp_rp[i], g_abs[i], mec="k", ms=12, ls="none", label=name_short,
             **marker_styles[i]
         )
     handles, labels = ax.get_legend_handles_labels()
