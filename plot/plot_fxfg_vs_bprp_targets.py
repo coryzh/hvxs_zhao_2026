@@ -104,7 +104,7 @@ def main() -> None:
 
     df_gold = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_210525.csv"
+        / "gold_sample_150525_curated_sorted_by_ra.csv"
     )
 
     add_hvxs(df_hvxs, ax)

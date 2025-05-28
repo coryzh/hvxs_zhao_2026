@@ -82,7 +82,6 @@ def axes_settings(ax_dict: dict) -> None:
 
 
 def add_prime_sources(df_prime: pd.DataFrame, axs: dict[plt.Axes]) -> Any:
-    df_prime = df_prime.sort_values(by="ra_x", ascending=True)
     marker_styles = ps.generate_marker_styles(
         df_prime.shape[0], generate_for="scatter"
     )
@@ -284,7 +283,7 @@ def make_plot() -> None:
     df_hvxs = pd.read_csv(in_file)
     df_gold = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_210525.csv"
+        / "gold_sample_150525_curated_sorted_by_ra.csv"
     )
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR

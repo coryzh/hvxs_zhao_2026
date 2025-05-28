@@ -50,11 +50,13 @@ def axes_settings(ax: plt.Axes) -> None:
 def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
         config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_150525_curated.csv"
+        / "gold_sample_150525_curated_sorted_by_ra.csv"
     )
     df = pd.read_csv(in_file_gold)
-    df = df.sort_values(by="ra_x", ascending=True)
     df = preprocessing(df)
+    # Dropping rows could mess up the indices,
+    # so some future updates is needed to make the script more stable against
+    # index changes.
 
     bp_rp = (
         df["phot_bp_mean_mag"]
@@ -74,6 +76,7 @@ def add_gold(ax: plt.Axes) -> Any:
     for i, row in df.iterrows():
         name = row["ID_x"]
         name_short = get_short_id(name)
+
         ax.plot(
             bp_rp[i], g_abs[i], mec="k", ms=12, ls="none", label=name_short,
             **marker_styles[i]
