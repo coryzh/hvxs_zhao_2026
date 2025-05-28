@@ -76,16 +76,15 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes) -> None:
 def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
         config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_150525_curated.csv"
+        / "gold_sample_150525_curated_sorted_by_ra.csv"
     )
     df = pd.read_csv(in_file_gold)
-    df = df.sort_values(by="ra_x")
-
     marker_styles = generate_marker_styles(df.shape[0], generate_for="scatter")
 
     l, b = calc_galactic_coordinates(df)
     for i, row in df.iterrows():
         name = process_string.get_short_id(row["ID_x"])
+        print(i, name, l[i], b[i])
         ax.scatter(
             l[i], b[i], label=rf'{name}', zorder=2, lw=2, s=160, ec="k",
             **marker_styles[i]
