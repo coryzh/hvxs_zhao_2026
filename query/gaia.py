@@ -2,7 +2,8 @@ from astroquery.gaia import Gaia
 from typing import List
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
-from astropy.units import Quantity, Unit
+from astropy.units import Quantity
+from tqdm import tqdm
 import pandas as pd
 import numpy as np
 
@@ -63,7 +64,7 @@ def cone_search_closest_neighbour(df: pd.DataFrame, id_col: str = "ID",
                                   dec_col: str = "dec") -> pd.DataFrame:
 
     closest_rows = []
-    for i, row in df.iterrows():
+    for i, row in tqdm(df.iterrows()):
         ra = row[ra_col]
         dec = row[dec_col]
         coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
@@ -86,3 +87,26 @@ def cone_search_closest_neighbour(df: pd.DataFrame, id_col: str = "ID",
     df_results = pd.merge(df, df_closest, how="left", on=id_col)
 
     return df_results
+
+
+def main() -> None:
+    from pathlib import Path
+    in_file_path = Path(
+        "/Users/yuezhao/Desktop/local_repos"
+        "/rubin_dp1_cdfs/data/catalogues/cdfs/source_catalogue.csv"
+    )
+    df = pd.read_csv(in_file_path)
+
+    df_agn = df[df["OType"] == "AGN"]
+
+    results = cone_search_closest_neighbour(
+        df_agn, id_col="Seq", ra_col="RAJ2000", dec_col="DEJ2000"
+    )
+
+    results.to_csv(
+        in_file_path.parent / "source_catalogue_agn_w_gaia.csv", index=False
+    )
+
+
+if __name__ == "__main__":
+    main()
