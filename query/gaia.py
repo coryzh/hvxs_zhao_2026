@@ -6,6 +6,7 @@ from astropy.units import Quantity
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
+import config
 
 
 Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source"
@@ -90,21 +91,20 @@ def cone_search_closest_neighbour(df: pd.DataFrame, id_col: str = "ID",
 
 
 def main() -> None:
-    from pathlib import Path
-    in_file_path = Path(
-        "/Users/yuezhao/Desktop/local_repos"
-        "/rubin_dp1_cdfs/data/catalogues/cdfs/source_catalogue.csv"
+    # from pathlib import Path
+    # in_file_path = Path(
+    #     "/Users/yuezhao/Desktop/local_repos"
+    #     "/rubin_dp1_cdfs/data/catalogues/cdfs/source_catalogue.csv"
+    # )
+    in_file_path = (
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources" / "hvxs_vpec_lo_gt_200.csv"
     )
     df = pd.read_csv(in_file_path)
-
-    df_agn = df[df["OType"] == "AGN"]
-
-    results = cone_search_closest_neighbour(
-        df_agn, id_col="Seq", ra_col="RAJ2000", dec_col="DEJ2000"
-    )
-
+    results = check_neighbours(df)
     results.to_csv(
-        in_file_path.parent / "source_catalogue_agn_w_gaia.csv", index=False
+        in_file_path.parent / "hvxs_vpec_lo_gt_200_neigbour_counts",
+        index=False
     )
 
 

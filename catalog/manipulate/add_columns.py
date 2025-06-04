@@ -91,6 +91,22 @@ def add_erass_iauname(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def add_qulity_bitmask(df: pd.DataFrame) -> pd.DataFrame:
+    cond_1 = (df["sep_x_g"] / df["pos_x_err"] <= 1)
+    cond_2 = (df["parallax_corr"] / df["parallax_error"] >= 5)
+    cond_3 = (
+        (1/df["parallax_corr"] >= df["dist_med"]) & df["parallax_corr"] > 0
+    )
+
+    df["quality"] = (
+        cond_1.astype(int) * (1 << 0) +
+        cond_2.astype(int) * (1 << 1) +
+        cond_3.astype(int) * (1 << 2)
+    )
+
+    return df
+
+
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR
                / "high-v_sources"
