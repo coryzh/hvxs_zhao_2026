@@ -99,7 +99,7 @@ def main() -> None:
 
     df_hvxs = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200.csv"
+        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
     )
 
     df_gold = pd.read_csv(

@@ -278,7 +278,8 @@ def add_legend(axs: dict[plt.Axes], handles: list, labels: list) -> None:
 def make_plot() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "hvxs_vpec_lo_gt_200.csv"
+        / "high-v_sources"
+        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
     )
     df_hvxs = pd.read_csv(in_file)
     df_gold = pd.read_csv(

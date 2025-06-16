@@ -97,7 +97,8 @@ def make_galactic_map() -> None:
     fig, ax = setup_axes()
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
+        / "high-v_sources"
+        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
     )
     df = pd.read_csv(in_file)
 
