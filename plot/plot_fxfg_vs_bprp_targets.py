@@ -36,14 +36,14 @@ def axes_settings(ax: plt.Axes) -> None:
 def add_control(ax: plt.axes) -> None:
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_10.csv"
+        / "control_sample" / "control_sample_stage_11.csv"
     )
 
     x = df_control["bp_rp"]
     y = df_control["fx_fg"]
 
     ax.scatter(
-        x, y, s=0.1, marker=".", c="k", alpha=0.2, rasterized=True, zorder=0
+        x, y, s=0.1, marker=".", c="k", alpha=0.5, rasterized=True, zorder=0
     )
 
 

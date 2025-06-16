@@ -136,7 +136,7 @@ def add_control_and_hvxs(
             # "cmap": sm.cmap, "norm": sm.norm, "ec": "k"
         },
         "Control": {
-            "s": 0.01, "c": "k", "alpha": 0.4, "rasterized": True
+            "s": 0.1, "c": "k", "alpha": 0.5, "rasterized": True
         }
     }
 
@@ -288,7 +288,7 @@ def make_plot() -> None:
     )
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_10.csv"
+        / "control_sample" / "control_sample_stage_11.csv"
     )
 
     df_hvxs["parallax_over_error"] = (

@@ -190,7 +190,7 @@ def make_cmd(in_file: Path) -> None:
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
         / "control_sample"
-        / "control_sample_stage_10.csv"
+        / "control_sample_stage_11.csv"
     )
     add_control(ax, df_control=df_control)
     _ = add_hvxs(in_file, ax)

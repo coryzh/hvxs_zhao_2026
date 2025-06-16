@@ -70,7 +70,7 @@ SCATTER_DICT_HVXS = {
 }
 
 SCATTER_DICT_CONTROL_CMD = {
-    's': 0.1, 'fc': 'k', 'ec': 'k', 'marker': '.', 'alpha': 0.3,
+    's': 0.1, 'fc': 'k', 'ec': 'k', 'marker': '.', 'alpha': 0.5,
     'zorder': -1, 'rasterized': True
 }
 
