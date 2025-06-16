@@ -92,16 +92,18 @@ def add_erass_iauname(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_qulity_bitmask(df: pd.DataFrame) -> pd.DataFrame:
+    # cond_1 = (df["n_neighbours_2sigma"] < 2)
     cond_1 = (df["sep_x_g"] / df["pos_x_err"] <= 1)
     cond_2 = (df["parallax_corr"] / df["parallax_error"] >= 5)
     cond_3 = (
-        (1/df["parallax_corr"] >= df["dist_med"]) & df["parallax_corr"] > 0
+        (abs(1 / df["parallax_corr"] - df["dist_med"])
+         / df["dist_med"] <= 0.2) & df["parallax_corr"] > 0
     )
 
     df["quality"] = (
-        cond_1.astype(int) * (1 << 0) +
+        cond_1.astype(int) * (1 << 2) +
         cond_2.astype(int) * (1 << 1) +
-        cond_3.astype(int) * (1 << 2)
+        cond_3.astype(int) * (1 << 0)
     )
 
     return df
@@ -110,9 +112,18 @@ def add_qulity_bitmask(df: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR
                / "high-v_sources"
-               / "combined_vpec_lolim_gt_200_unique_stage_7.csv")
+               / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour.csv")
+    df = pd.read_csv(in_file)
+    df = add_qulity_bitmask(df)
 
-    add_cartesian_coordinates(in_file)
+    df.to_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "high-v_sources"
+        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
+    )
+    print(df.value_counts(subset=["quality"]))
+
+    # add_cartesian_coordinates(in_file)
     # df.to_csv(config.RESULTS_CATALOGUE_DIR /
     #  "control_sample_simbad_cleaned.csv")
 
