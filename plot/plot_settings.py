@@ -6,6 +6,9 @@ from itertools import product
 
 IMAGE_DIR = config.DATA_DIR / "images" / "gold_sample"
 
+SURVEY_KEYS_X = ["csc", "xmm", "swift", "erass"]
+SURVEY_NAMES_X = ["CSC", "4XMM", "2SXPS", "eRASS"]
+
 SURVEY_KEYS = [
     "csc", "xmm", "swift", "erass", "panstarrs", "desi", "skymapper"
 ]
@@ -17,6 +20,14 @@ SURVEY_NAMES = [
 cblind_palette = sns.color_palette("colorblind", 5)
 
 SURVEY_COLORS = [cblind_palette[i] for i in [0, 2, 3, 4]]
+
+SURVEY_COLOR_DICT_X = {
+    key: val for key, val in zip(SURVEY_KEYS_X, SURVEY_COLORS)
+}
+
+SURVEY_NAME_DICT_X = {
+    key: val for key, val in zip(SURVEY_KEYS_X, SURVEY_NAMES_X)
+}
 
 SURVEY_COLOR_DICT = {key: val for key, val in zip(SURVEY_KEYS, SURVEY_COLORS)}
 
