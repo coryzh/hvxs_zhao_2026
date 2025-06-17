@@ -2,7 +2,7 @@ import numpy as np
 import config
 import pandas as pd
 import matplotlib.pyplot as plt
-from plot.plot_settings import SURVEY_COLOR_DICT, SURVEY_NAME_DICT
+from plot.plot_settings import SURVEY_COLOR_DICT_X, SURVEY_NAME_DICT_X
 from typing import Tuple
 from scipy.stats import gaussian_kde
 
@@ -15,7 +15,7 @@ def make_figure() -> Tuple[plt.Figure, plt.Axes]:
 
 
 def axes_settings(ax: plt.Axes) -> None:
-    ax.set_xlabel(r"Gaia-X-ray separation ($\sigma$)")
+    ax.set_xlabel(r"$\delta_\mathrm{x,g}$ ($r_\mathrm{err, x}$)")
     ax.set_ylabel(r"Probability density")
     ax.set_xlim(0, None)
     ax.set_ylim(0, None)
@@ -24,7 +24,7 @@ def axes_settings(ax: plt.Axes) -> None:
 def add_histogram(ax: plt.Axes, from_catalog: str) -> None:
     # for key, val in SURVEY_COLOR_DICT.items():
     in_file = (
-        config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+        config.RESULTS_CATALOGUE_DIR / "high-v_sources_old"
         / "combined_vpec_med_gt_0_all.csv"
     )
 
@@ -39,8 +39,8 @@ def add_histogram(ax: plt.Axes, from_catalog: str) -> None:
 
     ax.plot(
         sep_range, kde(sep_range), lw=2.0,
-        color=SURVEY_COLOR_DICT[from_catalog],
-        label=SURVEY_NAME_DICT[from_catalog]
+        color=SURVEY_COLOR_DICT_X[from_catalog],
+        label=SURVEY_NAME_DICT_X[from_catalog]
     )
     # _ = ax.hist(sep, bins=bins, density=True, histtype="step",
     # ec=SURVEY_COLOR_DICT[from_catalog],
@@ -50,7 +50,8 @@ def add_histogram(ax: plt.Axes, from_catalog: str) -> None:
 def make_histogram() -> None:
     fig, ax = make_figure()
 
-    for key in SURVEY_NAME_DICT.keys():
+    for key in SURVEY_NAME_DICT_X.keys():
+        print(f"Done for {key}.")
         add_histogram(ax, from_catalog=key)
 
     axes_settings(ax)
