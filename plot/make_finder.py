@@ -56,9 +56,9 @@ class ImageData:
 
 def make_figure() -> Tuple[plt.Figure, List[plt.Axes]]:
     plt.style.use("mycustomised")
-    fig = plt.figure(figsize=(48, 36))
+    fig = plt.figure(figsize=(36, 36))
     n_rows = 3
-    n_cols = 4
+    n_cols = 3
 
     # fig.text(0.5, 0.08, "Right ascension", ha="center", va="center",
     #          fontsize=62)
@@ -68,7 +68,7 @@ def make_figure() -> Tuple[plt.Figure, List[plt.Axes]]:
 
     df = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_210525.csv"
+        / "gold_sample_150525_curated_sorted_by_ra.csv"
     )
 
     for i, row in df.iterrows():
@@ -137,7 +137,7 @@ def make_figure() -> Tuple[plt.Figure, List[plt.Axes]]:
         ax.tick_params(axis="x", labelbottom=False, bottom=False, top=False)
         ax.tick_params(axis="y", labelleft=False, left=False, right=False)
         axs.append(ax)
-    plt.subplots_adjust(hspace=0.05, wspace=0.05)
+    plt.subplots_adjust(hspace=0.02, wspace=0.02)
     return fig, axs
 
 
