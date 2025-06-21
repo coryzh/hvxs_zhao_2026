@@ -67,8 +67,8 @@ def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim",
     # overlap_ids = None
     df_all = pd.DataFrame(columns=common_columns)
     for _name in catalogue_names:
-        cat_dir = config.RESULTS_CATALOGUE_DIR / "master_catalogs"
-        cat_path = cat_dir / f"{_name}_master_catalog_w_fx_fg.csv"
+        cat_dir = config.RESULTS_CATALOGUE_DIR / "complementary_tables"
+        cat_path = cat_dir / f"{_name}_likely_stars_master_w_fx_fg.csv"
         df = pd.read_csv(cat_path)
 
         logger.log("Catalogues loaded.\n")
@@ -185,14 +185,15 @@ def combine_catalogs(vpec_lim: float = 0, mode: str = "lolim",
 
     out_file_name = f"combined_vpec_{mode}_gt_{vpec_lim}_all.csv"
     out_file_path = (config.RESULTS_CATALOGUE_DIR
-                     / "high-v_sources" / out_file_name)
+                     / "complementary_tables" / out_file_name)
 
     df_all_updated.to_csv(out_file_path, index=False)
     logger.log(f"Catalogue saved to {out_file_path}.\n")
     logger.log("Saving the combined catalogue of unique X-ray sources ...")
 
     out_file_name = f"combined_vpec_{mode}_gt_{vpec_lim}_unique_stage_0.csv"
-    out_file_path_unique = (config.RESULTS_CATALOGUE_DIR / "high-v_sources"
+    out_file_path_unique = (config.RESULTS_CATALOGUE_DIR
+                            / "complementary_tables"
                             / out_file_name)
 
     df_all_unique.to_csv(out_file_path_unique, index=False)
