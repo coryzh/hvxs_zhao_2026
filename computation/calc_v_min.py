@@ -401,8 +401,8 @@ def run_computation(
 
     out_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "v_min_catalogs"
-        / f"{survey_name}_w_v_min.csv"
+        / "complementary_tables"
+        / f"{survey_name}_likely_stars_w_v_min.csv"
     )
 
     if out_file.exists():
@@ -471,15 +471,12 @@ def run_computation(
 
 
 def main() -> None:
-    survey_name = "erass"
+    survey_name = "xmm"
     in_cat_dir = (
-        config.ROOT_DIR
-        / "results"
-        / survey_name
-        / "catalogues"
-        / "nway_match"
+        config.RESULTS_CATALOGUE_DIR
+        / "complementary_tables"
     )
-    in_cat_file = f"catalog_{survey_name}_for_vpec.csv"
+    in_cat_file = f"{survey_name}_likely_stars.csv"
 
     df = pd.read_csv(in_cat_dir / in_cat_file)
     df = imputation_bailer_jones(df)
