@@ -2,7 +2,7 @@ import config
 import pandas as pd
 import data_schema as ds
 from catalog.manipulate.parallax_zeropoint_correction import correct_zp
-from catalog.manipulate.rename_columns import rename_distance_cols
+# from catalog.manipulate.rename_columns import rename_distance_cols
 
 
 def process_catalog(survey_name: str) -> None:
@@ -36,8 +36,9 @@ def process_catalog(survey_name: str) -> None:
     df_vmin_copy = df_vmin_copy.drop("ID_x", axis=1)
     df_gaia_copy = correct_zp(df_gaia_copy, verbose=True)
     df_gaia_copy = df_gaia_copy.rename(
-        columns={"ra": "ra_gaia", "dec": "dec_gaia",
-                 "l": "l_gaia", "b": "b_gaia"
+        columns={
+            "ra": "ra_gaia", "dec": "dec_gaia",
+            "l": "l_gaia", "b": "b_gaia"
         }
     )
 
