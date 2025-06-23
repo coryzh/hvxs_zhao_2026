@@ -98,12 +98,12 @@ def main() -> None:
     # )
     in_file_path = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "hvxs_vpec_lo_gt_200.csv"
+        / "complementary_tables" / "hvxs_comp_gt_200_stage_9.csv"
     )
     df = pd.read_csv(in_file_path)
     results = check_neighbours(df)
     results.to_csv(
-        in_file_path.parent / "hvxs_vpec_lo_gt_200_neigbour_counts",
+        in_file_path.parent / "hvxs_comp_gt_200_neigbour_counts.csv",
         index=False
     )
 

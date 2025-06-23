@@ -163,8 +163,8 @@ def _clean_df_simbad_name(
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources"
-        / "combined_vpec_lolim_gt_200_unique_stage_2.csv"
+        / "complementary_tables"
+        / "hvxs_comp_gt_200_stage_2.csv"
     )
 
     df = pd.read_csv(in_file)
@@ -183,7 +183,7 @@ def main() -> None:
     df_filtered_3 = _clean_df_simbad_name(df_filtered_2, verbose=verbose)
 
     df_filtered_3.to_csv(
-        in_file.parent / f"{in_file.stem.replace('stage_2', 'stage_3')}.csv",
+        in_file.parent / f"{in_file.stem}_simbad_cleaned.csv",
         index=False
     )
 

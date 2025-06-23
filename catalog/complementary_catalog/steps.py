@@ -3,6 +3,7 @@ import pandas as pd
 import data_schema as ds
 from catalog.manipulate.parallax_zeropoint_correction import correct_zp
 # from catalog.manipulate.rename_columns import rename_distance_cols
+import numpy as np
 
 
 def process_catalog(survey_name: str) -> None:
@@ -74,13 +75,41 @@ def process_catalog(survey_name: str) -> None:
     df_merged.to_csv(out_file, index=False)
 
 
-def main() -> None:
-    survey_names = [
-        "csc", "xmm", "erass", "swift"
-    ]
+def perform_cleaning() -> None:
+    in_file = (
+        config.RESULTS_CATALOGUE_DIR / "complementary_tables"
+        / "hvxs_comp_gt_200_neigbour_counts.csv"
+    )
 
-    for survey in survey_names:
-        process_catalog(survey_name=survey)
+    df = pd.read_csv(in_file)
+    df_copy = df.copy()
+
+    print(f"{df_copy.shape[0]} sources loaded.\n")
+    # # Step 1
+    # _filter_1 = (
+    #     df["fx_fg"] - df["fx_fg_err"] >= np.power(10, df["bp_rp"] - 3.5)
+    # )
+
+    # df_copy = df_copy[_filter_1]
+    # print(f"1. {df_copy.shape[0]} sources left.")
+    # Step 2
+
+    _filter_2 = (
+        df["n_neighbours"] < 1
+    )
+
+    df_copy = df_copy[_filter_2]
+    print(f"1. {df_copy.shape[0]} sources left.")
+
+
+def main() -> None:
+    # survey_names = [
+    #     "csc", "xmm", "erass", "swift"
+    # ]
+
+    # for survey in survey_names:
+    #     process_catalog(survey_name=survey)
+    perform_cleaning()
 
 
 if __name__ == "__main__":

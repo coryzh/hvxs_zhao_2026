@@ -111,19 +111,19 @@ def add_qulity_bitmask(df: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR
-               / "high-v_sources"
-               / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour.csv")
+               / "complementary_tables"
+               / "hvxs_comp_gt_200_neigbour_counts.csv")
     df = pd.read_csv(in_file)
+    # add_cartesian_coordinates(in_file)
     df = add_qulity_bitmask(df)
 
     df.to_csv(
         config.RESULTS_CATALOGUE_DIR
         / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
+        / f"{in_file.stem}_w_bitmask.csv"
     )
     print(df.value_counts(subset=["quality"]))
 
-    # add_cartesian_coordinates(in_file)
     # df.to_csv(config.RESULTS_CATALOGUE_DIR /
     #  "control_sample_simbad_cleaned.csv")
 

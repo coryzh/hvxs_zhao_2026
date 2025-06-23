@@ -46,10 +46,10 @@ def correct_bp_rp_excess_factor(df: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     in_files = [
-        config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200.csv",
-        config.RESULTS_CATALOGUE_DIR / "control_sample"
-        / "control_sample_stage_10.csv"
+        config.RESULTS_CATALOGUE_DIR / "complementary_tables"
+        / "hvxs_comp_gt_200_neigbour_counts_w_bitmask.csv",
+        # config.RESULTS_CATALOGUE_DIR / "control_sample"
+        # / "control_sample_stage_10.csv"
     ]
 
     for _file in in_files:
