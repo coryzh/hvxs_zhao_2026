@@ -172,7 +172,7 @@ def cross_match_astrometry(
 
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR / "complementary_tables"
-               / "hvxs_comp_gt_200_stage_3.csv")
+               / "control_comp_simbad_cleaned.csv")
 
     # cross_match_astrometry(in_file_csv=in_file, verbose=True,
     # radius_type="r50")

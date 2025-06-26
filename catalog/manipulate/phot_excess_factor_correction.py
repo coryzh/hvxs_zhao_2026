@@ -47,7 +47,7 @@ def correct_bp_rp_excess_factor(df: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     in_files = [
         config.RESULTS_CATALOGUE_DIR / "complementary_tables"
-        / "hvxs_comp_gt_200_neigbour_counts_w_bitmask.csv",
+        / "control_comp.csv",
         # config.RESULTS_CATALOGUE_DIR / "control_sample"
         # / "control_sample_stage_10.csv"
     ]

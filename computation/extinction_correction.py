@@ -58,7 +58,7 @@ def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
         / "complementary_tables"
-        / "hvxs_comp_gt_200_stage_5.csv"
+        / "control_comp_simbad_cleaned.csv"
     )
 
     df = pd.read_csv(in_file)

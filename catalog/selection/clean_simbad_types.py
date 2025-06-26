@@ -164,7 +164,7 @@ def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
         / "complementary_tables"
-        / "hvxs_comp_gt_200_stage_2.csv"
+        / "control_comp.csv"
     )
 
     df = pd.read_csv(in_file)
