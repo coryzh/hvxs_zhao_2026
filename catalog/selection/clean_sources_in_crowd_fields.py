@@ -38,10 +38,11 @@ def main() -> None:
     # Finally, remove rows that have more than 1 Gaia sources within 2 sigma:
     _filter_merged = df_merged["count"] > 1
     # n_sources = df_merged[_filter_merged].shape[0]
-
-    df_merged[_filter_merged].to_csv(
+    df_merged_filtered = df_merged[~_filter_merged]
+    print(f"{df_merged_filtered.shape[0]} sources kept.")
+    df_merged_filtered.to_csv(
         config.RESULTS_CATALOGUE_DIR / "control_sample"
-        / "control_sample_stage_11.csv", index=False
+        / "control_sample_1cpt_2sigma.csv", index=False
     )
 
 
