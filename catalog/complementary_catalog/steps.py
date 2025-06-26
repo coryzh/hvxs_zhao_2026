@@ -102,6 +102,37 @@ def perform_cleaning() -> None:
     print(f"1. {df_copy.shape[0]} sources left.")
 
 
+def combine_control_sample() -> None:
+    """Vertically concatenate the complementary and original control sample 
+    """
+
+    df_orig = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "control_sample"
+        / "control_sample_1cpt_2sigma.csv"
+    )
+
+    df_comp = pd.read_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "complementary_tables"
+        / "control_comp.csv"
+    )
+
+    df_orig = df_orig.drop(columns=[
+        "ID_x_2", "hvxs_gt_200_control_sample_oid",
+        "control_sample_stage_6_oid"
+        ]
+    )
+
+    df_concat = pd.concat([df_comp, df_orig], axis=0, ignore_index=True)
+    # print(f"{df_comp.shape[0] + df_orig.shape[0] == df_concat.shape[0]}")
+
+    df_concat.to_csv(
+        config.RESULTS_CATALOGUE_DIR
+        / "ready_catalogues" / "control.csv"
+    )
+
+
 def main() -> None:
     # survey_names = [
     #     "csc", "xmm", "erass", "swift"
@@ -109,7 +140,7 @@ def main() -> None:
 
     # for survey in survey_names:
     #     process_catalog(survey_name=survey)
-    perform_cleaning()
+    combine_control_sample()
 
 
 if __name__ == "__main__":
