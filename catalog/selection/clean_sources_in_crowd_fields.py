@@ -35,8 +35,10 @@ def main() -> None:
         df_c_filtered, df_c_neighbour_counts, on="ID_x", how="left"
     )
 
+    df_merged = df_merged.rename(columns={'count': 'n_neighbours'})
+
     # Finally, remove rows that have more than 1 Gaia sources within 2 sigma:
-    _filter_merged = df_merged["count"] > 1
+    _filter_merged = df_merged["n_neighbours"] > 1
     # n_sources = df_merged[_filter_merged].shape[0]
     df_merged_filtered = df_merged[~_filter_merged]
     print(f"{df_merged_filtered.shape[0]} sources kept.")
