@@ -56,14 +56,15 @@ def add_control(ax: plt.Axes) -> None:
     # _filter = df_all["dist_med"] < 1.5
     # df_all = df_all[_filter]
     l, b = calc_galactic_coordinates(df_all)
-    # ax.scatter(l, b, s=0.1, marker="o", color="k", alpha=0.6, rasterized=False)
+    # ax.scatter(l, b, s=0.1, marker="o", color="k", alpha=0.6,
+    # rasterized=False)
     h, xedges, yedges = np.histogram2d(l, b, bins=100, density=True)
     x_centers = 0.5 * (xedges[:-1] + xedges[1:])
     y_centers = 0.5 * (yedges[:-1] + yedges[1:])
     x, y = np.meshgrid(x_centers, y_centers)
 
     _ = ax.pcolormesh(
-        x, y, h.T, shading="auto", cmap="Greys", edgecolors="face", 
+        x, y, h.T, shading="auto", cmap="Greys", edgecolors="face",
         norm=colors.PowerNorm(gamma=0.5), rasterized=True
     )
 
