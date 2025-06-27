@@ -278,17 +278,17 @@ def add_legend(axs: dict[plt.Axes], handles: list, labels: list) -> None:
 def make_plot() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
+        / "ready_catalogues"
+        / "hvxs.csv"
     )
     df_hvxs = pd.read_csv(in_file)
     df_gold = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_150525_curated_sorted_by_ra.csv"
+        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        / "gold.csv"
     )
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_11.csv"
+        / "ready_catalogues" / "control.csv"
     )
 
     df_hvxs["parallax_over_error"] = (

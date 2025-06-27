@@ -49,8 +49,8 @@ def axes_settings(ax: plt.Axes) -> None:
 
 def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
-        config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_150525_curated_sorted_by_ra.csv"
+        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        / "gold.csv"
     )
     df = pd.read_csv(in_file_gold)
     df = preprocessing(df)
@@ -189,8 +189,8 @@ def make_cmd(in_file: Path) -> None:
     fig, ax = make_figure(use_nearby_star_cmd=False)
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample"
-        / "control_sample_stage_11.csv"
+        / "ready_catalogues"
+        / "control.csv"
     )
     add_control(ax, df_control=df_control)
     _ = add_hvxs(in_file, ax)
@@ -217,8 +217,8 @@ def make_cmd(in_file: Path) -> None:
 def main() -> None:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
+        / "ready_catalogues"
+        / "hvxs.csv"
     )
     make_cmd(in_file)
 

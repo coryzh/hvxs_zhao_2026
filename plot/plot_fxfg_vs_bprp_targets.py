@@ -27,7 +27,7 @@ def axes_settings(ax: plt.Axes) -> None:
         ]
     )
 
-    ax.set_xlim(-0.8, 5.0)
+    ax.set_xlim(-0.8, 4.3)
     ax.set_ylim(6e-6, 1050)
     ax.set_xlabel("Bp$-$Rp", fontsize=38)
     ax.set_ylabel("$F_X / F_G$", fontsize=38)
@@ -36,7 +36,7 @@ def axes_settings(ax: plt.Axes) -> None:
 def add_control(ax: plt.axes) -> None:
     df_control = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_11.csv"
+        / "ready_catalogues" / "control.csv"
     )
 
     x = df_control["bp_rp"]
@@ -98,13 +98,13 @@ def main() -> None:
     fig, ax = make_figure()
 
     df_hvxs = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
+        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        / "hvxs.csv"
     )
 
     df_gold = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_150525_curated_sorted_by_ra.csv"
+        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        / "gold.csv"
     )
 
     add_hvxs(df_hvxs, ax)

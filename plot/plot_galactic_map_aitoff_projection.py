@@ -10,6 +10,7 @@ from plot_settings import (
 import config
 from utils import process_string
 from matplotlib.lines import Line2D
+from matplotlib import colors
 
 
 def setup_axes() -> Tuple[plt.Figure, plt.Axes]:
@@ -50,19 +51,20 @@ def calc_galactic_coordinates(
 def add_control(ax: plt.Axes) -> None:
     df_all = pd.read_csv(
         config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_11.csv"
+        / "ready_catalogues" / "control.csv"
     )
-    _filter = df_all["dist_med"] < 1.5
-    df_all = df_all[_filter]
+    # _filter = df_all["dist_med"] < 1.5
+    # df_all = df_all[_filter]
     l, b = calc_galactic_coordinates(df_all)
-    h, xedges, yedges = np.histogram2d(l, b, bins=60, density=True)
+    # ax.scatter(l, b, s=0.1, marker="o", color="k", alpha=0.6, rasterized=False)
+    h, xedges, yedges = np.histogram2d(l, b, bins=100, density=True)
     x_centers = 0.5 * (xedges[:-1] + xedges[1:])
     y_centers = 0.5 * (yedges[:-1] + yedges[1:])
     x, y = np.meshgrid(x_centers, y_centers)
 
     _ = ax.pcolormesh(
-        x, y, h.T, shading="auto", cmap="Greys", edgecolors="face",
-        rasterized=True
+        x, y, h.T, shading="auto", cmap="Greys", edgecolors="face", 
+        norm=colors.PowerNorm(gamma=0.5), rasterized=True
     )
 
 
@@ -75,8 +77,8 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes) -> None:
 
 def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
-        config.RESULTS_CATALOGUE_DIR / "prime_sample"
-        / "gold_sample_150525_curated_sorted_by_ra.csv"
+        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        / "gold.csv"
     )
     df = pd.read_csv(in_file_gold)
     marker_styles = generate_marker_styles(df.shape[0], generate_for="scatter")
@@ -97,8 +99,8 @@ def make_galactic_map() -> None:
     fig, ax = setup_axes()
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
+        / "ready_catalogues"
+        / "hvxs.csv"
     )
     df = pd.read_csv(in_file)
 
