@@ -4,6 +4,8 @@ from astropy.coordinates import SkyCoord
 from pathlib import Path
 from constants import gal_cen
 import config
+from utils.distances import FromLiterature
+from utils.utility_functions import get_errors
 
 
 def add_galactic_coordinates(df: pd.DataFrame) -> pd.DataFrame:
@@ -18,31 +20,59 @@ def add_galactic_coordinates(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_cartesian_coordinates(in_file: Path) -> None:
     df = pd.read_csv(in_file)
+    df_copy = df.copy()
+    duplicated_cols_to_check = ["x", "y", "z", "r_gc"]
+    duplicated_cols = [
+        col for col in duplicated_cols_to_check if col in df_copy.columns
+    ]
+    df_copy = df_copy.drop(columns=duplicated_cols)
 
-    coords = SkyCoord(
-        df.ra_gaia.values * u.deg, df.dec_gaia.values * u.deg,
-        distance=df.dist_med.values * u.kpc,
-        frame="icrs"
-    )
+    def get_coords(row: pd.Series):
+        dist = FromLiterature(
+            row['dist_med'],
+            x_lo=row['dist_med'] - row['e_dist'],
+            x_hi=row['dist_med'] + row['E_dist']
+        )
+        d_gamma = dist.fit_gamma()["distribution"]
+        d_rand = d_gamma.rvs(1000)
+        coords = SkyCoord(
+            row['ra_gaia'] * u.deg, row['dec_gaia'] * u.deg,
+            distance=d_rand * u.kpc,
+            frame="icrs"
+        )
 
-    coords_galcen = coords.transform_to(gal_cen)
+        coords_galcen = coords.transform_to(gal_cen)
 
-    x, y, z = (coords_galcen.x.value,
-               coords_galcen.y.value,
-               coords_galcen.z.value)
+        x, y, z = (
+            coords_galcen.x.value,
+            coords_galcen.y.value,
+            coords_galcen.z.value
+        )
 
-    coords_galcen.representation_type = "cylindrical"
-    r_gc = coords_galcen.rho.value
+        coords_galcen.representation_type = "cylindrical"
+        r_gc = coords_galcen.rho.value
 
-    coord_cols = ["x", "y", "z", "r_gc"]
-    coord_arrs = [x, y, z, r_gc]
-    for name, arr in zip(coord_cols, coord_arrs):
-        df[name] = arr
+        row_values = []
+        for item in [x, y, z, r_gc]:
+            med, uperr, loerr = get_errors(item)
+            row_values.extend([med, uperr, loerr])
+        return row_values
+
+    coord_cols = [
+        "x_med", "e_x", "E_x",
+        "y_med", "e_y", "E_y",
+        "z_med", "e_z", "E_z",
+        "r_gc", "e_r_gc", "E_r_gc"
+    ]
+
+    coord_df = df_copy.apply(get_coords, axis=1, result_type='expand')
+    coord_df.columns = coord_cols
+    df_concat = pd.concat([df_copy, coord_df], axis=1, )
 
     out_file = (in_file.parent
-                / f"{in_file.stem}.csv".replace("stage_7", "stage_8"))
+                / f"{in_file.stem}_c.csv")
 
-    df.to_csv(out_file, index=False)
+    df_concat.to_csv(out_file, index=False)
 
 
 def add_hex_equatorial_coordinates(df: pd.DataFrame,
@@ -111,17 +141,18 @@ def add_qulity_bitmask(df: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     in_file = (config.RESULTS_CATALOGUE_DIR
-               / "high-v_sources"
-               / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour.csv")
-    df = pd.read_csv(in_file)
-    df = add_qulity_bitmask(df)
+               / "ready_catalogues"
+               / "control.csv")
+    # df = pd.read_csv(in_file)
+    add_cartesian_coordinates(in_file=in_file)
+    # df = add_qulity_bitmask(df)
 
-    df.to_csv(
-        config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources"
-        / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
-    )
-    print(df.value_counts(subset=["quality"]))
+    # df.to_csv(
+    #     config.RESULTS_CATALOGUE_DIR
+    #     / "high-v_sources"
+    #     / "hvxs_vpec_lo_gt_200_2sigma_one_neighbour_w_bitmask.csv"
+    # )
+    # print(df.value_counts(subset=["quality"]))
 
     # add_cartesian_coordinates(in_file)
     # df.to_csv(config.RESULTS_CATALOGUE_DIR /
