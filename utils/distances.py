@@ -23,18 +23,21 @@ L = constants.L
 #
 #     def likelihood(self, d):
 #         y = (1 / (np.sqrt(2 * pi) * self.e_parallax)) * \
-#             np.exp(- (self.parallax - 1 / d) ** 2 / (2. * self.e_parallax ** 2))
+#             np.exp(- (self.parallax - 1 / d) ** 2 
+# / (2. * self.e_parallax ** 2))
 #         return y
 #
 #     def posterior_unnorm(self, d):
 #         """
-#         This is the posterior distribution function (not normalized) of distances using
+#         This is the posterior distribution function (not normalized) of 
+# distances using
 #         the exponential prior (characterized by the scaling parameter L).
 #         The normalization constant is not considered here as it will be
 #         accounted for in the generate_distances() function.
 #         """
 #
-#         exponent = -(d / L) - (1 / (2 * self.e_parallax ** 2)) * (self.parallax - 1 / d) ** 2
+#         exponent = -(d / L) - (1 / (2 * self.e_parallax ** 2)) * 
+# (self.parallax - 1 / d) ** 2
 #
 #         return d ** 2 * np.exp(exponent)
 #
@@ -46,11 +49,15 @@ L = constants.L
 #         Parameter:
 #             d: distance in kpc. Can be a single value or a np.ndarray.
 #         """
-#         results = quad(func=self.posterior_unnorm, a=constants.minimum_d, b=+np.inf)
+#         results = quad(func=self.posterior_unnorm, a=constants.minimum_d,
+#  b=+np.inf)
 #
-#         # Normalization constant for the distance posterior is optimised for very narrow PDF. When the PDF is too
-#         # narrow, i.e., when sigma_parallax is very small, we estimate the integral as the area of the rectangular
-#         # with width of 0.01 and height equals to un-normalised PDF value at 1/parallax.
+#         # Normalization constant for the distance posterior is optimised for
+# very narrow PDF. When the PDF is too
+#         # narrow, i.e., when sigma_parallax is very small, we estimate the
+# integral as the area of the rectangular
+#         # with width of 0.01 and height equals to un-normalised PDF value at
+# 1/parallax.
 #         if np.isclose(results[0], 0, rtol=1e-6):
 #             norm = self.posterior_unnorm(1 / self.parallax) * 0.01
 #
@@ -155,10 +162,14 @@ class FromLiterature:
         self.conf_leve = conf_level
 
         if x_lo >= x_hi:
-            raise ValueError(f"Lower limit (x_lo) must be less than the upper limit (x_hi).")
+            raise ValueError(
+                "Lower limit (x_lo) must be less than the upper limit (x_hi)."
+            )
 
-        if conf_level< 0 or conf_level > 1:
-            raise ValueError(f"Confidence level must be a number between 0 and 1.")
+        if conf_level < 0 or conf_level > 1:
+            raise ValueError(
+                "Confidence level must be a number between 0 and 1."
+            )
 
     @property
     def x_loerr(self) -> float:
