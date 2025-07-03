@@ -7,7 +7,7 @@ import data_schema as ds
 from glob import glob
 
 
-def add_fidelity_columns() -> None:
+def add_and_filter_by_fidelity() -> None:
     in_root = config.RESULTS_CATALOGUE_DIR / "control_chunks"
     in_files = glob(
         str(in_root / "*_fidelity.csv")
@@ -29,7 +29,8 @@ def add_fidelity_columns() -> None:
         df_control, df_fidelity, on="source_id", how="left"
     )
 
-    df_merged.to_csv(
+    _filter = df_merged["fidelity_v2"] >= 0.5
+    df_merged[_filter].to_csv(
         config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
         / "control_w_fidelity.csv"
     )
@@ -165,13 +166,13 @@ def make_master(
 
 
 def main() -> None:
-    survey_names = ["csc", "xmm", "swift", "erass"]
+    # survey_names = ["csc", "xmm", "swift", "erass"]
 
-    for s in survey_names:
-        schema = ds.SCHEMA_DICT[s]
-        make_master(survey_name=s, id_x_col=schema.ID, verbose=True)
+    # for s in survey_names:
+    #     schema = ds.SCHEMA_DICT[s]
+    #     make_master(survey_name=s, id_x_col=schema.ID, verbose=True)
 
-    # add_fidelity_columns()
+    add_and_filter_by_fidelity()
 
 
 if __name__ == "__main__":
