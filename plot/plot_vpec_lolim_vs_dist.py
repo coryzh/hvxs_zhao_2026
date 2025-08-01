@@ -45,7 +45,7 @@ def axes_settings(ax_dict: dict) -> None:
     ax_top = ax_dict["top"]
     ax_cbar = ax_dict["cbar"]
 
-    ax_main.set_xlabel(r"$d$ (kpc)")
+    ax_main.set_xlabel(r"$d_\mathrm{b21}$ (kpc)")
     ax_main.set_ylabel(r"$v_\mathrm{pec, min, lo}\,(\mathrm{km~s^{-1}})$")
 
     ax_main.set_xscale("log")
@@ -64,7 +64,7 @@ def axes_settings(ax_dict: dict) -> None:
     ax_top.tick_params(axis='x', bottom=False, labelbottom=False)
     ax_top.tick_params(axis='y', labelleft=False)
 
-    ax_right.set_xlabel(r"$\sqrt{2}d\epsilon$ (AU)")
+    ax_right.set_xlabel(r"$\sqrt{2}d_\mathrm{b21}\epsilon$ (AU)")
     ax_right.tick_params(axis='y', labelleft=False)
     ax_right.set_xlim(5e-4, 300)
     ax_right.set_xticks([0.001, 0.01, 0.1, 1, 10, 100])
