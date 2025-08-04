@@ -29,8 +29,8 @@ def axes_settings(ax: plt.Axes) -> None:
 
     ax.set_xlim(-0.8, 4.3)
     ax.set_ylim(6e-6, 1050)
-    ax.set_xlabel("Bp$-$Rp", fontsize=38)
-    ax.set_ylabel("$F_X / F_G$", fontsize=38)
+    ax.set_xlabel(r"Bp$-$Rp", fontsize=38)
+    ax.set_ylabel(r"$F_\mathrm{X} / F_\mathrm{G}$", fontsize=38)
 
 
 def add_control(ax: plt.axes) -> None:
