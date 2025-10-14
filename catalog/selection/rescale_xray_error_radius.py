@@ -1,5 +1,6 @@
 import config
 import pandas as pd
+import warnings
 
 
 def _add_pos_xerr_column(df: pd.DataFrame, survey_name: str) -> pd.DataFrame:
@@ -16,16 +17,30 @@ def _add_pos_xerr_column(df: pd.DataFrame, survey_name: str) -> pd.DataFrame:
     Returns
     -------
     pd.DataFrame
-        The modified DataFrame with the positional error column added or renamed.
+        The modified DataFrame with the positional error column added or
+        renamed.
 
     Raises
     ------
     ValueError
         If the survey name is not recognized.
     """
+
+    if "pos_x_err" in df.columns:
+        warnings.warn(
+            "pos_x_err column already exists in the DataFrame, "
+            "while positional error is expected to be in its original form if"
+            "the input DataFrame is from a (relatively)-raw X-ray source "
+            "catalogue. Check how it was created.",
+            UserWarning
+        )
+        return df
+
     df_copy = df.copy()
     if survey_name == "csc":
-        df_copy["pos_x_err"] = df_copy[["err_ellipse_r0", "err_ellipse_r1"]].max(axis=1)
+        df_copy["pos_x_err"] = (
+            df_copy[["err_ellipse_r0", "err_ellipse_r1"]].max(axis=1)
+        )
 
     elif survey_name == "xmm":
         df_copy = df_copy.rename(
@@ -47,3 +62,9 @@ def _add_pos_xerr_column(df: pd.DataFrame, survey_name: str) -> pd.DataFrame:
             f"Choose from {list(config.SURVEY_NAMES_SHORT)}"
         )
     return df_copy
+
+
+def calibrate_pos_xerr(
+        df: pd.DataFrame, survey_name: str
+) -> pd.DataFrame:
+    df = _add_pos_xerr_column(df, survey_name)
