@@ -5,8 +5,7 @@ import numpy as np
 import argparse
 import logging
 from pathlib import Path
-
-logger = logging.getLogger(Path(__file__).stem)
+from log.log_config import configure_logging
 
 
 def _validator(df: pd.DataFrame, survey_name: str) -> None:
@@ -127,17 +126,19 @@ if __name__ == "__main__":
 
     in_file_path = Path(args.infile)
 
-    log_file_path = in_file_path.parent / f"{Path(__file__).stem}.log"
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler(
-                log_file_path, mode="a"
-            )
-        ]
-    )
+    # log_file_path = in_file_path.parent / f"{Path(__file__).stem}.log"
+    # logging.basicConfig(
+    #     level=level,
+    #     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    #     handlers=[
+    #         logging.StreamHandler(),
+    #         logging.FileHandler(
+    #             log_file_path, mode="a"
+    #         )
+    #     ]
+    # )
+    logger = logging.getLogger(Path(__file__).stem)
+    configure_logging(level=level, app_name=Path(__file__).stem)
 
     df_in = pd.read_csv(in_file_path)
     logger.info(

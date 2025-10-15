@@ -20,3 +20,6 @@ notebooks/compile_known_binaries.ipynb
 notebooks/metallicity_comparison.ipynb
 notebooks/compile_known_binaries.ipynb
 notebooks/test_check_simbad_cleaning_results.ipynb
+notebooks/*
+
+tests/

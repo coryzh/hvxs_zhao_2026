@@ -6,6 +6,9 @@ SURVEY_NAMES_SHORT = ["csc", "xmm", "erass", "swift"]
 # Path to the root of the project
 ROOT_DIR = Path(__file__).parent.parent
 
+# Log directory
+LOG_DIR = ROOT_DIR / "logs"
+
 # Path to the data directory
 DATA_DIR = ROOT_DIR / "data" / SURVEY_NAME
 
