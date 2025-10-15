@@ -6,7 +6,7 @@ import argparse
 import logging
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).stem)
 
 
 def _validator(df: pd.DataFrame, survey_name: str) -> None:
