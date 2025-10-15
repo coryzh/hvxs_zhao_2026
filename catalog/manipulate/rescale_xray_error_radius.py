@@ -48,7 +48,7 @@ def calibrate_pos_xerr(
 ) -> pd.DataFrame:
     df_copy = df.copy()
     logger.debug("Validating the input DataFrame ...")
-    df_copy = _validator(df_copy, survey_name)
+    _validator(df_copy, survey_name)
 
     logger.debug(f"Rescaling positional errors for {survey_name}")
     if survey_name == "csc":
@@ -56,7 +56,8 @@ def calibrate_pos_xerr(
         # error ellipses. 1-sigma in 2D corresponds to 39.3% confidence level.
         # Here we convert to 1-sigma Mahalanobis distance.
         pos_x_err = 0.408539 * np.sqrt(
-            df_copy["err_ellipse_r0"] * df_copy["err_ellipse_r1"]
+            df_copy["err_ellipse_r0"].values
+            * df_copy["err_ellipse_r1"].values
         )
 
     elif survey_name == "xmm":
