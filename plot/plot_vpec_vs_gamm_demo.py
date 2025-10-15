@@ -18,7 +18,7 @@ def axes_settings(ax: plt.Axes) -> None:
 def get_vpec(source_id: int, n_sim: int = 1000) -> dict:
     in_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
+        / "high-v_sources" / "combined_vpec_med_gt_0_unique_stage_0.csv"
     )
 
     df = pd.read_csv(in_file, index_col="source_id")
@@ -111,7 +111,7 @@ def make_figure(source_id: int, n_sim: int = 1000) -> None:
 
 
 def main() -> None:
-    make_figure(source_id=5946634735330650752)
+    make_figure(source_id=4787135780363189504)
 
 
 if __name__ == "__main__":
