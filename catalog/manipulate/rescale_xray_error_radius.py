@@ -3,6 +3,7 @@ import pandas as pd
 import warnings
 import numpy as np
 import argparse
+from pathlib import Path
 
 
 def _validator(df: pd.DataFrame, survey_name: str) -> None:
@@ -103,3 +104,17 @@ if __name__ == "__main__":
         "--outfile", required=False,
         help="Output CSV file to save the rescaled X-ray source catalogue"
     )
+
+    args = parser.parse_args()
+    df_in = pd.read_csv(args.infile)
+    df_out = calibrate_pos_xerr(df_in, args.survey)
+
+    if args.outfile:
+        df_out.to_csv(args.outfile, index=False)
+    else:
+        infile_path = Path(args.infile)
+        default_path = (
+            infile_path.parent / f"{infile_path.stem}_poserr_rescaled.csv"
+        )
+        df_out.to_csv(default_path, index=False)
+    
