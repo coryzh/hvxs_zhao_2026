@@ -2,6 +2,7 @@ import config
 import pandas as pd
 import warnings
 import numpy as np
+import argparse
 
 
 def _validator(df: pd.DataFrame, survey_name: str) -> None:
@@ -76,3 +77,29 @@ def calibrate_pos_xerr(
     df_copy = _clean_up(df_copy, survey_name)
 
     return df_copy
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog="rescale_xray_error_radius",
+        description=(
+            "Rescale the X-ray positional error radius from different survey"
+            " catalogues to 1-sigma"
+        )
+    )
+
+    parser.add_argument(
+        "infile", help="Input CSV file containing the X-ray source catalogue"
+    )
+
+    parser.add_argument(
+        "--survey", required=True, choices=config.SURVEY_NAMES_SHORT,
+        help=(
+            "Name of the X-ray survey, must be one of csc, xmm, erass, swift"
+        )
+    )
+
+    parser.add_argument(
+        "--outfile", required=False,
+        help="Output CSV file to save the rescaled X-ray source catalogue"
+    )
