@@ -15,7 +15,7 @@ def make_figure() -> Tuple[plt.Figure, plt.Axes]:
 
 
 def axes_settings(ax: plt.Axes) -> None:
-    ax.set_xlabel(r"$\delta_\mathrm{x,g}$ ($r_\mathrm{err, x}$)")
+    ax.set_xlabel(r"$\delta_\mathrm{x,g} / r_\mathrm{err, x}$")
     ax.set_ylabel(r"Probability density")
     ax.set_xlim(0, None)
     ax.set_ylim(0, None)
