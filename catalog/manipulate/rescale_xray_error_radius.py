@@ -3,7 +3,10 @@ import pandas as pd
 import warnings
 import numpy as np
 import argparse
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 def _validator(df: pd.DataFrame, survey_name: str) -> None:
@@ -44,7 +47,10 @@ def calibrate_pos_xerr(
         df: pd.DataFrame, survey_name: str
 ) -> pd.DataFrame:
     df_copy = df.copy()
+    logger.debug("Validating the input DataFrame ...")
     df_copy = _validator(df_copy, survey_name)
+
+    logger.debug(f"Rescaling positional errors for {survey_name}")
     if survey_name == "csc":
         # CSC's semi-major and semi-minor axes are 95% confidence level
         # error ellipses. 1-sigma in 2D corresponds to 39.3% confidence level.
@@ -105,16 +111,50 @@ if __name__ == "__main__":
         help="Output CSV file to save the rescaled X-ray source catalogue"
     )
 
+    parser.add_argument(
+       "-v", "--verbose", action="store_true", help="Enable logging output"
+    )
+
     args = parser.parse_args()
-    df_in = pd.read_csv(args.infile)
+
+    # Basic logging config
+    if args.verbose:
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
+
+    in_file_path = Path(args.infile)
+
+    log_file_path = in_file_path.parent / f"{Path(__file__).stem}.log"
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(
+                log_file_path, mode="a"
+            )
+        ]
+    )
+
+    df_in = pd.read_csv(in_file_path)
+    logger.info(
+        f"Loaded data frame from {in_file_path}: {df_in.shape[0]} rows"
+    )
+
+    logger.info("Rescaling X-ray positional errors...")
     df_out = calibrate_pos_xerr(df_in, args.survey)
 
-    if args.outfile:
-        df_out.to_csv(args.outfile, index=False)
-    else:
-        infile_path = Path(args.infile)
-        default_path = (
-            infile_path.parent / f"{infile_path.stem}_poserr_rescaled.csv"
+    if not args.outfile:
+        out_path = (
+            in_file_path.parent / f"{in_file_path.stem}_poserr_rescaled.csv"
         )
-        df_out.to_csv(default_path, index=False)
-    
+    else:
+        out_path = Path(args.outfile)
+
+    logger.info(
+        "Rescaled X-ray positional errors, "
+        f"output DataFrame shape: {df_out.shape}"
+    )
+    df_out.to_csv(out_path, index=False)
+    logger.info(f"Saved output to {out_path}")
