@@ -9,7 +9,7 @@ def select_targets(verbose: bool = False) -> None:
     logger = VerboseLogger(verbose=verbose)
     logger.begin()
 
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_gt_200.csv"
+    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources_old" / "combined_vpec_gt_200.csv"
     df = pd.read_csv(in_file)
     df["vpec_min_lolim"] = df["vpec_min_med"] - df["e_vpec_min"]
 
@@ -31,10 +31,13 @@ def select_targets(verbose: bool = False) -> None:
     df_filtered["RA"] = ra_hex
     df_filtered["Dec"] = dec_hex
 
-    columns_selected = ["ID_x", "source_id", "RA", "Dec", "ra", "dec", "dist_med",
+    columns_selected = ["ID_x", "source_id", "RA", "Dec", "ra", "dec",
+                        "sep_x_g", "pos_x_err",
+                        "parallax", "parallax_error", "pmra", "pmra_error",
+                        "pmdec", "pmdec_error",
                         "phot_g_mean_mag", "fx_fg", "vpec_min_lolim"]
 
-    out_file = in_file.parent / "salt_targets_2024-2.csv"
+    out_file = in_file.parent / "salt_2024-2" / "salt_targets_2024-2_astrometry.csv"
     df_filtered[columns_selected].to_csv(out_file)
 
     logger.log(f"Selected targets saved to {out_file}.\n")
