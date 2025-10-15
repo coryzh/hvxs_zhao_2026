@@ -81,8 +81,9 @@ def calibrate_pos_xerr(
         pos_x_err = df_copy["Err90"] / 2.146
 
     df_copy["pos_x_err"] = pos_x_err
+    logger.debug("Cleaning up unnecessary columns ...")
     df_copy = _clean_up(df_copy, survey_name)
-
+    logger.debug("Finished rescaling positional errors.")
     return df_copy
 
 
