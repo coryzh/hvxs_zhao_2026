@@ -21,6 +21,23 @@ def _validator(df: pd.DataFrame, survey_name: str) -> None:
         )
 
 
+def _clean_up(df: pd.DataFrame, survey_name: str) -> pd.DataFrame:
+    """remove unnecessary columns after calculating pos_x_err"""
+    df_copy = df.copy()
+    if survey_name == "csc":
+        df_copy = df_copy.drop(
+            columns=["err_ellipse_r0", "err_ellipse_r1"]
+        )
+    elif survey_name == "xmm":
+        df_copy = df_copy.drop(columns=["sc_poserr"])
+    elif survey_name == "erass":
+        df_copy = df_copy.drop(columns=["POS_ERR"])
+    elif survey_name == "swift":
+        df_copy = df_copy.drop(columns=["Err90"])
+
+    return df_copy
+
+
 def calibrate_pos_xerr(
         df: pd.DataFrame, survey_name: str
 ) -> pd.DataFrame:
@@ -56,5 +73,6 @@ def calibrate_pos_xerr(
         pos_x_err = df_copy["Err90"] / 2.146
 
     df_copy["pos_x_err"] = pos_x_err
+    df_copy = _clean_up(df_copy, survey_name)
 
     return df_copy
