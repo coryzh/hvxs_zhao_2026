@@ -116,7 +116,7 @@ def check_overlap_ckdtree(
         diffs = coords[nbrs_arr] - coords[i]  # shape (m, 2)
 
         # np.hypot computes sqrt(x^2 + y^2) for each row
-        seps = np.hypot(diffs[:, 0], diffs[:, 1])  # shape (m,)
+        seps = np.hypot(diffs[:, 0], diffs[:, 1]) / 3600  # shape (m,)
         err_sums = pos_err[i] + pos_err[nbrs_arr]  # shape (m,)
 
         mask = seps < err_sums
@@ -136,6 +136,7 @@ def check_overlap_ckdtree(
     df_sep = pd.DataFrame(rows)
     n_overlap = df_sep.shape[0]
 
+    print(df_sep)
     logger.info(
         f"Found {n_overlap} overlapping sources.",
     )
@@ -163,7 +164,7 @@ def check_overlap(df: pd.DataFrame) -> None:
             sep = np.sqrt(
                 (ra_x1 - ra_x2) ** 2 +
                 (dec_x1 - dec_x2) ** 2
-            )
+            ) / 3600
 
             err_sum = df.loc[i, "pos_x_err"] + df.loc[j, "pos_x_err"]
             if sep < err_sum:
@@ -182,7 +183,6 @@ def check_overlap(df: pd.DataFrame) -> None:
                 )
 
     n_overlap = df_sep.shape[0]
-    print(df_sep)
     logger.info(
         f"Found {n_overlap} overlapping sources.",
     )
@@ -195,8 +195,8 @@ if __name__ == "__main__":
     df_all = _concatenate_catalogues()
 
     start_time = time.perf_counter()
-    df_test = df_all.sample(n=1000, random_state=42).reset_index(drop=True)
-    check_overlap(df_test)
+    df_test = df_all.sample(n=100, random_state=42).reset_index(drop=True)
+    check_overlap_ckdtree(df_test)
     elapsed = time.perf_counter() - start_time
 
     expected_hours = (elapsed / df_test.shape[0]) * df_all.shape[0] / 3600
