@@ -5,6 +5,7 @@ import numpy as np
 import time
 from log.log_config import configure_logging
 from pathlib import Path
+from scipy.spatial import cKDTree
 
 
 def _concatenate_catalogues() -> pd.DataFrame:
@@ -73,6 +74,71 @@ def _concatenate_catalogues() -> pd.DataFrame:
         f"All catalogues concatenated, total rows: {df_all.shape[0]}"
     )
     return df_all
+
+
+def check_overlap_ckdtree(
+        df: pd.DataFrame, max_search_radius: float = None
+) -> None:
+    logger.info(f"Input DataFrame has {df.shape[0]} rows")
+    n_tot = df.shape[0]
+
+    # Prepare the arrays for cKDTree
+    coords = df[["ra_x", "dec_x"]].to_numpy()
+    pos_err = df["pos_x_err"].to_numpy()
+    ids = df["ID_x"].to_numpy()
+
+    # Build the KD Tree
+    logger.info(f"Building cKDTree for {n_tot} sources ...")
+    if max_search_radius is None:
+        max_search_radius = np.max(pos_err) * 2
+    tree = cKDTree(coords)
+
+    logger.info("Querying candidate neighbours using KD-Tree...")
+    neighbors = tree.query_ball_tree(tree, r=max_search_radius)
+
+    rows = []
+    logger.info(
+        "Checking candidate pairs and applying per-pair positional error sum"
+        " filter ..."
+    )
+
+    for i, nbrs in enumerate(neighbors):
+        # Keep only j>i to avoid double counting and self-matches
+        # nbrs is the list of indices of neighbors for point i
+        nbrs = [j for j in nbrs if j > i]
+        # If no neighbours after the above filter, continue to the next source
+        if not nbrs:
+            continue
+
+        # nbrs_arr is now a numpy array of integers
+        nbrs_arr = np.array(nbrs, dtype=int)
+
+        diffs = coords[nbrs_arr] - coords[i]  # shape (m, 2)
+
+        # np.hypot computes sqrt(x^2 + y^2) for each row
+        seps = np.hypot(diffs[:, 0], diffs[:, 1])  # shape (m,)
+        err_sums = pos_err[i] + pos_err[nbrs_arr]  # shape (m,)
+
+        mask = seps < err_sums
+        if not mask.any():
+            continue
+
+        # Append rows that pass the filter
+        for j_idx, sep in zip(nbrs_arr[mask], seps[mask]):
+            row = {
+                "id_x_1": ids[i],
+                "id_x_2": ids[j_idx],
+                "sep": sep,
+                "pos_x_err_1": pos_err[i],
+                "pos_x_err_2": pos_err[j_idx]
+            }
+            rows.append(row)
+    df_sep = pd.DataFrame(rows)
+    n_overlap = df_sep.shape[0]
+
+    logger.info(
+        f"Found {n_overlap} overlapping sources.",
+    )
 
 
 def check_overlap(df: pd.DataFrame) -> None:
