@@ -6,6 +6,7 @@ import time
 from log.log_config import configure_logging
 from pathlib import Path
 from scipy.spatial import cKDTree
+# from tqdm import tqdm
 
 
 def _concatenate_catalogues() -> pd.DataFrame:
@@ -79,25 +80,26 @@ def _concatenate_catalogues() -> pd.DataFrame:
 def check_overlap_ckdtree(
         df: pd.DataFrame, max_search_radius: float = None
 ) -> None:
-    logger.info(f"Input DataFrame has {df.shape[0]} rows")
+    logger.debug(f"Input DataFrame has {df.shape[0]} rows")
     n_tot = df.shape[0]
 
     # Prepare the arrays for cKDTree
     coords = df[["ra_x", "dec_x"]].to_numpy()
     pos_err = df["pos_x_err"].to_numpy()
     ids = df["ID_x"].to_numpy()
-
     # Build the KD Tree
-    logger.info(f"Building cKDTree for {n_tot} sources ...")
+    logger.debug(f"Building cKDTree for {n_tot} sources ...")
     if max_search_radius is None:
         max_search_radius = np.max(pos_err) * 2
+
     tree = cKDTree(coords)
 
-    logger.info("Querying candidate neighbours using KD-Tree...")
-    neighbors = tree.query_ball_tree(tree, r=max_search_radius)
+    logger.debug("Querying candidate neighbours using KD-Tree...")
+    # Make sure r is in the same units as coords (degrees)
+    neighbors = tree.query_ball_tree(tree, r=max_search_radius / 3600)
 
     rows = []
-    logger.info(
+    logger.debug(
         "Checking candidate pairs and applying per-pair positional error sum"
         " filter ..."
     )
@@ -116,7 +118,8 @@ def check_overlap_ckdtree(
         diffs = coords[nbrs_arr] - coords[i]  # shape (m, 2)
 
         # np.hypot computes sqrt(x^2 + y^2) for each row
-        seps = np.hypot(diffs[:, 0], diffs[:, 1]) / 3600  # shape (m,)
+        # here we convert coord differences from degrees to arcseconds
+        seps = np.hypot(diffs[:, 0], diffs[:, 1]) * 3600  # shape (m,)
         err_sums = pos_err[i] + pos_err[nbrs_arr]  # shape (m,)
 
         mask = seps < err_sums
@@ -130,27 +133,28 @@ def check_overlap_ckdtree(
                 "id_x_2": ids[j_idx],
                 "sep": sep,
                 "pos_x_err_1": pos_err[i],
-                "pos_x_err_2": pos_err[j_idx]
+                "pos_x_err_2": pos_err[j_idx],
             }
             rows.append(row)
     df_sep = pd.DataFrame(rows)
     n_overlap = df_sep.shape[0]
 
-    print(df_sep)
-    logger.info(
+    logger.debug(
         f"Found {n_overlap} overlapping sources.",
     )
 
+    return df_sep
+
 
 def check_overlap(df: pd.DataFrame) -> None:
-    logger.info(f"Input DataFrame has {df.shape[0]} rows")
+    logger.debug(f"Input DataFrame has {df.shape[0]} rows")
     n_tot = df.shape[0]
 
     df_sep = pd.DataFrame(
         columns=["id_x_1", "id_x_2", "sep", "pos_x_err_1", "pos_x_err_2"]
     )
 
-    logger.info("Checking for overlapping sources...")
+    logger.debug("Checking for overlapping sources...")
     for i in range(n_tot):
         for j in range(i + 1, n_tot):
             ra_x1 = df.loc[i, "ra_x"]
@@ -164,7 +168,7 @@ def check_overlap(df: pd.DataFrame) -> None:
             sep = np.sqrt(
                 (ra_x1 - ra_x2) ** 2 +
                 (dec_x1 - dec_x2) ** 2
-            ) / 3600
+            ) * 3600
 
             err_sum = df.loc[i, "pos_x_err"] + df.loc[j, "pos_x_err"]
             if sep < err_sum:
@@ -183,7 +187,7 @@ def check_overlap(df: pd.DataFrame) -> None:
                 )
 
     n_overlap = df_sep.shape[0]
-    logger.info(
+    logger.debug(
         f"Found {n_overlap} overlapping sources.",
     )
 
@@ -192,16 +196,38 @@ if __name__ == "__main__":
     logger = logging.getLogger(Path(__file__).stem)
     configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 
+    logger.info("Loading and concatenating X-ray catalogues ...")
     df_all = _concatenate_catalogues()
 
-    start_time = time.perf_counter()
-    df_test = df_all.sample(n=100, random_state=42).reset_index(drop=True)
-    check_overlap_ckdtree(df_test)
-    elapsed = time.perf_counter() - start_time
+    out_file_concat_xray = (
+        config.RESULTS_CATALOGUE_DIR
+        / "xray_catalogue_all_for_autocorrelation.csv"
+    )
+    df_all.to_csv(out_file_concat_xray, index=False)
 
-    expected_hours = (elapsed / df_test.shape[0]) * df_all.shape[0] / 3600
+    # Initialize an empty DataFrame to store all overlap results
+    df_all_overlap = pd.DataFrame()
+
+    # Get total number of rows to calculate total chunks for progress bar
+    total_rows = df_all.shape[0]
+    total_chunks = (total_rows + 9999) // 10000  # Ceiling division
+
+    start_time = time.time()
+    logger.info("Starting auto-correlation to find overlapping sources...")
+
+    df_all_overlap = check_overlap_ckdtree(df_all)
+    df_all_overlap.to_csv(
+        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_overlap.csv",
+        index=False
+    )
+
     logger.info(
-        f"Checking on {df_test.shape[0]} rows completed in {elapsed:.2f} "
-        f"seconds. For the full catalogue with {df_all.shape[0]} rows, "
-        f"it may take up to {expected_hours:.2f} hours."
+        f"Overlap results saved to "
+        f"{config.RESULTS_CATALOGUE_DIR / 'x_ray_catalogue_overlap.csv'}"
+    )
+
+    time_elapsed = time.time() - start_time
+    logger.info(
+        f"Auto-correlation completed in "
+        f"{time_elapsed:.2f} seconds."
     )
