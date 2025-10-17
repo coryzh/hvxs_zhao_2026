@@ -3,6 +3,7 @@ import config
 import logging
 import numpy as np
 import time
+import networkx as nx
 from log.log_config import configure_logging
 from pathlib import Path
 from scipy.spatial import cKDTree
@@ -188,43 +189,118 @@ def check_overlap(df: pd.DataFrame) -> None:
 
     n_overlap = df_sep.shape[0]
     logger.debug(
-        f"Found {n_overlap} overlapping sources.",
+        f"Found {n_overlap} overlapping pairs.",
     )
+
+
+def _get_pos_x_err_lookup_dict(df_sep: pd.DataFrame) -> dict:
+    df_pos_err = pd.concat([
+        df_sep[["id_x_1", "pos_x_err_1"]].rename(
+            columns={"id_x_1": "id_x", "pos_x_err_1": "pos_x_err"}
+        ),
+        df_sep[["id_x_2", "pos_x_err_2"]].rename(
+            columns={"id_x_2": "id_x", "pos_x_err_2": "pos_x_err"}
+        )
+    ], ignore_index=True).drop_duplicates(subset="id_x", keep="first")
+
+    pos_x_err_mapping = dict(
+        zip(df_pos_err["id_x"], df_pos_err["pos_x_err"])
+    )
+
+    return pos_x_err_mapping
+
+
+def summarize_overlap(df_sep: pd.DataFrame):
+    logger.debug("Summarizing source overlapping source list ...")
+
+    logger.debug("Building overlap graph ...")
+    graph = nx.from_pandas_edgelist(
+        df_all_overlap, source="id_x_1", target="id_x_2"
+    )
+
+    components = list(nx.connected_components(graph))
+    logger.debug(f"Found {len(components)} connected components.")
+
+    logger.debug(
+        "Making a mapping dictionary for positional errors based on the input"
+        " DataFrame..."
+    )
+    err_mapping = _get_pos_x_err_lookup_dict(df_sep)
+
+    logger.debug(
+        f"Mapping dictionary made for {len(err_mapping)} unique sources."
+    )
+
+    rows = []
+    for gid, comp in enumerate(components):
+        members = sorted(comp)
+
+        members_pos_err_str = [
+            str(err_mapping.get(m)) for m in members
+        ]
+
+        members_pos_err_num = [
+            err_mapping.get(m) for m in members
+        ]
+
+        min_err_idx = int(np.argmin(members_pos_err_num))
+        min_pos_err = members_pos_err_num[min_err_idx]
+        min_pos_err_id = members[min_err_idx]
+
+        row = {
+            "group_id": gid,
+            "group_size": len(members),
+            "member_ids": ";".join(members),
+            "member_pos_errs": ";".join(members_pos_err_str),
+            "kept_id": min_pos_err_id,
+            "kept_pos_err": min_pos_err,
+        }
+
+        rows.append(row)
+
+    groups_df = pd.DataFrame(
+        rows, columns=[
+            "group_id", "group_size", "member_ids", "member_pos_errs",
+            "kept_id", "kept_pos_err"
+        ]
+    )
+
+    return groups_df
 
 
 if __name__ == "__main__":
     logger = logging.getLogger(Path(__file__).stem)
-    configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
+    configure_logging(level=logging.DEBUG, app_name=Path(__file__).stem)
 
     logger.info("Loading and concatenating X-ray catalogues ...")
-    df_all = _concatenate_catalogues()
 
+    df_all = _concatenate_catalogues()
     out_file_concat_xray = (
         config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
         / "xray_catalogue_all_for_autocorrelation.csv"
     )
     df_all.to_csv(out_file_concat_xray, index=False)
 
-    # Initialize an empty DataFrame to store all overlap results
-    df_all_overlap = pd.DataFrame()
-    # Get total number of rows to calculate total chunks for progress bar
-    total_rows = df_all.shape[0]
-    total_chunks = (total_rows + 9999) // 10000  # Ceiling division
-
     start_time = time.time()
     logger.info("Starting auto-correlation to find overlapping sources...")
 
     df_all_overlap = check_overlap_ckdtree(df_all)
     df_all_overlap.to_csv(
-        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_overlap.csv",
+        out_file_concat_xray.parent / "x_ray_catalogue_overlap.csv",
         index=False
     )
 
     logger.info(
         f"Overlap results saved to "
-        f"{config.RESULTS_CATALOGUE_DIR / 'x_ray_catalogue_overlap.csv'}"
+        f"{out_file_concat_xray.parent / 'x_ray_catalogue_overlap.csv'}"
     )
 
+    logger.info("Summarizing overlap results ...")
+    df_summary = summarize_overlap(df_all_overlap)
+    df_summary.to_csv(
+        out_file_concat_xray.parent / "x_ray_catalogue_overlap_summary.csv",
+        index=False
+    )
     time_elapsed = time.time() - start_time
     logger.info(
         f"Auto-correlation completed in "
