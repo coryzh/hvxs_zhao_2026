@@ -207,7 +207,6 @@ if __name__ == "__main__":
 
     # Initialize an empty DataFrame to store all overlap results
     df_all_overlap = pd.DataFrame()
-
     # Get total number of rows to calculate total chunks for progress bar
     total_rows = df_all.shape[0]
     total_chunks = (total_rows + 9999) // 10000  # Ceiling division
