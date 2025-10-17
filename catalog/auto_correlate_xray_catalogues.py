@@ -200,7 +200,7 @@ if __name__ == "__main__":
     df_all = _concatenate_catalogues()
 
     out_file_concat_xray = (
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
         / "xray_catalogue_all_for_autocorrelation.csv"
     )
     df_all.to_csv(out_file_concat_xray, index=False)
