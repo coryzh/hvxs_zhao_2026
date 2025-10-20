@@ -226,6 +226,27 @@ def _get_pos_x_err_lookup_dict(df_sep: pd.DataFrame) -> dict:
 
 
 def summarize_overlap(df_sep: pd.DataFrame):
+    """
+    Summarize overlapping sources into groups based on connected components.
+    Parameters
+    ----------
+    df_sep : pd.DataFrame
+        DataFrame containing overlapping source pairs with their positional
+        errors. The DataFrame should have columns:
+        'id_x_1', 'pos_x_err_1', 'id_x_2', 'pos_x_err_2', and 'sep'.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame summarizing the overlapping sources.
+        Each row corresponds to a group of overlapping sources, with columns:
+        - 'group_id': Unique identifier for the group.
+        - 'group_size': Number of sources in the group.
+        - 'member_ids': Semicolon-separated list of X-ray IDs in the group.
+        - 'member_pos_errs': Semicolon-separated list of positional errors.
+        - 'kept_id': Source ID with the smallest positional error in the group.
+        - 'kept_pos_err': Smallest positional error in the group.
+    """
     logger.debug("Summarizing source overlapping source list ...")
 
     logger.debug("Building overlap graph ...")
