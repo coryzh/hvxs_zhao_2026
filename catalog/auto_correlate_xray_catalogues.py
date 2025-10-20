@@ -194,6 +194,21 @@ def check_overlap(df: pd.DataFrame) -> None:
 
 
 def _get_pos_x_err_lookup_dict(df_sep: pd.DataFrame) -> dict:
+    """Create a mapping from source ID to positional error.
+
+    Parameters
+    ----------
+    df_sep : pd.DataFrame
+        DataFrame containing overlapping source pairs with their positional
+        errors. The DataFrame should have columns:
+        'id_x_1', 'pos_x_err_1', 'id_x_2', 'pos_x_err_2', and 'sep'.
+
+    Returns
+    -------
+    dict
+        Mapping from source ID to positional error.
+    """
+
     df_pos_err = pd.concat([
         df_sep[["id_x_1", "pos_x_err_1"]].rename(
             columns={"id_x_1": "id_x", "pos_x_err_1": "pos_x_err"}
