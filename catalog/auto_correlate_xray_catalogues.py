@@ -7,7 +7,6 @@ import networkx as nx
 from log.log_config import configure_logging
 from pathlib import Path
 from scipy.spatial import cKDTree
-# from tqdm import tqdm
 
 
 def _concatenate_catalogues() -> pd.DataFrame:
@@ -302,6 +301,40 @@ def summarize_overlap(df_sep: pd.DataFrame):
     )
 
     return groups_df
+
+
+def get_list_of_discarded_sources(df: pd.DataFrame) -> pd.DataFrame:
+    """Get a list of discarded sources from the summary DataFrame.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Summary DataFrame containing overlapping source groups. Could be
+        loaded from files or generated from `summarize_overlap` function.
+        It should have at least the following columns:
+        - kept_id
+        - member_ids (delimited by ';')
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing discarded X-ray IDs.
+    """
+
+    discarded_sources = []
+    for _, row in df.iterrows():
+        member_ids = row["member_ids"].split(";")
+        kept_id = row["kept_id"]
+        for mid in member_ids:
+            discarded_sources.extend(
+                [mid for mid in member_ids if mid != kept_id]
+            )
+
+    df_discarded = pd.DataFrame(
+        discarded_sources, columns=["discarded_id_x"]
+    )
+
+    return df_discarded
 
 
 if __name__ == "__main__":
