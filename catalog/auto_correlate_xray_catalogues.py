@@ -337,41 +337,100 @@ def get_list_of_discarded_sources(df: pd.DataFrame) -> pd.DataFrame:
     return df_discarded
 
 
+def remove_discarded_sources_from_concatenated_catalogue(
+        df_all: pd.DataFrame, df_discarded: pd.DataFrame
+) -> pd.DataFrame:
+    """Remove discarded sources from the concatenated catalogue.
+
+    Parameters
+    ----------
+    df_all : pd.DataFrame
+        The concatenated X-ray catalogue DataFrame.
+    df_discarded : pd.DataFrame
+        DataFrame containing discarded X-ray IDs with column 'discarded_id_x'.
+
+    Returns
+    -------
+    pd.DataFrame
+        The cleaned concatenated catalogue with discarded sources removed.
+    """
+
+    # set() is used to 
+    discarded_ids = set(df_discarded["discarded_id_x"].tolist())
+    mask = ~df_all["ID_x"].isin(discarded_ids)
+    df_cleaned = df_all[mask].reset_index(drop=True)
+
+    logger.debug(
+        f"Removed {df_all.shape[0] - df_cleaned.shape[0]} discarded sources. "
+        f"Cleaned catalogue now has {df_cleaned.shape[0]} sources."
+    )
+
+    return df_cleaned
+
+
 if __name__ == "__main__":
     logger = logging.getLogger(Path(__file__).stem)
-    configure_logging(level=logging.DEBUG, app_name=Path(__file__).stem)
+    configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 
     logger.info("Loading and concatenating X-ray catalogues ...")
 
     df_all = _concatenate_catalogues()
-    out_file_concat_xray = (
-        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
-        / "xray_catalogue_all_for_autocorrelation.csv"
-    )
-    df_all.to_csv(out_file_concat_xray, index=False)
+    # out_file_concat_xray = (
+    #     config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
+    #     / "xray_catalogue_all_for_autocorrelation.csv"
+    # )
+    # df_all.to_csv(out_file_concat_xray, index=False)
 
     start_time = time.time()
     logger.info("Starting auto-correlation to find overlapping sources...")
 
     df_all_overlap = check_overlap_ckdtree(df_all)
-    df_all_overlap.to_csv(
-        out_file_concat_xray.parent / "x_ray_catalogue_overlap.csv",
-        index=False
-    )
+    # df_all_overlap.to_csv(
+    #     out_file_concat_xray.parent / "x_ray_catalogue_overlap.csv",
+    #     index=False
+    # )
 
-    logger.info(
-        f"Overlap results saved to "
-        f"{out_file_concat_xray.parent / 'x_ray_catalogue_overlap.csv'}"
-    )
+    # logger.info(
+    #     f"Overlap results saved to "
+    #     f"{out_file_concat_xray.parent / 'x_ray_catalogue_overlap.csv'}"
+    # )
 
     logger.info("Summarizing overlap results ...")
     df_summary = summarize_overlap(df_all_overlap)
-    df_summary.to_csv(
-        out_file_concat_xray.parent / "x_ray_catalogue_overlap_summary.csv",
-        index=False
-    )
+    # df_summary.to_csv(
+    #     out_file_concat_xray.parent / "x_ray_catalogue_overlap_summary.csv",
+    #     index=False
+    # )
     time_elapsed = time.time() - start_time
     logger.info(
         f"Auto-correlation completed in "
         f"{time_elapsed:.2f} seconds."
+    )
+
+    logger.info("Getting a list of discarded X-ray sources ...")
+    df_discarded = get_list_of_discarded_sources(df_summary)
+    logger.info(
+        f"From the {df_summary.shape[0]} groups of overlapping sources, "
+        f"{df_discarded.shape[0]} sources were moved to the discarded list."
+    )
+
+    logger.info("Removing discarded sources from concatenated catalogue ...")
+    df_cleaned = remove_discarded_sources_from_concatenated_catalogue(
+        df_all, df_discarded
+    )
+    logger.info(
+        "Cleaned concatenated catalogue now has "
+        f"{df_cleaned.shape[0]} sources."
+    )
+
+    # Save the cleaned concatenated catalogue
+    out_file_cleaned_xray = (
+        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
+        / "xray_catalogue_deduplicated.csv"
+    )
+
+    df_cleaned.to_csv(out_file_cleaned_xray, index=False)
+    logger.info(
+        "De-duplicated concatenated X-ray catalogue saved to "
+        f"{out_file_cleaned_xray}"
     )
