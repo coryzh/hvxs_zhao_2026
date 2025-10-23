@@ -2,7 +2,6 @@ import pandas as pd
 import config
 import logging
 import numpy as np
-import time
 import networkx as nx
 from log.log_config import configure_logging
 from pathlib import Path
@@ -35,6 +34,7 @@ def _concatenate_catalogues() -> pd.DataFrame:
     }
 
     cols_to_keep = ["ID_x", "ra_x", "dec_x", "pos_x_err"]
+    logger.info("Loading and concatenating X-ray catalogues ...")
     for survey in config.SURVEY_NAMES_SHORT:
         file_path = (
             config.ROOT_DIR / "results" / survey
@@ -80,26 +80,35 @@ def _concatenate_catalogues() -> pd.DataFrame:
 def check_overlap_ckdtree(
         df: pd.DataFrame, max_search_radius: float = None
 ) -> None:
-    logger.debug(f"Input DataFrame has {df.shape[0]} rows")
+    logger.info(
+        "Starting auto-correlation to find overlapping sources in the input "
+        f"DataFrame. The input DataFrame has {df.shape[0]} rows."
+    )
     n_tot = df.shape[0]
 
     # Prepare the arrays for cKDTree
     coords = df[["ra_x", "dec_x"]].to_numpy()
     pos_err = df["pos_x_err"].to_numpy()
     ids = df["ID_x"].to_numpy()
+
     # Build the KD Tree
-    logger.debug(f"Building cKDTree for {n_tot} sources ...")
     if max_search_radius is None:
         max_search_radius = np.max(pos_err) * 2
 
+    logger.info(
+        f"Building a KD-Tree for {n_tot} sources ..."
+        "No max search radius provided, using 2x of the maximum positional "
+        f"error = {max_search_radius:.2f} arcseconds."
+    )
+
     tree = cKDTree(coords)
 
-    logger.debug("Querying candidate neighbours using KD-Tree...")
+    logger.info("Querying candidate neighbours using KD-Tree...")
     # Make sure r is in the same units as coords (degrees)
     neighbors = tree.query_ball_tree(tree, r=max_search_radius / 3600)
 
     rows = []
-    logger.debug(
+    logger.info(
         "Checking candidate pairs and applying per-pair positional error sum"
         " filter ..."
     )
@@ -139,22 +148,25 @@ def check_overlap_ckdtree(
     df_sep = pd.DataFrame(rows)
     n_overlap = df_sep.shape[0]
 
-    logger.debug(
-        f"Found {n_overlap} overlapping sources.",
+    logger.info(
+        f"Found {n_overlap} overlapping pairs, which are arranged in a "
+        f"DataFrame with columns: {df_sep.columns.tolist()}. "
+        "ID_x_1 or ID_x_2 could contain repeated IDs, because one ID_x_1 "
+        "could be neighbour of multiple ID_x_2, and vice versa."
     )
 
     return df_sep
 
 
 def check_overlap(df: pd.DataFrame) -> None:
-    logger.debug(f"Input DataFrame has {df.shape[0]} rows")
+    logger.info(f"Input DataFrame has {df.shape[0]} rows")
     n_tot = df.shape[0]
 
     df_sep = pd.DataFrame(
         columns=["id_x_1", "id_x_2", "sep", "pos_x_err_1", "pos_x_err_2"]
     )
 
-    logger.debug("Checking for overlapping sources...")
+    logger.info("Checking for overlapping sources...")
     for i in range(n_tot):
         for j in range(i + 1, n_tot):
             ra_x1 = df.loc[i, "ra_x"]
@@ -187,7 +199,7 @@ def check_overlap(df: pd.DataFrame) -> None:
                 )
 
     n_overlap = df_sep.shape[0]
-    logger.debug(
+    logger.info(
         f"Found {n_overlap} overlapping pairs.",
     )
 
@@ -207,7 +219,10 @@ def _get_pos_x_err_lookup_dict(df_sep: pd.DataFrame) -> dict:
     dict
         Mapping from source ID to positional error.
     """
-
+    logger.info(
+        "Making a mapping dictionary for positional errors based on the input"
+        " DataFrame..."
+    )
     df_pos_err = pd.concat([
         df_sep[["id_x_1", "pos_x_err_1"]].rename(
             columns={"id_x_1": "id_x", "pos_x_err_1": "pos_x_err"}
@@ -219,6 +234,10 @@ def _get_pos_x_err_lookup_dict(df_sep: pd.DataFrame) -> dict:
 
     pos_x_err_mapping = dict(
         zip(df_pos_err["id_x"], df_pos_err["pos_x_err"])
+    )
+
+    logger.info(
+        f"Mapping dictionary made for {len(pos_x_err_mapping)} unique sources."
     )
 
     return pos_x_err_mapping
@@ -246,25 +265,17 @@ def summarize_overlap(df_sep: pd.DataFrame):
         - 'kept_id': Source ID with the smallest positional error in the group.
         - 'kept_pos_err': Smallest positional error in the group.
     """
-    logger.debug("Summarizing source overlapping source list ...")
+    logger.info("Summarizing source overlapping source list ...")
 
-    logger.debug("Building overlap graph ...")
+    logger.info("Building an overlap graph using networkx...")
     graph = nx.from_pandas_edgelist(
         df_all_overlap, source="id_x_1", target="id_x_2"
     )
 
     components = list(nx.connected_components(graph))
-    logger.debug(f"Found {len(components)} connected components.")
+    logger.info(f"Found {len(components)} connected components.")
 
-    logger.debug(
-        "Making a mapping dictionary for positional errors based on the input"
-        " DataFrame..."
-    )
     err_mapping = _get_pos_x_err_lookup_dict(df_sep)
-
-    logger.debug(
-        f"Mapping dictionary made for {len(err_mapping)} unique sources."
-    )
 
     rows = []
     for gid, comp in enumerate(components):
@@ -300,6 +311,19 @@ def summarize_overlap(df_sep: pd.DataFrame):
         ]
     )
 
+    logger.info(
+        f"Summarization complete. Found {groups_df.shape[0]} groups of "
+        "overlapping sources. The summary DataFrame has the following "
+        f"columns: {groups_df.columns.tolist()}.\n"
+        f"Explanation of columns:\n"
+        f" group_id: Unique identifier for the group.\n"
+        f" group_size: Number of sources in the group.\n"
+        f" member_ids: Semicolon-separated list of X-ray IDs in the group.\n"
+        f" member_pos_errs: Semicolon-separated list of positional errors.\n"
+        f" kept_id: Source ID with the smallest positional error in the "
+        f"group.\n"
+        f" kept_pos_err: Smallest positional error in the group."
+    )
     return groups_df
 
 
@@ -321,6 +345,7 @@ def get_list_of_discarded_sources(df: pd.DataFrame) -> pd.DataFrame:
         DataFrame containing discarded X-ray IDs.
     """
 
+    logger.info("Getting a list of discarded X-ray sources ...")
     discarded_sources = []
     for _, row in df.iterrows():
         member_ids = row["member_ids"].split(";")
@@ -333,6 +358,10 @@ def get_list_of_discarded_sources(df: pd.DataFrame) -> pd.DataFrame:
         discarded_sources, columns=["discarded_id_x"]
     )
 
+    logger.info(
+        f"From the {df.shape[0]} groups of overlapping sources, "
+        f"{df_discarded.shape[0]} sources were moved to the discarded list."
+    )
     return df_discarded
 
 
@@ -354,72 +383,54 @@ def remove_discarded_sources_from_concatenated_catalogue(
         The cleaned concatenated catalogue with discarded sources removed.
     """
 
-    # set() is used to 
+    # set() is used to create a set of discarded IDs for faster lookup
+    logger.info(
+        "Removing discarded sources from concatenated catalogue ...\n"
+        f"Loaded {df_discarded.shape[0]} discarded source IDs."
+    )
     discarded_ids = set(df_discarded["discarded_id_x"].tolist())
     mask = ~df_all["ID_x"].isin(discarded_ids)
     df_cleaned = df_all[mask].reset_index(drop=True)
 
-    logger.debug(
-        f"Removed {df_all.shape[0] - df_cleaned.shape[0]} discarded sources. "
+    logger.info(
+        f"Removed {df_all.shape[0] - df_cleaned.shape[0]} discarded sources.\n"
         f"Cleaned catalogue now has {df_cleaned.shape[0]} sources."
     )
 
     return df_cleaned
 
 
+def save_to_file(out_file_path: Path, df: pd.DataFrame) -> None:
+    """Save DataFrame to CSV file.
+
+    Parameters
+    ----------
+    out_file_path : Path
+        Path to the output CSV file.
+    df : pd.DataFrame
+        DataFrame to be saved.
+    """
+    logger.info(
+        f"Saving {df.shape[0]} rows to a .csv file ..."
+    )
+    df.to_csv(out_file_path, index=False)
+    logger.info(f"DataFrame saved to {out_file_path}.")
+
+
 if __name__ == "__main__":
     logger = logging.getLogger(Path(__file__).stem)
     configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 
-    logger.info("Loading and concatenating X-ray catalogues ...")
-
     df_all = _concatenate_catalogues()
-    # out_file_concat_xray = (
-    #     config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
-    #     / "xray_catalogue_all_for_autocorrelation.csv"
-    # )
-    # df_all.to_csv(out_file_concat_xray, index=False)
-
-    start_time = time.time()
-    logger.info("Starting auto-correlation to find overlapping sources...")
 
     df_all_overlap = check_overlap_ckdtree(df_all)
-    # df_all_overlap.to_csv(
-    #     out_file_concat_xray.parent / "x_ray_catalogue_overlap.csv",
-    #     index=False
-    # )
 
-    # logger.info(
-    #     f"Overlap results saved to "
-    #     f"{out_file_concat_xray.parent / 'x_ray_catalogue_overlap.csv'}"
-    # )
-
-    logger.info("Summarizing overlap results ...")
     df_summary = summarize_overlap(df_all_overlap)
-    # df_summary.to_csv(
-    #     out_file_concat_xray.parent / "x_ray_catalogue_overlap_summary.csv",
-    #     index=False
-    # )
-    time_elapsed = time.time() - start_time
-    logger.info(
-        f"Auto-correlation completed in "
-        f"{time_elapsed:.2f} seconds."
-    )
 
-    logger.info("Getting a list of discarded X-ray sources ...")
     df_discarded = get_list_of_discarded_sources(df_summary)
-    logger.info(
-        f"From the {df_summary.shape[0]} groups of overlapping sources, "
-        f"{df_discarded.shape[0]} sources were moved to the discarded list."
-    )
 
-    logger.info("Removing discarded sources from concatenated catalogue ...")
     df_cleaned = remove_discarded_sources_from_concatenated_catalogue(
         df_all, df_discarded
-    )
-    logger.info(
-        "Cleaned concatenated catalogue now has "
-        f"{df_cleaned.shape[0]} sources."
     )
 
     # Save the cleaned concatenated catalogue
@@ -428,8 +439,4 @@ if __name__ == "__main__":
         / "xray_catalogue_deduplicated.csv"
     )
 
-    df_cleaned.to_csv(out_file_cleaned_xray, index=False)
-    logger.info(
-        "De-duplicated concatenated X-ray catalogue saved to "
-        f"{out_file_cleaned_xray}"
-    )
+    save_to_file(out_file_cleaned_xray, df_cleaned)
