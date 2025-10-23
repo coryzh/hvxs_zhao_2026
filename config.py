@@ -31,6 +31,12 @@ RESULTS_PHOTOMETRY_DIR = RESULTS_DIR / "photometry"
 RESULTS_HIGHLIGHTS = RESULTS_DIR / "highlights"
 
 
+# MISC
+GOOGLE_SHEET_CREDENTIALS_JSON = (
+    ROOT_DIR / "steady-petal-476013-r9-b6b15714949e.json"
+)
+
+
 def make_dir() -> None:
     for name, value in globals().items():
         if isinstance(value, Path):
