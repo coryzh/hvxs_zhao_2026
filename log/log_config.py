@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional
+from log.handlers import GoogleSheetsHandler
 import logging
 import inspect
 import config
@@ -53,3 +54,12 @@ def configure_logging(
         level=level, format=fmt, datefmt=datefmt, handlers=handlers,
         force=force
     )
+
+    gs = GoogleSheetsHandler(
+        creds_json_path=str(config.GOOGLE_SHEET_CREDENTIALS_JSON),
+        spreadsheet_key="1VYqr5SHX9Jxk-huHc831Chnxx-1VsZJlFs8on6I32XE",
+        worksheet_name="logs",
+        fmt=fmt
+    )
+
+    logging.getLogger().addHandler(gs)
