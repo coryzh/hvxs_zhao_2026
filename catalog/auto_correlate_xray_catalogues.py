@@ -325,10 +325,9 @@ def get_list_of_discarded_sources(df: pd.DataFrame) -> pd.DataFrame:
     for _, row in df.iterrows():
         member_ids = row["member_ids"].split(";")
         kept_id = row["kept_id"]
-        for mid in member_ids:
-            discarded_sources.extend(
-                [mid for mid in member_ids if mid != kept_id]
-            )
+        discarded_sources.extend(
+            [mid for mid in member_ids if mid != kept_id]
+        )
 
     df_discarded = pd.DataFrame(
         discarded_sources, columns=["discarded_id_x"]
