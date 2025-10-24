@@ -347,6 +347,17 @@ class CombinedCatalogueSchema(Schema):
     from_: str = "from"
 
 
+class NWAYSchema(Schema):
+    p_any: str = "p_any"
+    p_i: str = "p_i"
+    p_single: str = "p_single"
+    Separation_max: str = "Separation_max"
+    ncat: str = "ncat"
+    dist_bayesfactor: str = "dist_bayesfactor"
+    dist_post: str = "dist_post"
+    match_flag: str = "match_flag"
+
+
 class LX:
     def __init__(self, band: str):
         self.band = band
