@@ -8,6 +8,13 @@ SURVEY_ID_IDENTIFIERS = {
     "1eRASS": "erass",
     "2SXPS": "swift"
 }
+
+SURVEY_SKY_AREA = {
+    "csc": 730.0,
+    "xmm": 1383.0,
+    "erass": 20626.4,
+    "swift": 3790.0
+}
 # Path to the root of the project
 ROOT_DIR = Path(__file__).parent.parent
 
