@@ -157,6 +157,10 @@ if __name__ == "__main__":
         config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
         / "xray_catalogue_deduplicated.csv"
     )
+
+    out_dir = (
+        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_for_nway"
+    )
     df = pd.read_csv(in_file)
 
     surveys = _detect_surveys(df)
@@ -165,6 +169,6 @@ if __name__ == "__main__":
 
     _tally_source_counts_per_survey(split_dfs, df)
 
-    save_split_catalogues(split_dfs, output_dir=in_file.parent)
+    save_split_catalogues(split_dfs, output_dir=out_dir)
 
     _ = split_catalogue(df)
