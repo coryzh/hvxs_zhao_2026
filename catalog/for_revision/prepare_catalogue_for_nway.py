@@ -10,7 +10,7 @@ import argparse
 def prepare_table(
         in_file_csv: Path, id_col_name: str = "id",
         ra_col: str = "ra", dec_col: str = "dec",
-        pos_err_col: str = "pos_err",
+        pos_err_col: str | None = None,
         sky_area: float = 2.0, data_extension_name: str = "data"
 ) -> None:
     # Step 1: Convert DataFrame to Astropy Table
@@ -37,7 +37,11 @@ def prepare_table(
         logger.info("No duplicated entries found. Good to go next step.")
 
     # Step 3: Keep only the required columns.
-    cols_required = [id_col_name, ra_col, dec_col, pos_err_col]
+    if pos_err_col is None:
+        cols_required = [id_col_name, ra_col, dec_col]
+    else:
+        cols_required = [id_col_name, ra_col, dec_col, pos_err_col]
+
     logger.info(f"3. Keeping only the required columns: {cols_required} ...")
     df = df[cols_required]
 
@@ -104,7 +108,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--pos_err_col", required=False, default="pos_err",
+        "--pos_err_col", required=False, default=None,
         help="Name of the positional error column in the input catalogue"
     )
 
