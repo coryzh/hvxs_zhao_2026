@@ -42,7 +42,7 @@ nrand = 1000
 id_x_dict = {
     "csc": "name", "erass": "IAUNAME", "xmm": "iauname", "swift": "IAUName",
     "cv": "Name", "as": "UID", "ab": "Name", "yso": "source_id_dr2",
-    "known_cobs": "Name"
+    "known_cobs": "Name", "concat": "ID_x"
 }
 
 # Random state
