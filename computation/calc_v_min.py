@@ -4,10 +4,10 @@ related function for coordinate conversion
 and kinematics are all included in this script. The functions are also
 re-worked to be compatible with numba.
 """
-import config
 import numpy as np
 import pandas as pd
 import constants as con
+import argparse
 from utils.distances import (
     ExponentialPriorModel,
     SimpleInversion,
@@ -19,6 +19,7 @@ from utils.rotation_curve import v_rot
 from numba import jit
 from tqdm import tqdm
 from utils.utility_functions import get_errors
+from pathlib import Path
 
 # Rotation velocity curve. Gridded values used for numpy.interp
 print("Initializing ...\n")
@@ -373,7 +374,7 @@ def find_v_min(
 
 
 def run_computation(
-        df: pd.DataFrame, method: str = "scipy",
+        df: pd.DataFrame, out_file: Path, method: str = "scipy",
         survey_name: str = None, batch_size: int = 1000
 ) -> None:
 
@@ -398,12 +399,6 @@ def run_computation(
     ]
 
     # result_df = pd.DataFrame(columns=cols)
-
-    out_file = (
-        config.RESULTS_CATALOGUE_DIR
-        / "gaia_astrometry_catalogues"
-        / f"{survey_name}_w_v_min.csv"
-    )
 
     if out_file.exists():
         overwrite = input(
@@ -470,21 +465,55 @@ def run_computation(
             result_data = []
 
 
-def main() -> None:
-    survey_name = "concat"
-    in_cat_dir = (
-        config.RESULTS_CATALOGUE_DIR
-        / "gaia_astrometry_catalogues"
-    )
-    in_cat_file = "gaia_astrometry_stars_only.csv"
-
-    df = pd.read_csv(in_cat_dir / in_cat_file)
+def main(
+        in_cat_path: Path, out_file: Path, survey_name: str = "concat",
+        batch_size: int = 10, method: str = "scipy"
+) -> None:
+    df = pd.read_csv(in_cat_path)
     df = imputation_bailer_jones(df)
     df_sub = df.iloc[0:20]
     run_computation(
-        df_sub, method="scipy", survey_name=survey_name, batch_size=6
+        df_sub, out_file=out_file, method=method, survey_name=survey_name,
+        batch_size=batch_size
     )
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description=(
+            "Compute minimum peculiar and space velocities for sources"
+            "in the input catalogue. The input catalogue should contain Gaia "
+            "astrometric and distance information from the Bailer-Jones+21 "
+            "catalogue."
+        )
+    )
+    parser.add_argument(
+        "--in_cat_path", type=str, required=True,
+        help="Path to the input catalogue CSV file."
+    )
+    parser.add_argument(
+        "--out_file", type=str, required=True,
+        help="Path to the output CSV file to save results."
+    )
+    parser.add_argument(
+        "--survey_name", type=str, default="concat",
+        help="Short name of the survey (default: concat)."
+    )
+    parser.add_argument(
+        "--batch_size", type=int, default=10,
+        help="Number of sources to process in each batch (default: 10)."
+    )
+    parser.add_argument(
+        "--method", type=str, default="scipy",
+        help="Method for minimization: 'scipy' or 'numpy' (default: scipy)."
+    )
+
+    args = parser.parse_args()
+
+    main(
+        in_cat_path=Path(args.in_cat_path),
+        out_file=Path(args.out_file),
+        survey_name=args.survey_name,
+        batch_size=args.batch_size,
+        method=args.method
+    )
