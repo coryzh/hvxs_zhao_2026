@@ -38,10 +38,12 @@ def _render_query_str(
             "b.r_lo_photogeo/1000 AS r_lo_photogeo, \n"
             "b.r_hi_photogeo/1000 AS r_hi_photogeo \n"
             f"FROM {user_table_name} AS u \n"
-            "LEFT JOIN gaiadr3.gaia_source AS dr3 \n"
+            # Require a matching Gaia DR3 row that meets filters (INNER JOIN)
+            "JOIN gaiadr3.gaia_source AS dr3 \n"
             "  ON u.source_id = dr3.source_id \n"
             "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
             "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+            # Distance may be missing; keep rows even if b is NULL (LEFT JOIN)
             "LEFT JOIN external.gaiaedr3_distance AS b \n"
             "  ON u.source_id = b.source_id \n"
         )
@@ -85,7 +87,7 @@ def login(service: str = "gaia", username: str | None = None) -> None:
 
 def upload_table(username: str, table_path: Path, table_name: str) -> None:
     Gaia.upload_table(
-        str(table_path),
+        upload_resource=str(table_path),
         table_name=table_name,
         format="csv"
     )
@@ -98,16 +100,34 @@ def upload_table(username: str, table_path: Path, table_name: str) -> None:
 
 
 def query_gaia(query: str, **kwargs) -> None:
-    job = Gaia.launch_job(query, **kwargs)
-    results = job.get_results()
+    _ = Gaia.launch_job_async(query, **kwargs)
 
     logger.info("Query completed.")
-    return results
 
 
 if __name__ == "__main__":
     username = "yzhao02"
-    user_table_name = "xray_"
-    query = _render_query_str(username, user_table_name, scheme="photometry")
-    print(query)
-    # login(username=username, service="gaia")
+    user_table_name = "hvxs_xray_catalogue_concat"
+    login(username=username, service="gaia")
+
+    upload_table(
+        username=username,
+        table_path=(
+            config.RESULTS_CATALOGUE_DIR
+            / "nway_matched_results"
+            / "xray_catalogue_concatenated.csv"
+        ),
+        table_name=user_table_name
+    )
+
+    query = _render_query_str(username, user_table_name, scheme="astrometry")
+
+    query_gaia(
+        query, dump_to_file=True,
+        output_file=str(
+            config.RESULTS_CATALOGUE_DIR
+            / "gaia_astrometry_catalogues"
+            / "gaia_astrometry_stars_only.csv"
+        ),
+        output_format="csv"
+    )

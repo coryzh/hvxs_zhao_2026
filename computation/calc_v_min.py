@@ -401,8 +401,8 @@ def run_computation(
 
     out_file = (
         config.RESULTS_CATALOGUE_DIR
-        / "complementary_tables"
-        / f"{survey_name}_likely_stars_w_v_min.csv"
+        / "gaia_astrometry_catalogues"
+        / f"{survey_name}_w_v_min.csv"
     )
 
     if out_file.exists():
@@ -471,18 +471,18 @@ def run_computation(
 
 
 def main() -> None:
-    survey_name = "xmm"
+    survey_name = "concat"
     in_cat_dir = (
         config.RESULTS_CATALOGUE_DIR
-        / "complementary_tables"
+        / "gaia_astrometry_catalogues"
     )
-    in_cat_file = f"{survey_name}_likely_stars.csv"
+    in_cat_file = "gaia_astrometry_stars_only.csv"
 
     df = pd.read_csv(in_cat_dir / in_cat_file)
     df = imputation_bailer_jones(df)
-    # df_sub = df.iloc[0:20]
+    df_sub = df.iloc[0:20]
     run_computation(
-        df, method="scipy", survey_name=survey_name, batch_size=6
+        df_sub, method="scipy", survey_name=survey_name, batch_size=6
     )
 
 
