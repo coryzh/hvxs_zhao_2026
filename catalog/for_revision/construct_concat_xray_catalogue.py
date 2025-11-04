@@ -35,6 +35,9 @@ def construct_concat_xray_catalogue() -> pd.DataFrame:
     df_concat = pd.DataFrame()
     essential_cols = [
         ds.CombinedCatalogueSchema.ID_x, ds.CombinedCatalogueSchema.source_id,
+        ds.CombinedCatalogueSchema.ra_x, ds.CombinedCatalogueSchema.dec_x,
+        ds.CombinedCatalogueSchema.pos_x_err,
+        ds.CombinedCatalogueSchema.sep_x_g
     ]
     summed_rows = 0
     for survey_name in config.SURVEY_NAMES_SHORT:
