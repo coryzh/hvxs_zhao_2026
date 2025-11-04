@@ -307,6 +307,7 @@ class CombinedCatalogueSchema(Schema):
     ra_gaia: str = "ra_gaia"
     dec_gaia: str = "dec_gaia"
     sep_x_g: str = "sep_x_g"
+    sep_x_g_sigma: str = "sep_x_g_sigma"
     ruwe: str = "ruwe"
     astrometric_excess_noise: str = "astrometric_excess_noise"
     astrometric_excess_noise_sig: str = "astrometric_excess_noise_sig"
