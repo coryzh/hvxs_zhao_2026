@@ -91,8 +91,59 @@ def _save_to_files(out_root: Path) -> None:
     )
 
     logger.info(
-        f"Saved dropped duplicated matches to {output_file_dropped}."
+        f"Saved dropped duplicated pairs to {output_file_dropped}."
     )
+
+
+def _sanity_check(
+        df: pd.DataFrame, df_cleaned: pd.DataFrame, df_dropped: pd.DataFrame
+) -> None:
+    # Get all duplicated source IDs
+    dup_source_ids = df[
+        df.duplicated(subset=ds.CombinedCatalogueSchema.source_id, keep=False)
+    ][ds.CombinedCatalogueSchema.source_id]
+
+    # Count occurrences of each duplicated source ID
+    dup_counts = dup_source_ids.value_counts()
+    tot_duplicates = dup_counts.sum()
+    tot_duplicates_via_keep_false = dup_source_ids.shape[0]
+
+    # Number of unique duplicated source IDs
+    n_unique = df[
+        df.duplicated(subset=ds.CombinedCatalogueSchema.source_id, keep=False)
+    ][ds.CombinedCatalogueSchema.source_id].nunique()
+
+    n_unique_via_dropped = tot_duplicates - df_dropped.shape[0]
+
+    if tot_duplicates != tot_duplicates_via_keep_false:
+        logger.warning(
+            f"Sanity check failed: The total of duplicates via tallying "
+            f"({tot_duplicates}) does not match the total via keep=False "
+            f"({tot_duplicates_via_keep_false})."
+        )
+    else:
+        logger.info(
+            f"Sanity check passed: The total of duplicates via tallying "
+            f"({tot_duplicates}) matches the total via keep=False "
+            f"({tot_duplicates_via_keep_false})."
+        )
+
+    if n_unique != n_unique_via_dropped:
+        logger.warning(
+            f"Sanity check failed: The number of unique duplicated source IDs "
+            f"({n_unique}) obtained from .nunique() on the original DataFrame "
+            "does not match the expected number obtained by taking off "
+            f"the number of dropped rows from the original total: "
+            f"({n_unique_via_dropped})."
+        )
+    else:
+        logger.info(
+            f"Sanity check passed: The number of unique duplicated source IDs "
+            f"({n_unique}) obtained from .nunique() on the original DataFrame "
+            f"matches the expected number obtained by taking off "
+            f"the number of dropped rows from the original total: "
+            f"({n_unique_via_dropped})."
+        )
 
 
 if __name__ == "__main__":
@@ -105,3 +156,8 @@ if __name__ == "__main__":
     )
 
     _save_to_files(out_root=output_dir)
+    _sanity_check(
+        df=df,
+        df_cleaned=df_deduplicated,
+        df_dropped=df_dropped
+    )
