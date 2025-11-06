@@ -59,7 +59,7 @@ def _render_query_str(
             "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
         )
 
-    elif scheme == "aen_info":
+    elif scheme == "aen":
         query = (
             "SELECT u.ID_x, u.source_id, dr3.astrometric_excess_noise, \n"
             "dr3.astrometric_excess_noise_sig, dr3.ruwe, "
@@ -154,7 +154,7 @@ def query_gaia(query: str, **kwargs) -> None:
 if __name__ == "__main__":
     username = "yzhao02"
     table_name = "hvxs_xray_catalogue_concat"
-    scheme = "photometry"
+    scheme = "gspphot"  # Options: astrometry, photometry, aen, gspphot
     login(username=username, service="gaia")
 
     table_exists = _check_table_exists(
