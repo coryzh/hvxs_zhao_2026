@@ -30,7 +30,11 @@ def deduplicate_concatenated_nway_matches(
         df: pd.DataFrame
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Remove Gaia sources that have multiple X-ray matches, keeping only the
-    nearest match. N.B. None of the X-ray sources have multi
+    nearest match. N.B. None of the X-ray sources have multiple Gaia matches, 
+    but some Gaia sources have multiple X-ray matches. So the X-ray IDs can be
+    used to uniquely identify each row. This function will return a cleaned
+    DataFrame with duplicated Gaia sources removed, as well as a DataFrame
+    containing the dropped duplicates for record-keeping.
 
     Parameters
     ----------
