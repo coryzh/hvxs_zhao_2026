@@ -25,10 +25,44 @@ def add_symmetric_flux_error_for_csc() -> pd.DataFrame:
     return df_csc
 
 
-if __name__ == "__main__":
-    df_csc_updated = add_symmetric_flux_error_for_csc()
-    output_path = (
-        config.ROOT_DIR / "results" / "csc" / "catalogues" / "nway_match"
-        / "csc_confident_point_sources_poserr_rescaled.csv"
+def add_symmetric_flux_error_for_swift() -> pd.DataFrame:
+    """Add symmetric flux error column for Swift catalogue.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with added symmetric flux error column.
+    """
+    file_path = (
+        config.ROOT_DIR / "results" / "swift" / "catalogues" / "nway_match"
+        / "swift_confident_point_sources_poserr_rescaled.csv"
     )
-    df_csc_updated.to_csv(output_path, index=False)
+
+    df_swift = pd.read_csv(file_path)
+
+    # Calculate symmetric flux error
+    df_swift["PowFlux_cen_err"] = (
+        df_swift["PowFlux_pos"] + df_swift["PowFlux_neg"].abs()
+    ) / 2.0
+
+    df_swift = df_swift.rename(
+        columns={"PowFlux": "PowFlux_cen"}
+    )
+
+    return df_swift
+
+
+if __name__ == "__main__":
+    # df_csc_updated = add_symmetric_flux_error_for_csc()
+    # output_path = (
+    #     config.ROOT_DIR / "results" / "csc" / "catalogues" / "nway_match"
+    #     / "csc_confident_point_sources_poserr_rescaled.csv"
+    # )
+    # df_csc_updated.to_csv(output_path, index=False)
+
+    df_swift_updated = add_symmetric_flux_error_for_swift()
+    output_path = (
+        config.ROOT_DIR / "results" / "swift" / "catalogues" / "nway_match"
+        / "swift_confident_point_sources_poserr_rescaled.csv"
+    )
+    df_swift_updated.to_csv(output_path, index=False)
