@@ -113,7 +113,7 @@ if __name__ == "__main__":
     upload_table(
         username=username,
         table_path=(
-            config.RESULTS_CATALOGUE_DIR
+            config.RESULTS_CATALOGUES_FOR_REVISION
             / "nway_matched_results"
             / "xray_catalogue_concatenated.csv"
         ),
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     query_gaia(
         query, dump_to_file=True,
         output_file=str(
-            config.RESULTS_CATALOGUE_DIR
+            config.RESULTS_CATALOGUES_FOR_REVISION
             / "gaia_astrometry_catalogues"
             / "gaia_astrometry_stars_only.csv"
         ),
