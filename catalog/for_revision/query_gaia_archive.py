@@ -115,7 +115,7 @@ if __name__ == "__main__":
         table_path=(
             config.RESULTS_CATALOGUES_FOR_REVISION
             / "nway_matched_results"
-            / "xray_catalogue_concatenated.csv"
+            / "xray_catalogue_concatenated_deduplicated.csv"
         ),
         table_name=user_table_name
     )
@@ -126,7 +126,7 @@ if __name__ == "__main__":
         query, dump_to_file=True,
         output_file=str(
             config.RESULTS_CATALOGUES_FOR_REVISION
-            / "gaia_astrometry_catalogues"
+            / "astrometry"
             / "gaia_astrometry_stars_only.csv"
         ),
         output_format="csv"
