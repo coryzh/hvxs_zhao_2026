@@ -7,6 +7,9 @@ from log.log_config import configure_logging
 from pathlib import Path
 from scipy.spatial import cKDTree
 
+logger = logging.getLogger(Path(__file__).stem)
+configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
+
 
 def _concatenate_catalogues() -> pd.DataFrame:
     """Concatenate multiple X-ray catalogues into a single DataFrame.
@@ -422,9 +425,6 @@ def save_to_file(out_file_path: Path, df: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger(Path(__file__).stem)
-    configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
-
     df_all = _concatenate_catalogues()
 
     df_all_overlap = check_overlap_ckdtree(df_all)
