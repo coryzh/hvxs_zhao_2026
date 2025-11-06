@@ -4,7 +4,7 @@
 # Define input and output dir and the path to the script
 SURVEYS=("csc" "xmm" "erass" "swift")
 
-ROOT_DIR="../../../results/combined/catalogues/nway_matched_results/"
+ROOT_DIR="../../../results/combined/catalogues/for_revision/nway_matched_results/"
 
 for survey in "${SURVEYS[@]}"; do
     FILE_IN="${ROOT_DIR}/${survey}_gaia_nway_match.fits"
