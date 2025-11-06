@@ -435,7 +435,8 @@ if __name__ == "__main__":
 
     # Save the cleaned concatenated catalogue
     out_file_cleaned_xray = (
-        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "x_ray_catalogue_deduplication"
         / "xray_catalogue_deduplicated.csv"
     )
 
