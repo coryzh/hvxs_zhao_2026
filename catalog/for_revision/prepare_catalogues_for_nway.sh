@@ -12,8 +12,8 @@ declare -A SKY_AREA=(
 )
 
 for survey in "${SURVEYS[@]}"; do
-    FILE_XRAY_IN="../../../results/combined/catalogues/x_ray_catalogue_for_nway/xray_catalogue_${survey}.csv"
-    FILE_GAIA_IN="../../../results/combined/catalogues/x_ray_catalogue_for_nway/${survey}_gaia_neighbours.csv"
+    FILE_XRAY_IN="../../../results/combined/catalogues/for_revision/x_ray_catalogue_for_nway/xray_catalogue_${survey}.csv"
+    FILE_GAIA_IN="../../../results/combined/catalogues/for_revision/x_ray_catalogue_for_nway/${survey}_gaia_neighbours.csv"
         # Run the command
         python3 prepare_catalogue_for_nway.py "$FILE_XRAY_IN" \
             --id_col "ID_x" \
