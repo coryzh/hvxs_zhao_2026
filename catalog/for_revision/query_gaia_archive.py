@@ -85,6 +85,24 @@ def login(service: str = "gaia", username: str | None = None) -> None:
     logger.info(f"Logged in to Gaia Archive as user '{username}'.")
 
 
+def _check_table_exists(user_name: str, table_name: str) -> bool:
+    user_table_name = _get_user_table_name(user_name, table_name)
+
+    all_tables = Gaia.load_tables(only_names=True, include_shared_tables=True)
+    all_table_names = [
+        table.get_qualified_name() for table in all_tables
+    ]
+
+    if user_table_name in all_table_names:
+        logger.info(
+            f"Table '{user_table_name}' exists in Gaia Archive "
+            f"under the user '{user_name}'."
+        )
+        return True
+    else:
+        return False
+
+
 def upload_table(username: str, table_path: Path, table_name: str) -> None:
     Gaia.upload_table(
         upload_resource=str(table_path),
@@ -107,20 +125,24 @@ def query_gaia(query: str, **kwargs) -> None:
 
 if __name__ == "__main__":
     username = "yzhao02"
-    user_table_name = "hvxs_xray_catalogue_concat"
+    table_name = "hvxs_xray_catalogue_concat"
     login(username=username, service="gaia")
 
-    upload_table(
-        username=username,
-        table_path=(
-            config.RESULTS_CATALOGUES_FOR_REVISION
-            / "nway_matched_results"
-            / "xray_catalogue_concatenated_deduplicated.csv"
-        ),
-        table_name=user_table_name
+    table_exists = _check_table_exists(
+        user_name=username, table_name=table_name
     )
+    if not table_exists:
+        upload_table(
+            username=username,
+            table_path=(
+                config.RESULTS_CATALOGUES_FOR_REVISION
+                / "nway_matched_results"
+                / "xray_catalogue_concatenated_deduplicated.csv"
+            ),
+            table_name=table_name
+        )
 
-    query = _render_query_str(username, user_table_name, scheme="astrometry")
+    query = _render_query_str(username, table_name, scheme="astrometry")
 
     query_gaia(
         query, dump_to_file=True,
