@@ -59,6 +59,30 @@ def _render_query_str(
             "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
         )
 
+    elif scheme == "aen_related":
+        query = (
+            "SELECT u.ID_x, u.source_id, dr3.astrometric_excess_noise, \n"
+            "dr3.astrometric_excess_noise_sig, dr3.ruwe, "
+            "dr3.non_single_star\n"
+            f"FROM {user_table_name} AS u \n"
+            "LEFT JOIN gaiadr3.gaia_source AS dr3 \n"
+            "  ON u.source_id = dr3.source_id \n"
+            "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
+            "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+        )
+
+    elif scheme == "gspphot":
+        query = (
+            "SELECT u.ID_x, u.source_id, dr3.mh_gspphot, \n"
+            "dr3.mh_gspphot_lower, dr3.mh_gspphot_upper, \n"
+            "dr3.ag_gspphot, dr3.ebpminrp_gspphot \n"
+            f"FROM {user_table_name} AS u \n"
+            "LEFT JOIN gaiadr3.gaia_source AS dr3 \n"
+            "  ON u.source_id = dr3.source_id \n"
+            "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
+            "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+        )
+
     else:
         raise ValueError(f"Unknown option '{scheme}' for query rendering.")
 
@@ -126,6 +150,7 @@ def query_gaia(query: str, **kwargs) -> None:
 if __name__ == "__main__":
     username = "yzhao02"
     table_name = "hvxs_xray_catalogue_concat"
+    scheme = "astrometry"
     login(username=username, service="gaia")
 
     table_exists = _check_table_exists(
@@ -142,14 +167,14 @@ if __name__ == "__main__":
             table_name=table_name
         )
 
-    query = _render_query_str(username, table_name, scheme="astrometry")
+    query = _render_query_str(username, table_name, scheme=scheme)
 
     query_gaia(
         query, dump_to_file=True,
         output_file=str(
             config.RESULTS_CATALOGUES_FOR_REVISION
-            / "astrometry"
-            / "gaia_astrometry_stars_only.csv"
+            / "gaia"
+            / f"{scheme}_stars_only.csv"
         ),
         output_format="csv"
     )
