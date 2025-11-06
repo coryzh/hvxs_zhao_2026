@@ -78,5 +78,6 @@ if __name__ == "__main__":
     df_concat = construct_concat_xray_catalogue()
     save_concat_catalogue(
         df_concat,
-        output_dir=config.RESULTS_CATALOGUE_DIR / "nway_matched_results"
+        output_dir=config.RESULTS_CATALOGUES_FOR_REVISION
+        / "nway_matched_results"
     )
