@@ -21,19 +21,23 @@ def _concatenate_catalogues() -> pd.DataFrame:
     col_remapping_dict = {
         "csc": {
             "name": "ID_x", "ra_deg": "ra_x", "dec_deg": "dec_x",
+            "flux_aper_b": "f_x", "flux_aper_b_sym_err": "f_x_err",
         },
         "xmm": {
             "iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x",
+            "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err",
         },
         "swift": {
             "IAUName": "ID_x", "RA": "ra_x", "Decl": "dec_x",
+            "PowFlux_cen": "f_x", "PowFlux_cen_err": "f_x_err",
         },
         "erass": {
-            "IAUNAME": "ID_x", "RA": "ra_x", "DEC": "dec_x"
+            "IAUNAME": "ID_x", "RA": "ra_x", "DEC": "dec_x",
+            "ML_FLUX_1": "f_x", "ML_FLUX_ERR_1": "f_x_err",
         }
     }
 
-    cols_to_keep = ["ID_x", "ra_x", "dec_x", "pos_x_err"]
+    cols_to_keep = ["ID_x", "ra_x", "dec_x", "pos_x_err", "f_x", "f_x_err"]
     logger.info("Loading and concatenating X-ray catalogues ...")
     for survey in config.SURVEY_NAMES_SHORT:
         file_path = (
