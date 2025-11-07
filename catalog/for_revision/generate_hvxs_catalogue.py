@@ -7,6 +7,9 @@ from catalog.for_revision.auto_correlate_xray_catalogues import (
     _concatenate_catalogues
 )
 from pathlib import Path
+from typing import Literal
+from utils.calc_flux import calculate_optical_flux
+
 
 configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 logger = logging.getLogger(Path(__file__).stem)
@@ -108,13 +111,59 @@ def _add_f_g_col(df: pd.DataFrame) -> pd.DataFrame:
 
     return df_copy
 
-    return df_xray
+
+def _add_fx_fg_col(df: pd.DataFrame) -> pd.DataFrame:
+    df_copy = df.copy()
+
+    fx = df_copy[ds.CombinedCatalogueSchema.f_x]
+    fg = df_copy[ds.CombinedCatalogueSchema.f_g]
+
+    df_copy[ds.CombinedCatalogueSchema.fx_fg] = fx / fg
+
+    logger.info("Added FX/FG ratio column.")
+
+    return df_copy
 
 
-def test() -> None:
+def _filter_by_vpec_min_lim(
+        df: pd.DataFrame, vpec_min_lim: float,
+        vpec_min_lim_opt: Literal['lo', 'med']
+) -> pd.DataFrame:
+    df_copy = df.copy()
+
+    if vpec_min_lim_opt == 'lo':
+        vpec_col = (
+            df_copy[ds.CombinedCatalogueSchema.vpec_min_med]
+            - df_copy[ds.CombinedCatalogueSchema.e_vpec_min]
+        )
+    elif vpec_min_lim_opt == 'med':
+        vpec_col = df_copy[ds.CombinedCatalogueSchema.vpec_min_med]
+
+    else:
+        raise ValueError(f"Unknown vpec_min_lim_opt: {vpec_min_lim_opt}")
+
+    initial_len = df_copy.shape[0]
+
+    df_filtered = df_copy[
+        df_copy[vpec_col] >= vpec_min_lim
+    ].reset_index(drop=True)
+
+    final_len = df_filtered.shape[0]
+
+    logger.info(
+        f"Filtered by Vpec_min limit ({vpec_min_lim_opt}): "
+        f"from {initial_len} to {final_len}."
+    )
+
+    return df_filtered
+
+
+def make_catalogue(
+        vpec_min_lim: float, vpec_min_lim_opt: Literal['lo', 'med']
+) -> pd.DataFrame:
     df_master = _concatenate_catalogues()
     logger.info(f"Concatenated catalogue shape: {df_master.shape}")
 
 
 if __name__ == "__main__":
-    test()
+    make_catalogue(vpec_min_lim=200, vpec_min_lim_opt='lo')
