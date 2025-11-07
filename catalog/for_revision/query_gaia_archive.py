@@ -29,7 +29,7 @@ def _render_query_str(
             "SELECT u.ID_x, u.source_id, dr3.ra, dr3.dec, \n"
             "dr3.parallax, dr3.parallax_error, \n"
             "dr3.pmra, dr3.pmra_error, dr3.pmdec, dr3.pmdec_error, \n"
-            "dr3.phot_g_mean_mag, dr3.nu_eff_used_in_astrometry, \n"
+            "dr3.nu_eff_used_in_astrometry, \n"
             "dr3.pseudocolour, dr3.ecl_lat, dr3.astrometric_params_solved, \n"
             "b.r_med_geo/1000 AS r_med_geo, \n"
             "b.r_lo_geo/1000 AS r_lo_geo, \n"
