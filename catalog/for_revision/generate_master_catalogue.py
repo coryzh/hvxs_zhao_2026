@@ -3,9 +3,13 @@ import pandas as pd
 import config
 import data_schema as ds
 from utils.calc_flux import calculate_optical_flux
+from catalog.manipulate.parallax_zeropoint_correction import correct_zp
 from log.log_config import configure_logging
 from pathlib import Path
 from typing import Literal
+from catalog.for_revision.auto_correlate_xray_catalogues import (
+    _concatenate_catalogues
+)
 
 configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 logger = logging.getLogger(Path(__file__).stem)
@@ -71,30 +75,25 @@ def _get_survey_sub_df_from_concatenated_catalogue(
 
 def _zp_correction(df: pd.DataFrame) -> pd.DataFrame:
     df_copy = df.copy()
-    logger.info("Applying zero-point correction to photometry...")
+    logger.info("Applying zero-point correction to parallax...")
 
-    phot_g_mean_mag = df_copy['phot_g_mean_mag']
-    bp_rp = df_copy['bp_rp']
-
-    zp_correction = 0.026 * (bp_rp - 0.4) ** 2 - 0.004
-    phot_g_mean_mag_corrected = phot_g_mean_mag - zp_correction
-
-    df_copy['phot_g_mean_mag'] = phot_g_mean_mag_corrected
-
-    logger.info("Zero-point correction applied.")
+    df_copy = correct_zp(df_copy, verbose=False)
 
     return df_copy
 
 
 def _load_df(
         option: Literal[
-            'astrometry', 'photometry', 'aen', 'gspphot', "nway"
+            'astrometry', 'photometry', 'aen', 'gspphot', "nway", "velocity"
         ] = 'astrometry'
 ) -> pd.DataFrame:
     file_root = config.RESULTS_CATALOGUES_FOR_REVISION
 
     if option in ['astrometry', 'photometry', 'aen', 'gspphot']:
         file_path = file_root / "gaia" / f"{option}_stars_only.csv"
+    elif option == "velocity":
+        file_path = file_root / "velocity" / "space_velocities.csv"
+
     elif option == "nway":
         file_path = (
             file_root / "nway_matched_results"
@@ -105,13 +104,27 @@ def _load_df(
 
     df = pd.read_csv(file_path)
     logger.info(f"Loaded {option} catalogue: {df.shape[0]} rows")
+
+    if option == 'velocity':
+        df = df.drop(
+            columns=["r_med_photogeo", "r_lo_photogeo", "r_hi_photogeo"],
+        )
+    elif option == "nway":
+        cols_to_keep = [
+            ds.CombinedCatalogueSchema.ID_x,
+            ds.CombinedCatalogueSchema.source_id,
+            "sep_x_g",
+            "sep_x_g_sigma"
+        ]
+        df = df[cols_to_keep]
+
     return df
 
 
 def _add_f_g_col(df: pd.DataFrame) -> pd.DataFrame:
     df_copy = df.copy()
 
-    phot_g_mean_mag = df_copy['phot_g_mean_mag']
+    phot_g_mean_mag = df_copy['phot_g_mean_mag'].values
 
     fg = calculate_optical_flux(phot_g_mean_mag)
 
@@ -138,3 +151,88 @@ def _add_fx_fg_col(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("Added FX/FG ratio and the FX/FG error columns.")
 
     return df_copy
+
+
+def _join_gaia_dfs(
+    df_left, df_right, on: str = ds.CombinedCatalogueSchema.source_id,
+    left_label: str = 'left', right_label: str = 'right'
+) -> pd.DataFrame:
+    cols_right = [
+        col for col in df_right.columns if col != 'ID_x'
+    ]
+
+    df_joined = pd.merge(
+        df_left, df_right[cols_right],
+        on=on, how='left'
+    )
+    logger.info(
+        f"Joined {right_label} to {left_label} DataFrames on '{on}'."
+    )
+
+    return df_joined
+
+
+def _save_to_file(df: pd.DataFrame, file_path: Path) -> None:
+    df.to_csv(file_path, index=False)
+    logger.info(f"Saved DataFrame to {file_path}")
+
+
+def make_catalogue() -> None:
+    logger.info("Loading astrometry catalogue ...")
+    df_base = _load_df(option='astrometry')
+
+    logger.info("Loading photometry catalogue ...")
+    df_photometry = _load_df(option='photometry')
+
+    logger.info("Adding F_G column to photometry catalogue ...")
+    df_photometry = _add_f_g_col(df_photometry)
+
+    logger.info("Merging astrometry and photometry catalogues ...")
+    df_base = _join_gaia_dfs(
+        df_left=df_base, df_right=df_photometry,
+        left_label='astrometry', right_label='photometry'
+    )
+
+    logger.info("Applying parallax zero-point correction ...")
+    df_base = _zp_correction(df_base)
+
+    logger.info(
+        "Generating concatenated X-ray catalogue. This catalogue will be "
+        "joined to get the x-ray columns ..."
+    )
+
+    df_xray = _concatenate_catalogues()
+    logger.info(f"Concatenated catalogue shape: {df_xray.shape}")
+
+    logger.info(
+        "Joining with concatenated X-ray catalogue to get the X-ray columns..."
+    )
+
+    df_base = pd.merge(
+        df_base, df_xray,
+        on=ds.CombinedCatalogueSchema.ID_x,
+        how='left'
+    )
+
+    logger.info("Adding FX/FG ratio and the FX/FG error columns ...")
+    df_base = _add_fx_fg_col(df_base)
+
+    logger.info("Joining additional catalogues ...")
+    for label in ["aen", "gspphot", "velocity", "nway"]:
+        df_to_join = _load_df(option=label)
+
+        df_base = _join_gaia_dfs(
+            df_left=df_base, df_right=df_to_join,
+            left_label='base', right_label=label
+        )
+
+    logger.info(f"Finished. Final catalogue shape: {df_base.shape}")
+
+    out_file_path = (
+        config.RESULTS_CATALOGUES_FOR_REVISION / "master_catalogue.csv"
+    )
+    _save_to_file(df_base, file_path=out_file_path)
+
+
+if __name__ == "__main__":
+    make_catalogue()
