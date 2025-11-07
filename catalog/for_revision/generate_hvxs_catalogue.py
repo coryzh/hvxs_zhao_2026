@@ -117,10 +117,12 @@ def _add_fx_fg_col(df: pd.DataFrame) -> pd.DataFrame:
 
     fx = df_copy[ds.CombinedCatalogueSchema.f_x]
     fg = df_copy[ds.CombinedCatalogueSchema.f_g]
+    fx_fg_err = df_copy[ds.CombinedCatalogueSchema.f_x_err] / fg
 
     df_copy[ds.CombinedCatalogueSchema.fx_fg] = fx / fg
+    df_copy[ds.CombinedCatalogueSchema.fx_fg_err] = fx_fg_err
 
-    logger.info("Added FX/FG ratio column.")
+    logger.info("Added FX/FG ratio and the FX/FG error columns.")
 
     return df_copy
 
