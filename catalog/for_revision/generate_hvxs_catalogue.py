@@ -91,7 +91,22 @@ def _load_df(
     logger.info(f"Loaded {option} catalogue: {df.shape[0]} rows")
     return df
 
-    df_xray = df[xray_columns].copy()
+
+def _add_f_g_col(df: pd.DataFrame) -> pd.DataFrame:
+    df_copy = df.copy()
+
+    phot_g_mean_mag = df_copy['phot_g_mean_mag']
+
+    fg = calculate_optical_flux(phot_g_mean_mag)
+
+    df_copy[ds.CombinedCatalogueSchema.f_g] = fg
+
+    logger.info(
+        f"Added F_G column. Total of "
+        f"{df_copy[ds.CombinedCatalogueSchema.f_g].isna().sum()} NaN values."
+    )
+
+    return df_copy
 
     return df_xray
 
