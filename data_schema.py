@@ -345,6 +345,7 @@ class CombinedCatalogueSchema(Schema):
     lum_x: str = "lum_x"
     lum_x_err: str = "lum_x_err"
     fx_fg: str = "fx_fg"
+    f_g: str = "f_g"
     from_: str = "from"
 
 
