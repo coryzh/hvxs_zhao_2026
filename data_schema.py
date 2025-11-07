@@ -340,6 +340,7 @@ class CombinedCatalogueSchema(Schema):
     phot_g_mean_mag: str = "phot_g_mean_mag"
     phot_rp_mean_mag: str = "phot_rp_mean_mag"
     phot_bp_mean_mag: str = "phot_bp_mean_mag"
+    bp_rp: str = "bp_rp"
     f_x: str = "f_x"
     f_x_err: str = "f_x_err"
     lum_x: str = "lum_x"
