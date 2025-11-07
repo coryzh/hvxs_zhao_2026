@@ -70,17 +70,26 @@ def _get_survey_sub_df_from_concatenated_catalogue(
     return df_survey
 
 
-def _get_xray_columns(df: pd.DataFrame) -> pd.DataFrame:
-    xray_columns = [
-        ds.CombinedCatalogueSchema.ID_x,
-        ds.CombinedCatalogueSchema.ra_x,
-        ds.CombinedCatalogueSchema.Xray_RA,
-        ds.CombinedCatalogueSchema.Xray_Dec,
-        ds.CombinedCatalogueSchema.Xray_PosErr,
-        ds.CombinedCatalogueSchema.Xray_Flux,
-        ds.CombinedCatalogueSchema.Xray_Flux_Err,
-        ds.CombinedCatalogueSchema.Xray_Survey,
-    ]
+def _load_df(
+        option: Literal[
+            'astrometry', 'photometry', 'aen', 'gspphot', "nway"
+        ] = 'astrometry'
+) -> pd.DataFrame:
+    file_root = config.RESULTS_CATALOGUES_FOR_REVISION
+
+    if option in ['astrometry', 'photometry', 'aen', 'gspphot']:
+        file_path = file_root / "gaia" / f"{option}_stars_only.csv"
+    elif option == "nway":
+        file_path = (
+            file_root / "nway_matched_results"
+            / "xray_catalogue_concatenated_deduplicated.csv"
+        )
+    else:
+        raise ValueError(f"Unknown option: {option}")
+
+    df = pd.read_csv(file_path)
+    logger.info(f"Loaded {option} catalogue: {df.shape[0]} rows")
+    return df
 
     df_xray = df[xray_columns].copy()
 
