@@ -4,16 +4,21 @@ import data_schema as ds
 import logging
 import numpy as np
 from log.log_config import configure_logging
-from catalog.for_revision.auto_correlate_xray_catalogues import (
-    _concatenate_catalogues
-)
 from pathlib import Path
 from typing import Literal
 
-
-
 configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 logger = logging.getLogger(Path(__file__).stem)
+
+
+def _load_master_catalogue() -> pd.DataFrame:
+    file_path = (
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "master_catalogue.csv"
+    )
+    df = pd.read_csv(file_path)
+    logger.info(f"Master catalogue loaded: {df.shape[0]} rows.")
+    return df
 
 
 def _filter_by_vpec_min_lim(
@@ -82,8 +87,20 @@ def _save_to_file(df: pd.DataFrame, file_path: Path) -> None:
 def make_catalogue(
         vpec_min_lim: float, vpec_min_lim_opt: Literal['lo', 'med']
 ) -> pd.DataFrame:
-    df_master = _concatenate_catalogues()
-    logger.info(f"Concatenated catalogue shape: {df_master.shape}")
+    df = _load_master_catalogue()
+    df = _filter_by_vpec_min_lim(
+        df, vpec_min_lim=vpec_min_lim,
+        vpec_min_lim_opt=vpec_min_lim_opt
+    )
+    df = _filter_by_fx_fg(df)
+
+    output_path = (
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / f"hvxs_catalogue_vpecmin{vpec_min_lim_opt}_gt_{vpec_min_lim}.csv"
+    )
+    _save_to_file(df, output_path)
+
+    return df
 
 
 if __name__ == "__main__":
