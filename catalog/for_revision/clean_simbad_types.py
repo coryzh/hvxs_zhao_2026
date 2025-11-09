@@ -2,7 +2,7 @@ import pandas as pd
 import data_schema as ds
 import logging
 import warnings
-from log.loggers import configure_logging
+from log.log_config import configure_logging
 from pathlib import Path
 
 
