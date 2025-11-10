@@ -16,9 +16,7 @@ def _rename_columns(df: pd.DataFrame) -> pd.DataFrame:
             "Prob": "cl_member_prob"
     }
 
-    df = df.rename(
-        columns=col_mapping, inplace=True
-    )
+    df = df.rename(columns=col_mapping)
 
     logger.info(
         f"Columns renamed for cluster catalogue. Using mapping"
@@ -65,7 +63,7 @@ def cross_match_ids(df: pd.DataFrame, df_members: pd.DataFrame) -> None:
     )
 
     n_likely_members = df_merged['cluster_name'].notna().sum()
-    logger.log(
+    logger.info(
         f"{n_likely_members} sources are likely cluster members.\n"
     )
 
@@ -85,7 +83,7 @@ def _save_to_file(df: pd.DataFrame, file_path: Path) -> None:
     logger.end()
 
 
-def clean(df: pd.DataFrame, out_file: Path) -> pd.DataFrame:
+def clean(df: pd.DataFrame, out_file: Path = None) -> pd.DataFrame:
     df_members = load_cluster_catalogue()
     df_members = _rename_columns(df_members)
 
