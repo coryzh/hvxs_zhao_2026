@@ -68,7 +68,8 @@ def _cleanup(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def clean(
-        df: pd.DataFrame, prob_thresh: float = 0.1, opt: str = 'lmc'
+        df: pd.DataFrame, prob_thresh: float = 0.1, opt: str = 'lmc',
+        out_file: Path = None
 ) -> pd.DataFrame:
     """
     Used to remove members in SMC or LMC (specified by the opt argument),
@@ -102,5 +103,10 @@ def clean(
         df_merged, prob_thresh=prob_thresh, opt=opt
     )
     df = _cleanup(df)
+    if out_file is not None:
+        df.to_csv(out_file, index=False)
+        logger.info(f"Cleaned DataFrame saved to {out_file}.\n")
+
+    logger.info(f"Cleaned DataFrame shape: {df.shape}.\n")
 
     return df

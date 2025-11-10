@@ -32,7 +32,7 @@ def _merge_fidelity_to_main_df(
     return df_merged
 
 
-def _clean_df_simbad_type(
+def _clean_fidelity(
         df: pd.DataFrame, fidelity_thresh: float = 0.5
 ) -> pd.DataFrame:
     _filter = df["fidelity_v2"] >= fidelity_thresh
@@ -59,11 +59,13 @@ def _cleanup(df: pd.DataFrame) -> pd.DataFrame:
 def clean(df: pd.DataFrame, out_file: Path = None) -> pd.DataFrame:
     df_fidelity = _load_fidelity_catalogue()
     df = _merge_fidelity_to_main_df(df, df_fidelity)
-    df = _clean_df_simbad_type(df, fidelity_thresh=0.5)
+    df = _clean_fidelity(df, fidelity_thresh=0.5)
     df = _cleanup(df)
 
     if out_file:
         df.to_csv(out_file, index=False)
         logger.info(f"Cleaned dataframe saved to {out_file}.")
+
+    logger.info(f"Cleaned dataframe shape: {df.shape}")
 
     return df

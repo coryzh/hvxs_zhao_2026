@@ -193,4 +193,5 @@ def clean(
     if out_file is not None:
         _save_to_file(df, out_file)
 
+    logger.info(f"Cleaned DataFrame shape: {df.shape}.")
     return df
