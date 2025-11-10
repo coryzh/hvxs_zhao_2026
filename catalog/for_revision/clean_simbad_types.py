@@ -43,6 +43,32 @@ unwanted_otypes_patterns = [
 unwanted_name_patterns = ["Cl*", "Cl", "NGC", "LEDA"]
 
 
+def _merge_to_main_df(
+    df: pd.DataFrame, df_simbad: pd.DataFrame
+) -> pd.DataFrame:
+    logger.info("Merging SIMBAD columns into main DataFrame (left join)  ...")
+    df_merged = pd.merge(
+        df, df_simbad, on=ds.CombinedCatalogueSchema.ID_x, how='left'
+    )
+
+    # Fill empty fields in SIMBAD columns with 'NA'
+    simbad_columns = [
+        ds.SimbadSchema.SIMBAD_ID,
+        ds.SimbadSchema.SIMBAD_MAIN_TYPE,
+        ds.SimbadSchema.SIMBAD_OTYPES,
+        ds.SimbadSchema.SIMBAD_OTYPE
+    ]
+
+    logger.info(
+        f"Filling missing SIMBAD columns {simbad_columns} with 'NA' ..."
+    )
+
+    for col in simbad_columns:
+        df_merged[col] = df_merged[col].fillna('NA')
+
+    return df_merged
+
+
 def _clean_df_simbad_main_type(
         df: pd.DataFrame
 ) -> pd.DataFrame:
@@ -73,9 +99,7 @@ def _clean_df_simbad_main_type(
     return df[_filter]
 
 
-def _clean_df_simbad_secondary_types(
-        df: pd.DataFrame, verbose: bool = False
-) -> pd.DataFrame:
+def _clean_df_simbad_secondary_types(df: pd.DataFrame) -> pd.DataFrame:
     """
     Clean the catalogue based on secondary types of the sources in the input
     DataFrame.
@@ -103,12 +127,10 @@ def _clean_df_simbad_secondary_types(
             )
         )
 
-    logger.log(
+    logger.info(
         f"{df.shape[0] - _filter.sum()} rows removed based on their "
         "secondary types.\n"
     )
-
-    logger.end()
 
     return df[_filter]
 
@@ -163,10 +185,7 @@ def clean(
     df = pd.read_csv(in_file)
     df_simbad = pd.read_csv(in_file_simbad)
 
-    df = pd.merge(
-        df, df_simbad, on=ds.CombinedCatalogueSchema.ID_x, how='left'
-    )
-
+    df = _merge_to_main_df(df, df_simbad)
     df = _clean_df_simbad_main_type(df)
     df = _clean_df_simbad_secondary_types(df)
     df = _clean_df_simbad_name(df)
