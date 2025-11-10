@@ -152,6 +152,11 @@ def _clean_df_simbad_name(
     return df[_filter]
 
 
+def _save_to_file(df: pd.DataFrame, file_path: Path) -> None:
+    df.to_csv(file_path, index=False)
+    logger.info(f"Saved DataFrame to {file_path}")
+
+
 def clean(
         in_file: Path, in_file_simbad: Path, out_file: Path
 ) -> pd.DataFrame:
@@ -166,7 +171,7 @@ def clean(
     df = _clean_df_simbad_secondary_types(df)
     df = _clean_df_simbad_name(df)
 
-    df.to_csv(out_file, index=False)
-    logger.info(f"Cleaned catalogue saved to {out_file}")
+    if out_file is not None:
+        _save_to_file(df, out_file)
 
     return df
