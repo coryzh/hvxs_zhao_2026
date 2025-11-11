@@ -46,6 +46,13 @@ def _merge_to_main_df(
     logger.info(
         f"Merging neighbour counts to main dataframe: {df.shape[0]} sources..."
     )
+
+    # Note: This step does not impute missing values for n_neighbours, so
+    # sources whose Gaia match is beyond <radius> will have NaN counts.
+    # The further cleaning will remove these sources as well.
+    # Implicitly, this script removes sources whose Gaia matches are beyond
+    # <radius> or have more than threshold number of neighbours within
+    # <radius>.
     df_merged = pd.merge(
         df, df_count, how="left", on=ds.CombinedCatalogueSchema.ID_x
     )
