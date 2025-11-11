@@ -9,7 +9,7 @@ configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 logger = logging.getLogger(Path(__file__).stem)
 
 
-def _clean(
+def clean(
         df: pd.DataFrame, pos_x_err_thresh: float = 10.0, out_file: Path = None
 ) -> pd.DataFrame:
     logger.info(f"Catalogue loaded: {df.shape[0]} sources.")
@@ -20,7 +20,7 @@ def _clean(
     n_removed = (~_filter).sum()
     logger.info(
         f"Catalogue cleaned: removed {n_removed} sources with "
-        f"pos_x_err < {pos_x_err_thresh} arcsec."
+        f"pos_x_err >= {pos_x_err_thresh} arcsec."
         f" Remaining sources: {df.shape[0]}."
     )
 
