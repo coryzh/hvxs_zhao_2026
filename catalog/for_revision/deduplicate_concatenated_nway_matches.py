@@ -156,7 +156,7 @@ if __name__ == "__main__":
     df_deduplicated, df_dropped = deduplicate_concatenated_nway_matches(df)
 
     output_dir = (
-        config.RESULTS_CATALOGUE_DIR / "nway_matched_results"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "nway_matched_results"
     )
 
     _save_to_files(out_root=output_dir)
