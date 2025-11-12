@@ -97,7 +97,7 @@ def _load_df(
     elif option == "nway":
         file_path = (
             file_root / "nway_matched_results"
-            / "xray_catalogue_concatenated_deduplicated.csv"
+            / "xray_catalogue_concatenated_further_cleaned.csv"
         )
     else:
         raise ValueError(f"Unknown option: {option}")

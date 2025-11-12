@@ -3,12 +3,12 @@ from typing import Union
 
 FloatOrVector = Union[float, np.ndarray]
 
-s_b_f = 1.24e-14
-s_b_b = 4.09e-14
-gamma_b = 2.69
-gamma_i = 2.40
-gamma_f = 0.96
-K = 60.2
+s_b_f = 2.42e-14
+s_b_b = 0.80e-14
+gamma_b = 2.44
+gamma_i = 2.10
+gamma_f = 1.61
+K = 46.0
 
 
 def density_agn(s: FloatOrVector) -> FloatOrVector:
