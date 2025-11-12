@@ -187,7 +187,7 @@ if __name__ == "__main__":
     df = load_nway_fits_table(in_file_path)
 
     df = _rename_columns(df, args.survey_name)
-
+    print(f"Filtering for {args.p_single_lim=}, {args.p_any_lim=}")
     df = clean_nway_catalogue(
         df,
         p_single_lim=args.p_single_lim,

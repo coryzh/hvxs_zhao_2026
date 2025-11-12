@@ -11,7 +11,5 @@ for survey in "${SURVEYS[@]}"; do
     FILE_OUT="${FILE_IN%.*}_clean.csv"
 
     # Run the command
-    python3 clean_nway_catalogue.py "$FILE_IN" \
-        "$survey" \
-        "$FILE_OUT"
+    python3 clean_nway_catalogue.py "$FILE_IN" "$survey" "$FILE_OUT" --p_single_lim 0.90 --p_any_lim 0.90
 done
