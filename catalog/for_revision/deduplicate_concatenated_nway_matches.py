@@ -13,7 +13,7 @@ configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 
 def _load_catalogue() -> pd.DataFrame:
     file_path = (
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "nway_matched_results"
         / "xray_catalogue_concatenated.csv"
     )
