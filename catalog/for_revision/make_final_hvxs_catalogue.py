@@ -3,18 +3,21 @@ from catalog.for_revision import (
     clean_simbad_types, clean_cluster_members, clean_smc_and_lmc_members,
     clean_gaia_fedility
 )
+from typing import Literal
 
 
-def run_subsequent_cleaning() -> None:
+def run_subsequent_cleaning(
+        opt: Literal["hvxs", "control", "gold"]
+) -> None:
     in_file = (
         config.RESULTS_CATALOGUES_FOR_REVISION
-        / "hvxs_catalogue_vpecmin_lo_gt_200.csv"
+        / f"{opt}.csv"
     )
 
     in_file_simbad = (
         config.RESULTS_CATALOGUES_FOR_REVISION
         / "simbad"
-        / "hvxs_simbad.csv"
+        / f"{opt}_simbad.csv"
     )
 
     df = clean_simbad_types.clean(
