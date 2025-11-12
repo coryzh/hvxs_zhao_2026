@@ -34,7 +34,7 @@ def run_cleaning_pipeline() -> None:
     # Step 2: Decrowd the concatenated NWAY catalogue
     df = decrowding_concatenated_nway_catalogue.clean(
         df=df,
-        radius=3.0,
+        radius=2.0,
         n_neighbours_thresh=1,
         out_file=None
     )
