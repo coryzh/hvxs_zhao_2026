@@ -18,7 +18,7 @@ def _load_catalogue(survey_name: str) -> pd.DataFrame:
         )
 
     file_path = (
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "nway_matched_results"
         / f"{survey_name}_gaia_nway_match_clean.csv"
     )
