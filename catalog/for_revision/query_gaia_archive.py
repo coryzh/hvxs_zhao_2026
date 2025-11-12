@@ -166,7 +166,7 @@ if __name__ == "__main__":
             table_path=(
                 config.RESULTS_CATALOGUES_FOR_REVISION
                 / "nway_matched_results"
-                / "xray_catalogue_concatenated_deduplicated.csv"
+                / "xray_catalogue_concatenated_further_cleaned.csv"
             ),
             table_name=table_name
         )
