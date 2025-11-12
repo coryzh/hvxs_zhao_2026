@@ -96,7 +96,7 @@ def make_catalogue(
 
     output_path = (
         config.RESULTS_CATALOGUES_FOR_REVISION
-        / f"hvxs_catalogue_vpecmin{vpec_min_lim_opt}_gt_{vpec_min_lim}.csv"
+        / f"hvxs_catalogue_vpecmin_{vpec_min_lim_opt}_gt_{vpec_min_lim}.csv"
     )
     _save_to_file(df, output_path)
 
