@@ -21,7 +21,7 @@ def _get_file_paths(
         "base": config.RESULTS_CATALOGUES_FOR_REVISION / opt / f"{opt}.csv",
         "simbad": (
             config.RESULTS_CATALOGUES_FOR_REVISION
-            / "simbad" / f"{opt}_simbad.csv"
+            / "simbad" / "simbad.csv"
         ),
         "ready": (
             config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
