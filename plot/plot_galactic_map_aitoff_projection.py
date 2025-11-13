@@ -50,7 +50,7 @@ def calc_galactic_coordinates(
 
 def add_control(ax: plt.Axes) -> None:
     df_all = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "ready_catalogues" / "control.csv"
     )
     # _filter = df_all["dist_med"] < 1.5
@@ -78,7 +78,7 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes) -> None:
 
 def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
-        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
         / "gold.csv"
     )
     df = pd.read_csv(in_file_gold)
@@ -99,7 +99,7 @@ def add_gold(ax: plt.Axes) -> Any:
 def make_galactic_map() -> None:
     fig, ax = setup_axes()
     in_file = (
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "ready_catalogues"
         / "hvxs.csv"
     )
