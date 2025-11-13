@@ -4,7 +4,10 @@ import data_schema as ds
 from pathlib import Path
 from log.loggers import VerboseLogger
 
-extragalactic_patterns = ["Galaxy", "AGN", "Seyfert", "BLLac", "Blazar", "LINER", "LensedG", "ULX", "EmissionG"]
+extragalactic_patterns = [
+    "Galaxy", "AGN", "AGN_Candidate", "Seyfert",
+    "BLLac", "Blazar", "LINER", "LensedG", "ULX", "EmissionG"
+]
 xrb_patterns = "XBin"
 regex = "|".join(extragalactic_patterns)
 
@@ -15,7 +18,7 @@ def count_simbad_types(in_file: Path, verbose: bool = False) -> None:
     logger.log(f"Loading catalogue at {in_file} ...\n")
     df = pd.read_csv(in_file)
 
-    logger.log(f"Counting SIMBAD types ... \n")
+    logger.log("Counting SIMBAD types ... \n")
     type_counts = df.value_counts(subset=ds.SimbadSchema.SIMBAD_MAIN_TYPE)
     total_simbad_match = type_counts.sum()
     df_type_counts = type_counts.to_frame().reset_index()
@@ -40,7 +43,10 @@ def count_simbad_types(in_file: Path, verbose: bool = False) -> None:
 
 
 def main() -> None:
-    in_file = config.RESULTS_CATALOGUE_DIR / "high-v_sources" / "combined_vpec_lolim_gt_150_unique_stage_1.csv"
+    in_file = (
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "simbad" / "hvxs_simbad.csv"
+    )
     count_simbad_types(in_file, verbose=True)
 
 
