@@ -7,6 +7,8 @@ from constants import gal_cen
 from utils.utility_functions import get_errors
 import logging
 from log.log_config import configure_logging
+from computation.calc_v_min import imputation_bailer_jones
+
 
 configure_logging(level=logging.INFO, app_name=Path(__file__).stem)
 logger = logging.getLogger(Path(__file__).stem)
@@ -14,6 +16,14 @@ logger = logging.getLogger(Path(__file__).stem)
 
 def transform_distance_columns(df: pd.DataFrame) -> pd.DataFrame:
     logger.info(f"Got catalogue shape: {df.shape}")
+
+    # Check if all sources have valid r_med_photogeo
+    if df["r_med_photogeo"].isna().any():
+        logger.info(
+            "Some sources have NaN in 'r_med_photogeo'. "
+            "Imputing distances using Bailer-Jones method ..."
+        )
+        df = imputation_bailer_jones(df)
 
     logger.info("Adding distance error columns...")
     dist_lo_err = df["r_med_photogeo"] - df["r_lo_photogeo"]
@@ -66,7 +76,9 @@ def add_cartesian_coordinates(df: pd.DataFrame) -> pd.DataFrame:
             x_hi=row['dist_med'] + row['E_dist']
         )
         d_gamma = dist.fit_gamma()["distribution"]
+
         d_rand = d_gamma.rvs(1000)
+
         coords = SkyCoord(
             row['ra_gaia'] * u.deg, row['dec_gaia'] * u.deg,
             distance=d_rand * u.kpc,
