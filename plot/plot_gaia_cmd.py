@@ -49,7 +49,7 @@ def axes_settings(ax: plt.Axes) -> None:
 
 def add_gold(ax: plt.Axes) -> Any:
     in_file_gold = (
-        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
         / "gold.csv"
     )
     df = pd.read_csv(in_file_gold)
@@ -140,7 +140,7 @@ def add_hvxs(in_file: Path, ax: plt.Axes) -> cm.ScalarMappable:
 
 def add_background(ax: plt.Axes, fig: plt.Figure) -> None:
     df_all = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "control_sample"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
         / "control_sample_stage_10.csv"
     )
 
@@ -188,7 +188,7 @@ def add_cbar(ax: plt.Axes, fig: plt.Figure, sm: cm.ScalarMappable) -> None:
 def make_cmd(in_file: Path) -> None:
     fig, ax = make_figure(use_nearby_star_cmd=False)
     df_control = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "ready_catalogues"
         / "control.csv"
     )
@@ -216,7 +216,7 @@ def make_cmd(in_file: Path) -> None:
 
 def main() -> None:
     in_file = (
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "ready_catalogues"
         / "hvxs.csv"
     )
