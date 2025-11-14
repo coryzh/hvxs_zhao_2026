@@ -53,6 +53,7 @@ def add_gold(ax: plt.Axes) -> Any:
         / "gold.csv"
     )
     df = pd.read_csv(in_file_gold)
+    df = df.sort_values(by="ra_x", ascending=True).reset_index(drop=True)
     df = preprocessing(df)
     # Dropping rows could mess up the indices,
     # so some future updates is needed to make the script more stable against
@@ -71,16 +72,19 @@ def add_gold(ax: plt.Axes) -> Any:
         - 5.0 * np.log10(dist) - 10.0
     )
 
-    marker_styles = ps.generate_marker_styles(df.shape[0])
+    marker_styles = ps.GOLD_SOURCE_SCATTER_SETTINGS_LIST
 
     for i, row in df.iterrows():
         name = row["ID_x"]
         name_short = get_short_id(name)
 
-        ax.plot(
-            bp_rp[i], g_abs[i], mec="k", ms=12, ls="none", label=name_short,
-            **marker_styles[i]
+        ax.scatter(
+            bp_rp[i], g_abs[i], label=name_short, **marker_styles[i]
         )
+        # ax.plot(
+        #     bp_rp[i], g_abs[i], mec="k", ms=12, ls="none", label=name_short,
+        #     **marker_styles[i]
+        # )
     handles, labels = ax.get_legend_handles_labels()
     return handles, labels
 
@@ -206,7 +210,8 @@ def make_cmd(in_file: Path) -> None:
     )
 
     legend = plt.legend(
-        handles, labels, loc="center left", bbox_to_anchor=[1.0, 0.5]
+        handles, labels, loc="upper left", bbox_to_anchor=[0.7, 1.0],
+        fontsize=14
     )
     for handle in legend.legend_handles:
         handle.set_alpha(1.0)
