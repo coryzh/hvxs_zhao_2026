@@ -75,12 +75,21 @@ def _render_query_str(
         query = (
             "SELECT u.ID_x, u.source_id, dr3.mh_gspphot, \n"
             "dr3.mh_gspphot_lower, dr3.mh_gspphot_upper, \n"
-            "dr3.ag_gspphot, dr3.ebpminrp_gspphot \n"
+            "dr3.ag_gspphot, dr3.ebpminrp_gspphot, \n"
+            "dr3.teff_gspphot, dr3.teff_gspphot_lower, \n"
+            "dr3.teff_gspphot_upper, dr3.logg_gspphot, \n"
+            "dr3.logg_gspphot_lower, dr3.logg_gspphot_upper, \n"
+            "dr3.azero_gspphot, dr3.azero_gspphot_lower, \n"
+            "dr3.azero_gspphot_upper, \n"
+            "dr3.libname_gspphot, apparams.mg_gspphot, \n"
+            "apparams.mg_gspphot_lower, apparams.mg_gspphot_upper \n"
             f"FROM {user_table_name} AS u \n"
             "JOIN gaiadr3.gaia_source AS dr3 \n"
             "  ON u.source_id = dr3.source_id \n"
             "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
             "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+            "LEFT JOIN gaiadr3.astrophysical_parameters AS apparams \n"
+            "  ON u.source_id = apparams.source_id \n"
         )
 
     else:
