@@ -35,7 +35,7 @@ def axes_settings(ax: plt.Axes) -> None:
 
 def add_control(ax: plt.axes) -> None:
     df_control = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "ready_catalogues" / "control.csv"
     )
 
@@ -57,10 +57,12 @@ def add_hvxs(df: pd.DataFrame, ax: plt.Axes) -> None:
 
 
 def add_gold(df: pd.DataFrame, ax: plt.Axes) -> Any:
-    df = df.sort_values(by="ra_x", ascending=True)
+    df = df.sort_values(by="ra_x", ascending=True).reset_index(drop=True)
     marker_styles = ps.generate_marker_styles(
         df.shape[0], generate_for="scatter"
     )
+
+    marker_styles = ps.GOLD_SOURCE_SCATTER_SETTINGS_LIST
 
     for i, row in df.iterrows():
         x = row["bp_rp"]
@@ -68,7 +70,7 @@ def add_gold(df: pd.DataFrame, ax: plt.Axes) -> Any:
         name = get_short_id(row["ID_x"])
 
         ax.scatter(
-            x, y, label=name, zorder=2, s=150, ec="k", **marker_styles[i]
+            x, y, label=name, **marker_styles[i]
         )
 
     handles, labels = ax.get_legend_handles_labels()
@@ -98,12 +100,12 @@ def main() -> None:
     fig, ax = make_figure()
 
     df_hvxs = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
         / "hvxs.csv"
     )
 
     df_gold = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
         / "gold.csv"
     )
 

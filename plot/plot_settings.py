@@ -90,16 +90,22 @@ SCATTER_DICT_GALACTIC_MAP_ALL = {
 }
 
 HEX_COLORS = [
-    '#2F26D7', '#A344AD', '#72C3DC', '#84E296', '#FFD166', '#D72638'
+    '#2F26D7', '#A344AD', '#72C3DC', '#84E296', '#FFD166',
+    '#D72638', '#F46036'
 ]
 
 CMAP = LinearSegmentedColormap.from_list(' ', HEX_COLORS)
 
-PRIME_SOURCE_MARKER = ["o", "s", "D", "H", "X"]
+PRIME_SOURCE_MARKER = ['o', 's', 'D', 'P', 'X', 'p', 'H']
 
 PRIME_SOURCE_COLOR = sns.color_palette("deep", 8)
 
 PRIME_SCATTER_MARKER_SETTINGS = {"s": 160, "ec": "k", "zorder": 5, "lw": 2}
+
+GOLD_SOURCE_SCATTER_SETTINGS_LIST = [
+        {'s': 150, 'ec': 'k', 'marker': marker, 'fc': fc, 'zorder': 4}
+        for marker, fc in zip(PRIME_SOURCE_MARKER, HEX_COLORS)
+]
 
 
 def generate_marker_styles(n, generate_for: str = "plot"):
@@ -133,7 +139,7 @@ def generate_marker_styles(n, generate_for: str = "plot"):
     # sometimes confused with upper/lower limits.
     marker_styles = [
         'o', 's', 'D', 'P',
-        'X'
+        'X', 'p', 'H'
     ]
     color_palette = sns.color_palette("hls", 4)
 
