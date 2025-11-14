@@ -77,13 +77,13 @@ def add_data(axs: Dict[str, plt.Axes]) -> None:
     )
 
     df_hvx = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_lolim_gt_200_unique_stage_9.csv"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "ready_catalogues" / "hvxs.csv"
     )
 
     df_control = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR
-        / "control_sample" / "control_sample_stage_10.csv"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "ready_catalogues" / "control.csv"
     )
 
     print("Catalogues loaded!")
