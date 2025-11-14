@@ -5,7 +5,7 @@ import astropy.units as u
 from astropy.coordinates import SkyCoord
 from typing import Tuple, Any
 from plot_settings import (
-    SCATTER_DICT_GALACTIC_MAP, generate_marker_styles
+    SCATTER_DICT_GALACTIC_MAP, GOLD_SOURCE_SCATTER_SETTINGS_LIST
 )
 import config
 from utils import process_string
@@ -82,14 +82,15 @@ def add_gold(ax: plt.Axes) -> Any:
         / "gold.csv"
     )
     df = pd.read_csv(in_file_gold)
-    marker_styles = generate_marker_styles(df.shape[0], generate_for="scatter")
+    df = df.sort_values(by="ra_x", ascending=True).reset_index(drop=True)
+    marker_styles = GOLD_SOURCE_SCATTER_SETTINGS_LIST
 
     l, b = calc_galactic_coordinates(df)
     for i, row in df.iterrows():
         name = process_string.get_short_id(row["ID_x"])
         print(i, name, l[i], b[i])
         ax.scatter(
-            l[i], b[i], label=rf'{name}', zorder=2, lw=2, s=160, ec="k",
+            l[i], b[i], label=rf'{name}', lw=2,
             **marker_styles[i]
         )
     handles, labels = ax.get_legend_handles_labels()
