@@ -76,6 +76,7 @@ def add_scatter(
 
 def add_hist(df: pd.DataFrame, axs: List[plt.Axes], **kwargs_hist) -> None:
 
+    print(f"{df.shape[0]} sources loaded.")
     x = df["mh_gspphot"].values
     y = np.abs(df["z_med"].values)
 
@@ -130,11 +131,13 @@ def add_legend(fig: plt.figure, gs: GridSpec) -> None:
 
 def main() -> None:
     in_file_control = (
-        config.RESULTS_CATALOGUE_DIR / "ready_catalogues" / "control_c.csv"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "ready_catalogues" / "control.csv"
     )
 
     in_file_hvxs = (
-        config.RESULTS_CATALOGUE_DIR / "ready_catalogues" / "hvxs.csv"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "ready_catalogues" / "hvxs.csv"
     )
 
     in_file_cob = (
