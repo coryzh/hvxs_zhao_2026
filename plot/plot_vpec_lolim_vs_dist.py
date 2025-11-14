@@ -82,17 +82,17 @@ def axes_settings(ax_dict: dict) -> None:
 
 
 def add_prime_sources(df_prime: pd.DataFrame, axs: dict[plt.Axes]) -> Any:
-    marker_styles = ps.generate_marker_styles(
-        df_prime.shape[0], generate_for="scatter"
+    df_prime = df_prime.sort_values(by="ra_x", ascending=True).reset_index(
+        drop=True
     )
+    marker_styles = ps.GOLD_SOURCE_SCATTER_SETTINGS_LIST
     for i, row in df_prime.iterrows():
         x_left = row["dist_med"]
         y_left = row["vpec_min_med"] - row["e_vpec_min"]
         # x_err_left = [[row["e_dist"]], [row["E_dist"]]]
         name = get_short_id(row["ID_x"])
         axs["main"].scatter(
-            x_left, y_left, label=name, s=100, ec="k", zorder=2,
-            **marker_styles[i]
+            x_left, y_left, label=name, **marker_styles[i]
         )
 
         # axs["main"].errorbar(
@@ -107,8 +107,7 @@ def add_prime_sources(df_prime: pd.DataFrame, axs: dict[plt.Axes]) -> Any:
         ).to(Unit("AU"))
 
         axs["right"].scatter(
-            x_right, y_left, label=name, s=100, ec="k", zorder=2,
-            **marker_styles[i]
+            x_right, y_left, label=name, **marker_styles[i]
         )
 
     handles, labels = axs["main"].get_legend_handles_labels()
@@ -269,7 +268,7 @@ def add_legend(axs: dict[plt.Axes], handles: list, labels: list) -> None:
     labels.insert(0, labels_HVXS)
 
     axs["cbar"].legend(
-        handles, labels, loc="upper left", bbox_to_anchor=(0, 1.0),
+        handles, labels, loc="upper left", bbox_to_anchor=(0, 0.92),
         ncols=3, handletextpad=0.01, columnspacing=0.6, borderaxespad=0.0,
         fontsize=20, frameon=False
     )
@@ -277,17 +276,17 @@ def add_legend(axs: dict[plt.Axes], handles: list, labels: list) -> None:
 
 def make_plot() -> None:
     in_file = (
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "ready_catalogues"
         / "hvxs.csv"
     )
     df_hvxs = pd.read_csv(in_file)
     df_gold = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "ready_catalogues"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
         / "gold.csv"
     )
     df_control = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR
+        config.RESULTS_CATALOGUES_FOR_REVISION
         / "ready_catalogues" / "control.csv"
     )
 

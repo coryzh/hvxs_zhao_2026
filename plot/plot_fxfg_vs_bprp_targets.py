@@ -91,8 +91,8 @@ def add_legend(handles, labels) -> None:
     handles[0] = handle_HVXS
 
     plt.legend(
-        handles, labels, loc="upper left", bbox_to_anchor=(1.0, 1.0),
-        borderaxespad=0.0
+        handles, labels, loc="upper left", bbox_to_anchor=(0.03, 0.97),
+        borderaxespad=0.0, fontsize=16
     )
 
 
