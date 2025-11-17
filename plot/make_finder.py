@@ -67,7 +67,7 @@ def make_figure() -> Tuple[plt.Figure, List[plt.Axes]]:
     axs = []
 
     df = pd.read_csv(
-        config.RESULTS_CATALOGUE_DIR / "prime_sample"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
         / "gold_sample_150525_curated_sorted_by_ra.csv"
     )
 
