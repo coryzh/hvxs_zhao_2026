@@ -125,6 +125,7 @@ def clean_nway_catalogue(
         ds.CombinedCatalogueSchema.sep_x_g,
         ds.NWAYSchema.p_any,
         ds.NWAYSchema.p_single,
+        ds.NWAYSchema.p_i,
         ds.NWAYSchema.match_flag,
     ]
 
