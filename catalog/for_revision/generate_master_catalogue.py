@@ -113,6 +113,10 @@ def _load_df(
         cols_to_keep = [
             ds.CombinedCatalogueSchema.ID_x,
             ds.CombinedCatalogueSchema.source_id,
+            ds.NWAYSchema.p_any,
+            ds.NWAYSchema.p_single,
+            ds.NWAYSchema.match_flag,
+            ds.NWAYSchema.p_i,
             "sep_x_g",
             "sep_x_g_sigma"
         ]
