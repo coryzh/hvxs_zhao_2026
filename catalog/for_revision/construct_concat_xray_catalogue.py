@@ -37,7 +37,9 @@ def construct_concat_xray_catalogue() -> pd.DataFrame:
         ds.CombinedCatalogueSchema.ID_x, ds.CombinedCatalogueSchema.source_id,
         ds.CombinedCatalogueSchema.ra_x, ds.CombinedCatalogueSchema.dec_x,
         ds.CombinedCatalogueSchema.pos_x_err,
-        ds.CombinedCatalogueSchema.sep_x_g
+        ds.CombinedCatalogueSchema.sep_x_g,
+        ds.NWAYSchema.p_any, ds.NWAYSchema.p_single,
+        ds.NWAYSchema.match_flag, ds.NWAYSchema.p_i
     ]
     summed_rows = 0
     for survey_name in config.SURVEY_NAMES_SHORT:
