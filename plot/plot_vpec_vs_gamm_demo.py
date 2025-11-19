@@ -12,13 +12,13 @@ def axes_settings(ax: plt.Axes) -> None:
     ax.set_xlabel(r"$\gamma\,(\mathrm{km~s^{-1}})$")
     ax.set_ylabel(r"$v_\mathrm{pec}\,(\mathrm{km~s^{-1}})$")
     ax.set_xlim(-500, 500)
-    ax.set_ylim(None, 900)
+    ax.set_ylim(None, 800)
 
 
 def get_vpec(source_id: int, n_sim: int = 1000) -> dict:
     in_file = (
-        config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_med_gt_0_unique_stage_0.csv"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "ready_catalogues" / "hvxs.csv"
     )
 
     df = pd.read_csv(in_file, index_col="source_id")
@@ -95,14 +95,14 @@ def make_figure(source_id: int, n_sim: int = 1000) -> None:
     ax.plot(x_min, y1_min, "ro", ms=14, mec="k", mew=1.5)
     ax.plot(x_min, min(y), marker="s", mfc="w", ms=14, mec="k", mew=1.5)
 
+    axes_settings(ax)
+
     id_x = wrap_sign(vpec_dict["id_x"])
     ax.text(
-        0.05, 0.85, s=f"X-ray ID: {id_x}\nGaia: {source_id}",
+        0.20, 0.85, s=f"{id_x}\nGaia DR3 {source_id}",
         transform=ax.transAxes, ha="left",
         va="bottom", fontsize=24
     )
-
-    axes_settings(ax)
 
     plt.savefig(
         config.RESULTS_FIGURES_DIR / "vpec_vs_gamma"
@@ -111,7 +111,7 @@ def make_figure(source_id: int, n_sim: int = 1000) -> None:
 
 
 def main() -> None:
-    make_figure(source_id=4787135780363189504)
+    make_figure(source_id=5044582098679935360)
 
 
 if __name__ == "__main__":
