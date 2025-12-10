@@ -471,9 +471,9 @@ def main(
 ) -> None:
     df = pd.read_csv(in_cat_path)
     df = imputation_bailer_jones(df)
-    df_sub = df.iloc[0:20]
+    # df_sub = df.iloc[0:20]
     run_computation(
-        df_sub, out_file=out_file, method=method, survey_name=survey_name,
+        df, out_file=out_file, method=method, survey_name=survey_name,
         batch_size=batch_size
     )
 
