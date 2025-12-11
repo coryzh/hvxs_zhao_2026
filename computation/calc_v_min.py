@@ -218,8 +218,12 @@ def cartesian_peculiar_velocity_components(ra, dec, pmra, pmdec, dist, v_r):
     specific velocities. pmra is the proper motion in the direction of ra
     including the cosdec factor.
     """
-
+    conv = (3.14 / 180.)
     l, b = convert_to_galactic(ra, dec)
+
+    l *= conv  # convert to radian
+    b *= conv
+
     U_2, V_2, W_2, _v_space = galactocentric_cartesian_velocity(
         ra, dec, pmra, pmdec, dist, v_r
     )
