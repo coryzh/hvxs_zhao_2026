@@ -456,26 +456,30 @@ def run_computation(
     ]
 
     # Process rows in parallel using multiprocessing
+    buffer = []
     with Pool(processes=n_workers) as pool:
-        results = list(
-            tqdm(
+        for res in tqdm(
                 pool.imap(process_single_source, task_args),
                 total=len(task_args),
                 desc="Processing sources"
-            )
-        )
-        # pool.map(process_single_source, task_args)
+        ):
+            buffer.append(res)
+            if len(buffer) >= batch_size:
+                pd.DataFrame(
+                    buffer, columns=cols
+                ).to_csv(out_file, mode="a", index=False, header=False)
+                buffer.clear()
 
-    # Write results in batches
-    for i in range(0, len(results), batch_size):
-        batch_results = results[i:i + batch_size]
-        batch_df = pd.DataFrame(batch_results, columns=cols)
-        batch_df.to_csv(out_file, mode="a", index=False, header=False)
+    if len(buffer) > 0:  # Flush the remainder rows
+        pd.DataFrame(buffer, columns=cols).to_csv(
+            out_file, mode="a", index=False, header=False
+        )
 
 
 def main(
         in_cat_path: Path, out_file: Path, survey_name: str = "concat",
-        batch_size: int = 10, method: str = "scipy", verbose: bool = True
+        batch_size: int = 10, method: str = "scipy", verbose: bool = True,
+        n_workers: int = 4
 ) -> None:
     df = pd.read_csv(in_cat_path)
     df = imputation_bailer_jones(df)
@@ -485,7 +489,7 @@ def main(
 
     run_computation(
         df, out_file=out_file, method=method, survey_name=survey_name,
-        batch_size=batch_size
+        batch_size=batch_size, n_workers=n_workers
     )
 
 
@@ -522,7 +526,10 @@ if __name__ == "__main__":
         "--verbose", type=bool, default=True,
         help="Whether to print verbose output (default: True)."
     )
-
+    parser.add_argument(
+        "--n_workers", type=int, default=4,
+        help="Number of worker processes for parallel processing (default: 4)."
+    )
     args = parser.parse_args()
 
     main(
@@ -530,5 +537,7 @@ if __name__ == "__main__":
         out_file=Path(args.out_file),
         survey_name=args.survey_name,
         batch_size=args.batch_size,
-        method=args.method
+        method=args.method,
+        verbose=args.verbose,
+        n_workers=args.n_workers
     )
