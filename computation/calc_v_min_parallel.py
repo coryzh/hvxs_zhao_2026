@@ -15,9 +15,10 @@ from numba import jit
 from utils.utility_functions import get_errors
 from pathlib import Path
 from multiprocessing import Pool
+from tqdm import tqdm
 
 # Rotation velocity curve. Gridded values used for numpy.interp
-print("Initializing ...\n")
+print("Initialising ...\n")
 
 print(
     "1. Importing Galactic potential and performing pre-computation of "
@@ -442,7 +443,14 @@ def run_computation(
 
     # Process rows in parallel using multiprocessing
     with Pool(processes=n_workers) as pool:
-        results = pool.map(process_single_source, task_args)
+        results = list(
+            tqdm(
+                pool.imap(process_single_source, task_args),
+                total=len(task_args),
+                desc="Processing sources"
+            )
+        )
+        # pool.map(process_single_source, task_args)
 
     # Write results in batches
     for i in range(0, len(results), batch_size):
