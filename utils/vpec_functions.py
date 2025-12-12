@@ -121,7 +121,6 @@ def galactocentric_cartesian_velocity(ra: FloatOrIterable, dec: FloatOrIterable,
 
     # PMs in Galactic coordinate
     mu_l, mu_b = galactic_proper_motion(ra, dec, pmra, pmdec, dt=0.1)
-
     # Physical velocities
     v_b = D_cgs * (mu_b / conv1) * conv * (1e-5 / con.yr)  # in km/s
     v_l = D_cgs * (mu_l / conv1) * np.cos(b) * conv * (1e-5 / con.yr)  # in km/s
@@ -164,8 +163,12 @@ def cartesian_peculiar_velocity_components(ra: FloatOrIterable, dec: FloatOrIter
     np.random.seed(random_seed)
 
     l, b = convert_to_galactic(ra, dec)
+    conv = (con.pi / 180)
+    b *= conv  # convert to radian
+    l *= conv
+
     U_2, V_2, W_2, _v_space = galactocentric_cartesian_velocity(ra, dec, pmra, pmdec, dist, v_r,
-                                                                U_sun, V_sun, W_sun, Theta_0, R_0)
+                                                                U_sun, V_sun, W_sun, Theta_0, R_0, print_results=print_results)
     # R_p: Galactocentric distance to the source projected onto the Galactic plane
     D_p = dist * np.cos(b)
     R_p = np.sqrt(R_0 ** 2 + D_p ** 2 - 2 * R_0 * D_p * np.cos(l))
