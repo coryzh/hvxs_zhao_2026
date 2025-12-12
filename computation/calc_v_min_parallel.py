@@ -18,18 +18,14 @@ from multiprocessing import Pool
 from tqdm import tqdm
 
 # Rotation velocity curve. Gridded values used for numpy.interp
-print("Initialising ...\n")
-
-print(
-    "1. Importing Galactic potential and performing pre-computation of "
-    "Galactic rotation curve ...\n"
-)
-
-r_grid = np.arange(0, 150, 0.01)
+r_rot_low = 0.0
+r_rot_high = 150.0
+r_rot_step = 0.01
+r_grid = np.arange(r_rot_low, r_rot_high, r_rot_step)
 v_rot_val = v_rot(r_grid)
 
 # Constants
-print("2. Importing Galactic and solar constants ...\n")
+
 U_sun = con.U_sun
 V_sun = con.V_sun
 W_sun = con.W_sun
@@ -43,11 +39,29 @@ id_x_dict = {
 }
 
 # Random state
-print("3. Setting random state ...\n")
 random_seed: int = 114514
 np.random.seed(random_seed)
 
-print("Beginning computation ...\n")
+
+def initialise_comments():
+    print("Initialising ...\n")
+
+    print(
+        "1. Importing Galactic potential and performing pre-computation of "
+        "Galactic rotation curve ...\n"
+        f"Using rotation curve grid from {r_rot_low} to {r_rot_high} "
+        f"with step {r_rot_step} kpc"
+    )
+
+    print(
+        "2. Imported Galactic and solar constants:\n"
+        f"R_0 = {R_0} kpc, Theta_0 = {Theta_0} km/s\n"
+        f"(U_sun, V_sun, W_sun) = ({U_sun}, {V_sun}, {W_sun}) km/s\n"
+    )
+
+    print(f"3. Setting random state to {random_seed} ...\n")
+
+    print("Beginning computation ...\n")
 
 
 def imputation_bailer_jones(df: pd.DataFrame) -> pd.DataFrame:
@@ -461,10 +475,13 @@ def run_computation(
 
 def main(
         in_cat_path: Path, out_file: Path, survey_name: str = "concat",
-        batch_size: int = 10, method: str = "scipy"
+        batch_size: int = 10, method: str = "scipy", verbose: bool = True
 ) -> None:
     df = pd.read_csv(in_cat_path)
     df = imputation_bailer_jones(df)
+
+    if verbose:
+        initialise_comments()
 
     run_computation(
         df, out_file=out_file, method=method, survey_name=survey_name,
@@ -500,6 +517,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--method", type=str, default="scipy",
         help="Method for minimization: 'scipy' or 'numpy' (default: scipy)."
+    )
+    parser.add_argument(
+        "--verbose", type=bool, default=True,
+        help="Whether to print verbose output (default: True)."
     )
 
     args = parser.parse_args()
