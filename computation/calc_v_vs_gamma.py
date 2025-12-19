@@ -7,13 +7,10 @@ from pathlib import Path
 from argparse import ArgumentParser
 
 
-def get_vpec(source_id: int, out_dir: Path, n_sim: int = 1000) -> dict:
-    in_file = (
-        config.RESULTS_CATALOGUE_DIR
-        / "high-v_sources" / "combined_vpec_med_gt_0_unique_stage_0.csv"
-    )
-
-    df = pd.read_csv(in_file, index_col="source_id")
+def get_vpec(
+        catalog_path: Path, source_id: int, out_dir: Path, n_sim: int = 1000
+) -> dict:
+    df = pd.read_csv(catalog_path, index_col="source_id")
     df = df.rename(columns={"ra_gaia": "ra", "dec_gaia": "dec"})
     row = df.loc[source_id]
 
@@ -21,9 +18,9 @@ def get_vpec(source_id: int, out_dir: Path, n_sim: int = 1000) -> dict:
     pm_colnames = ["pmra", "pmdec"]
 
     arg_dict = {}
-    d_med = row["dist_med"]
-    d_hi = d_med + row["E_dist"]
-    d_lo = d_med - row["e_dist"]
+    d_med = row["r_med_photogeo"]
+    d_hi = row["r_hi_photogeo"]
+    d_lo = row["r_lo_photogeo"]
     dist = FromLiterature(x_est=d_med, x_hi=d_hi, x_lo=d_lo, conf_level=0.68)
     # dist = SimpleInversion(row["parallax_corr"], row["parallax_error"])
     fit_results = dist.fit_gamma()
@@ -78,10 +75,14 @@ if __name__ == "__main__":
         description="Calculate vpec vs gamma for a given source_id"
     )
     parser.add_argument(
-        "source_id", type=int, help="Gaia source_id of the target source"
+        "--catalog_path", type=Path,
+        help="Path to the input catalog CSV file"
     )
     parser.add_argument(
-        "out_dir", type=Path,
+        "--source_id", type=int, help="Gaia source_id of the target source"
+    )
+    parser.add_argument(
+        "--out_dir", type=Path,
         help="Output directory to save results"
     )
     parser.add_argument(
@@ -94,6 +95,7 @@ if __name__ == "__main__":
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     get_vpec(
+        catalog_path=args.catalog_path,
         source_id=args.source_id,
         out_dir=args.out_dir,
         n_sim=args.n_sim
