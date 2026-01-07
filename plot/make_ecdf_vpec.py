@@ -16,13 +16,14 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 200.0) -> None:
         "as": "Active stars",
         "ab": "Active binaries",
         "yso": "YSOs",
-        "cv": "CVs"
+        "cv": "CVs",
+        "nicob": "NICOBs"
     }
 
     color_dict = {
         "as": colors[0], "ab": colors[1], "yso": colors[2],
         "cv": colors[3], "LMXB": colors[0], "PSR": colors[1],
-        "HMXB": colors[2], "NI": colors[3]
+        "HMXB": colors[2], "nicob": colors[3]
     }
 
     logger = VerboseLogger(verbose=verbose)
@@ -37,7 +38,7 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 200.0) -> None:
     for key, value in source_types.items():
         in_file = (
             config.RESULTS_CATALOGUE_DIR / "v_catalogs_contaminants"
-            / f"{key}_w_vpec_and_vspace.csv"
+            / f"{key}_vpec.csv"
         )
         df = pd.read_csv(in_file)
 
@@ -46,10 +47,13 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 200.0) -> None:
         vpec_med = df["vpec_med"].values
         # vpec_lo = vpec_med - df["e_vpec"].values
         # vpec_up = vpec_med + df["E_vpec"].values
-
+        if key == "nicob":
+            ls = '-'
+        else:
+            ls = '--'
         plot_ecdf(
             arr=vpec_med, ax=ax, color=color_dict[key],
-            ls="--", lw=1.5, normalised=True, label=value
+            ls=ls, lw=2.0, normalised=True, label=value
         )
         x, ecdf = get_ecdf(vpec_med)
         f_ecdf = interp1d(x, ecdf, fill_value=(0, 1.0), bounds_error=False)
@@ -60,11 +64,11 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 200.0) -> None:
 
     in_file_xrb = (
         config.RESULTS_CATALOGUE_DIR / "v_catalogs_contaminants"
-        / "known_cobs_w_vpec_and_vspace.csv"
+        / "xrb_vpec.csv"
     )
 
     df_xrb = pd.read_csv(in_file_xrb)
-    xrb_types = dict(LMXB="LMXBs", PSR="BPSRs", HMXB="HMXBs", NI="NICOBs")
+    xrb_types = dict(LMXB="LMXBs", PSR="BPSRs", HMXB="HMXBs")
     for key, value in xrb_types.items():
         xrb_filter = df_xrb.Type.str.contains(key)
         df_xrb_sub = df_xrb[xrb_filter]
@@ -94,7 +98,7 @@ def make_ecdf(verbose: bool = False, vpec_lo_lim: float = 200.0) -> None:
     ax.set_ylim(0, 1)
 
     plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=4)
-    out_file = config.RESULTS_FIGURES_DIR / "ecdfs" / "ecdf_vpec.pdf"
+    out_file = config.RESULTS_FIGURES_DIR / "ecdfs" / "ecdf_vpec_new.pdf"
     plt.savefig(out_file)
 
     logger.log(f"Figure saved to {out_file}.")
