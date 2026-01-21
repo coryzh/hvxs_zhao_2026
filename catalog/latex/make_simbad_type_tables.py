@@ -18,7 +18,6 @@ def remained_simbad_type_table(df: pd.DataFrame) -> None:
     \end{tabular}
 \end{table*}
     """
-
     simbad_type_counts = df[ds.SimbadSchema.SIMBAD_MAIN_TYPE].value_counts()
     type_names = simbad_type_counts.index
     type_counts = simbad_type_counts.values
@@ -57,9 +56,9 @@ def remained_simbad_type_table(df: pd.DataFrame) -> None:
 
 def main() -> None:
     in_file = (
-        config.RESULTS_CATALOGUE_DIR
-        / "complementary_tables"
-        / "stage3_simbad_types_combined.csv"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "hvxs"
+        / "hvxs_simbad_cleaned.csv"
     )
     df = pd.read_csv(in_file)
     remained_simbad_type_table(df)
