@@ -36,6 +36,8 @@ def construct_concat_xray_catalogue() -> pd.DataFrame:
     essential_cols = [
         ds.CombinedCatalogueSchema.ID_x, ds.CombinedCatalogueSchema.source_id,
         ds.CombinedCatalogueSchema.ra_x, ds.CombinedCatalogueSchema.dec_x,
+        ds.CombinedCatalogueSchema.ra_gaia,
+        ds.CombinedCatalogueSchema.dec_gaia,
         ds.CombinedCatalogueSchema.pos_x_err,
         ds.CombinedCatalogueSchema.sep_x_g,
         ds.NWAYSchema.p_any, ds.NWAYSchema.p_single,
