@@ -91,7 +91,28 @@ def _render_query_str(
             "LEFT JOIN gaiadr3.astrophysical_parameters AS apparams \n"
             "  ON u.source_id = apparams.source_id \n"
         )
-
+    elif scheme == "lsst_non_agn_matches":
+        query = (
+            "SELECT u.ID_x, u.source_id, dr3.ra, dr3.dec, \n"
+            "dr3.parallax, dr3.parallax_error, \n"
+            "dr3.pmra, dr3.pmra_error, dr3.pmdec, dr3.pmdec_error, \n"
+            "dr3.nu_eff_used_in_astrometry, \n"
+            "dr3.pseudocolour, dr3.ecl_lat, dr3.astrometric_params_solved, \n"
+            "b.r_med_geo/1000 AS r_med_geo, \n"
+            "b.r_lo_geo/1000 AS r_lo_geo, \n"
+            "b.r_hi_geo/1000 AS r_hi_geo, \n"
+            "b.r_med_photogeo/1000 AS r_med_photogeo, \n"
+            "b.r_lo_photogeo/1000 AS r_lo_photogeo, \n"
+            "b.r_hi_photogeo/1000 AS r_hi_photogeo \n"
+            f"FROM {user_table_name} AS u \n"
+            # Require a matching Gaia DR3 row that meets filters (INNER JOIN)
+            "JOIN gaiadr3.gaia_source AS dr3 \n"
+            "  ON u.source_id = dr3.source_id \n"
+            "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+            # Distance may be missing; keep rows even if b is NULL (LEFT JOIN)
+            "LEFT JOIN external.gaiaedr3_distance AS b \n"
+            "  ON u.source_id = b.source_id \n"
+        )
     else:
         raise ValueError(f"Unknown option '{scheme}' for query rendering.")
 
@@ -163,7 +184,8 @@ def query_gaia(query: str, **kwargs) -> None:
 if __name__ == "__main__":
     username = "yzhao02"
     table_name = "hvxs_xray_catalogue_concat"
-    scheme = "gspphot"  # Options: astrometry, photometry, aen, gspphot
+    # Options: astrometry, photometry, aen, gspphot, lsst_non_agn_matches
+    scheme = "lsst_non_agn_matches"
     login(username=username, service="gaia")
 
     table_exists = _check_table_exists(
