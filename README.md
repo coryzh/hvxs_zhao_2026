@@ -6,6 +6,7 @@ This directory contains scripts and utilities for processing and refining astron
 
 ## Python Scripts
 
+- `rescale_xray_error_radius.py`: Used to rescale X-ray error radii to 1 Mahalanobis radius of a 2D isotropic Gaussian
 - `auto_correlate_xray_catalogues.py`: 
 - `clean_cluster_members.py`: 
 - `clean_gaia_fedility.py`: 
@@ -24,7 +25,6 @@ This directory contains scripts and utilities for processing and refining astron
 - `prepare_catalogue_for_nway.py`: 
 - `query_gaia_archive.py`: 
 - `remove_poorly_localised_xray_sources.py`: 
-- `rescale_xray_error_radius.py`: 
 - `select_control_catalogue.py`: 
 - `select_gold_sample.py`: 
 - `select_hvxs_catalogue.py`: 
