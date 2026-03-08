@@ -68,7 +68,7 @@ def make_figure() -> Tuple[plt.Figure, List[plt.Axes]]:
 
     df = pd.read_csv(
         config.RESULTS_CATALOGUES_FOR_REVISION / "ready_catalogues"
-        / "gold_sample_150525_curated_sorted_by_ra.csv"
+        / "gold_150525_curated_sorted_by_ra.csv"
     )
 
     for i, row in df.iterrows():
@@ -144,7 +144,8 @@ def make_figure() -> Tuple[plt.Figure, List[plt.Axes]]:
 def main() -> None:
     fig, axs = make_figure()
     plt.savefig(
-        config.RESULTS_FIGURES_DIR / "finding_charts" / "combined_finders.pdf"
+        config.RESULTS_FIGURES_DIR / "finding_charts"
+        / "combined_finders.pdf"
     )
 
 
