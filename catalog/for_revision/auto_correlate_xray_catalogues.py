@@ -26,9 +26,14 @@ def _concatenate_catalogues() -> pd.DataFrame:
             "name": "ID_x", "ra_deg": "ra_x", "dec_deg": "dec_x",
             "flux_aper_b": "f_x", "flux_aper_b_sym_err": "f_x_err",
         },
+        # # Comment out for 4XMM DR14
+        # "xmm": {
+        #     "iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x",
+        #     "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err",
+        # },
         "xmm": {
-            "iauname": "ID_x", "sc_ra": "ra_x", "sc_dec": "dec_x",
-            "sc_ep_8_flux": "f_x", "sc_ep_8_flux_err": "f_x_err",
+            "IAUNAME": "ID_x", "RA": "ra_x", "DEC": "dec_x",
+            "EP_FLUX": "f_x", "EP_FLUX_ERR": "f_x_err",
         },
         "swift": {
             "IAUName": "ID_x", "RA": "ra_x", "Decl": "dec_x",
@@ -42,7 +47,7 @@ def _concatenate_catalogues() -> pd.DataFrame:
 
     cols_to_keep = ["ID_x", "ra_x", "dec_x", "pos_x_err", "f_x", "f_x_err"]
     logger.info("Loading and concatenating X-ray catalogues ...")
-    for survey in config.SURVEY_NAMES_SHORT:
+    for survey in col_remapping_dict.keys():
         file_path = (
             config.ROOT_DIR / "results" / survey
             / "catalogues" / "nway_match" /
