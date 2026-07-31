@@ -5,7 +5,11 @@ from scipy.interpolate import interp1d
 
 
 def get_percentage(object_type: str, vpec_lim: float) -> float:
-    in_file = config.ROOT_DIR / "results" / object_type / "catalogues" / f"{object_type}_gaia_w_vpec.csv"
+    in_file = (
+        config.RESULTS_CATALOGUE_DIR
+        / "v_catalogs_contaminants"
+        / f"{object_type}_vpec.csv"
+    )
     df = pd.read_csv(in_file)
 
     vpec = df["vpec_med"].values
