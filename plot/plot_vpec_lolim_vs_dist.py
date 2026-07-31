@@ -318,14 +318,14 @@ def make_plot() -> None:
         ax_dict["top"], df_hvxs=df_hvxs, df_control=df_control
     )
 
-    handles, labels = add_prime_sources(df_prime=df_gold, axs=ax_dict)
+    # handles, labels = add_prime_sources(df_prime=df_gold, axs=ax_dict)
 
-    add_legend(axs=ax_dict, handles=handles, labels=labels)
+    # add_legend(axs=ax_dict, handles=handles, labels=labels)
 
     plt.savefig(
         config.RESULTS_FIGURES_DIR
         / "dist_vs_vpec"
-        / "dist_vs_vpec_min_lolim.pdf"
+        / "dist_vs_vpec_min_lolim_no_gold.pdf"
     )
 
 
