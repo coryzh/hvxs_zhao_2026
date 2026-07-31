@@ -5,6 +5,7 @@ SURVEY_NAMES_SHORT = ["csc", "xmm", "erass", "swift"]
 SURVEY_ID_IDENTIFIERS = {
     "2CXO": "csc",
     "4XMM": "xmm",
+    "5XMM": "5xmm",
     "1eRASS": "erass",
     "2SXPS": "swift"
 }
@@ -12,6 +13,7 @@ SURVEY_ID_IDENTIFIERS = {
 SURVEY_SKY_AREA = {
     "csc": 730.0,
     "xmm": 1383.0,
+    "5xmm": 1397.0,
     "erass": 20626.4,
     "swift": 3790.0
 }
