@@ -34,6 +34,8 @@ def _clean_up(df: pd.DataFrame, survey_name: str) -> pd.DataFrame:
         )
     elif survey_name == "xmm":
         df_copy = df_copy.drop(columns=["sc_poserr"])
+    elif survey_name == "5xmm":
+        df_copy = df_copy.drop(columns=["RADEC_ERR"])
     elif survey_name == "erass":
         df_copy = df_copy.drop(columns=["POS_ERR"])
     elif survey_name == "swift":
@@ -66,6 +68,9 @@ def calibrate_pos_xerr(
         # This correspond to sqrt(2) * mahalanobis radius, so to convert it
         # to 1 mahalanobis radius, we divide it by sqrt(2).
         pos_x_err = (1 / np.sqrt(2)) * df_copy["sc_poserr"]
+
+    elif survey_name == "5xmm":
+        pos_x_err = (1 / np.sqrt(2)) * df_copy["RADEC_ERR"]
 
     elif survey_name == "erass":
         # eRASS positional errors are given at 1-sigma confidence level.
@@ -103,7 +108,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--survey", required=True, choices=config.SURVEY_NAMES_SHORT,
         help=(
-            "Name of the X-ray survey, must be one of csc, xmm, erass, swift"
+            "Name of the X-ray survey, must be one of csc, xmm, 5xmm, "
+            "erass, swift"
         )
     )
 
