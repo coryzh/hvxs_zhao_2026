@@ -111,7 +111,7 @@ def make_figure(source_id: int, n_sim: int = 1000) -> None:
 
 
 def main() -> None:
-    make_figure(source_id=5044582098679935360)
+    make_figure(source_id=6298627607542697088)
 
 
 if __name__ == "__main__":
