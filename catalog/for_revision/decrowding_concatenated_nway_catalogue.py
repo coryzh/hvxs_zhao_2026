@@ -13,7 +13,7 @@ def _load_gaia_neighbours() -> pd.DataFrame:
     in_file = (
         config.RESULTS_CATALOGUES_FOR_REVISION
         / "gaia_neighbours"
-        / "gaia_neighbours_20arcsec.csv"
+        / "gaia_neighbours_10arcsec.csv"
     )
 
     df = pd.read_csv(in_file)
