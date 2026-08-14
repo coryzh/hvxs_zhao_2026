@@ -65,7 +65,7 @@ def split_catalogue(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
 if __name__ == "__main__":
     in_file = (
         config.RESULTS_CATALOGUES_FOR_REVISION / "x_ray_catalogue_for_nway"
-        / "gaia_neighbours_20arcsec.fits"
+        / "gaia_neighbours_10arcsec.fits"
     )
 
     df = load_catalogue(in_file)
