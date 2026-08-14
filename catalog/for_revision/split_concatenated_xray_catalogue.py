@@ -154,12 +154,13 @@ def split_catalogue(
 
 if __name__ == "__main__":
     in_file = (
-        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_deduplication"
+        config.RESULTS_CATALOGUES_FOR_REVISION
+        / "x_ray_catalogue_deduplication"
         / "xray_catalogue_deduplicated.csv"
     )
 
     out_dir = (
-        config.RESULTS_CATALOGUE_DIR / "x_ray_catalogue_for_nway"
+        config.RESULTS_CATALOGUES_FOR_REVISION / "x_ray_catalogue_for_nway"
     )
     df = pd.read_csv(in_file)
 
