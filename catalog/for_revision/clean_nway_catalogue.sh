@@ -2,7 +2,7 @@
 
 
 # Define input and output dir and the path to the script
-SURVEYS=("csc" "xmm" "erass" "swift")
+SURVEYS=("csc" "5xmm" "erass" "swift")
 
 ROOT_DIR="../../../results/combined/catalogues/for_revision/nway_matched_results/"
 
