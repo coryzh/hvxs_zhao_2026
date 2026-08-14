@@ -7,6 +7,7 @@ SURVEY_ID_IDENTIFIERS = {
     "4XMM": "xmm",
     "5XMM": "5xmm",
     "1eRASS": "erass",
+    "3eRASS": "erass",
     "2SXPS": "swift"
 }
 
