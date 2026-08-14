@@ -1,11 +1,12 @@
 #!/bin/zsh
 
 # Define input and output dir and the path to the script
-SURVEYS=("csc" "xmm" "erass" "swift")
+SURVEYS=("csc" "5xmm" "erass" "swift")
 
 # Define sky areas for each survey
 declare -A SKY_AREA=(
     ["csc"]=730.0
+    ["5xmm"]=1397.0
     ["xmm"]=1383.0   
     ["erass"]=20626.4
     ["swift"]=3790.0
