@@ -113,6 +113,100 @@ def _render_query_str(
             "LEFT JOIN external.gaiaedr3_distance AS b \n"
             "  ON u.source_id = b.source_id \n"
         )
+
+    elif scheme == "good_astrometry":
+        query = (
+            "SELECT u.ID_x, u.source_id, dr3.ra, dr3.dec, \n"
+            "dr3.parallax, dr3.parallax_error, \n"
+            "dr3.pmra, dr3.pmra_error, dr3.pmdec, dr3.pmdec_error, \n"
+            "dr3.nu_eff_used_in_astrometry, \n"
+            "dr3.pseudocolour, dr3.ecl_lat, dr3.astrometric_params_solved, \n"
+            "dr3.astrometric_excess_noise, dr3.astrometric_excess_noise_sig,\n"
+            "dr3.ruwe, dr3.non_single_star, \n"
+            "dr3.phot_g_mean_mag, "
+            "dr3.phot_bp_mean_mag, dr3.phot_rp_mean_mag,\n"
+            "b.r_med_geo/1000 AS r_med_geo, \n"
+            "b.r_lo_geo/1000 AS r_lo_geo, \n"
+            "b.r_hi_geo/1000 AS r_hi_geo, \n"
+            "b.r_med_photogeo/1000 AS r_med_photogeo, \n"
+            "b.r_lo_photogeo/1000 AS r_lo_photogeo, \n"
+            "b.r_hi_photogeo/1000 AS r_hi_photogeo \n"
+            f"FROM {user_table_name} AS u \n"
+            # Require a matching Gaia DR3 row that meets filters (INNER JOIN)
+            "JOIN gaiadr3.gaia_source AS dr3 \n"
+            "  ON u.source_id = dr3.source_id \n"
+            "  AND dr3.parallax_over_error >= 5 \n"
+            # Distance may be missing; keep rows even if b is NULL (LEFT JOIN)
+            "LEFT JOIN external.gaiaedr3_distance AS b \n"
+            "  ON u.source_id = b.source_id \n"
+        )
+
+    elif scheme == "high_aen_sources":
+        """
+        Query to retrieve sources with astrometric excess noise (AEN);
+        more details, see Gandhi et al. 2021 MNRAS, 510, 3885
+        """
+        query = (
+            "SELECT u.ID_x, u.source_id, dr3.ra, dr3.dec, \n"
+            "dr3.parallax, dr3.parallax_error, \n"
+            "dr3.pmra, dr3.pmra_error, dr3.pmdec, dr3.pmdec_error, \n"
+            "dr3.nu_eff_used_in_astrometry, \n"
+            "dr3.pseudocolour, dr3.ecl_lat, dr3.astrometric_params_solved, \n"
+            "dr3.astrometric_excess_noise, dr3.astrometric_excess_noise_sig,\n"
+            "dr3.ruwe, dr3.non_single_star, \n"
+            "dr3.phot_g_mean_mag, "
+            "dr3.phot_bp_mean_mag, dr3.phot_rp_mean_mag,\n"
+            "b.r_med_geo/1000 AS r_med_geo, \n"
+            "b.r_lo_geo/1000 AS r_lo_geo, \n"
+            "b.r_hi_geo/1000 AS r_hi_geo, \n"
+            "b.r_med_photogeo/1000 AS r_med_photogeo, \n"
+            "b.r_lo_photogeo/1000 AS r_lo_photogeo, \n"
+            "b.r_hi_photogeo/1000 AS r_hi_photogeo \n"
+            f"FROM {user_table_name} AS u \n"
+            # Require a matching Gaia DR3 row that meets filters (INNER JOIN)
+            "JOIN gaiadr3.gaia_source AS dr3 \n"
+            "  ON u.source_id = dr3.source_id \n"
+            "  AND dr3.parallax >= 0.1 \n"
+            "  AND dr3.parallax <= 10.0 \n"
+            "  AND dr3.parallax_over_error >= 5 \n"
+            "  AND dr3.visibility_periods_used >= 10 \n"
+            "  AND astrometric_excess_noise >= 0.01 \n"
+            "  AND dr3.astrometric_excess_noise >= 2 \n"
+            "  AND dr3.phot_g_mean_mag <= 20 \n"
+            "  AND dr3.phot_g_mean_mag >= 13 \n"
+            # Distance may be missing; keep rows even if b is NULL (LEFT JOIN)
+            "LEFT JOIN external.gaiaedr3_distance AS b \n"
+            "  ON u.source_id = b.source_id \n"
+        )
+
+    elif scheme == "vol_limited_sources":
+        query = (
+            "SELECT u.ID_x, u.source_id, dr3.ra, dr3.dec, \n"
+            "dr3.parallax, dr3.parallax_error, \n"
+            "dr3.pmra, dr3.pmra_error, dr3.pmdec, dr3.pmdec_error, \n"
+            "dr3.nu_eff_used_in_astrometry, \n"
+            "dr3.pseudocolour, dr3.ecl_lat, dr3.astrometric_params_solved, \n"
+            "dr3.astrometric_excess_noise, dr3.astrometric_excess_noise_sig,\n"
+            "dr3.ruwe, dr3.non_single_star, \n"
+            "dr3.phot_g_mean_mag, "
+            "dr3.mh_gspphot, "
+            "dr3.phot_bp_mean_mag, dr3.phot_rp_mean_mag,\n"
+            "b.r_med_geo/1000 AS r_med_geo, \n"
+            "b.r_lo_geo/1000 AS r_lo_geo, \n"
+            "b.r_hi_geo/1000 AS r_hi_geo, \n"
+            "b.r_med_photogeo/1000 AS r_med_photogeo, \n"
+            "b.r_lo_photogeo/1000 AS r_lo_photogeo, \n"
+            "b.r_hi_photogeo/1000 AS r_hi_photogeo \n"
+            f"FROM {user_table_name} AS u \n"
+            # Require a matching Gaia DR3 row that meets filters (INNER JOIN)
+            "JOIN gaiadr3.gaia_source AS dr3 \n"
+            "  ON u.source_id = dr3.source_id \n"
+            "  AND dr3.parallax_over_error >= 5 \n"
+            "  AND 1./dr3.parallax <= 1 \n"
+            # Distance may be missing; keep rows even if b is NULL (LEFT JOIN)
+            "LEFT JOIN external.gaiaedr3_distance AS b \n"
+            "  ON u.source_id = b.source_id \n"
+        )
     else:
         raise ValueError(f"Unknown option '{scheme}' for query rendering.")
 
@@ -185,7 +279,7 @@ if __name__ == "__main__":
     username = "yzhao02"
     table_name = "hvxs_xray_catalogue_concat"
     # Options: astrometry, photometry, aen, gspphot, lsst_non_agn_matches
-    scheme = "lsst_non_agn_matches"
+    scheme = "high_aen_sources"
     login(username=username, service="gaia")
 
     table_exists = _check_table_exists(
@@ -211,7 +305,7 @@ if __name__ == "__main__":
         output_file=str(
             config.RESULTS_CATALOGUES_FOR_REVISION
             / "gaia"
-            / f"{scheme}_stars_only.csv"
+            / f"{scheme}.csv"
         ),
         output_format="csv"
     )
