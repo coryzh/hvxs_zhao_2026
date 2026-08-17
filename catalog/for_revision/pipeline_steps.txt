@@ -1,0 +1,34 @@
+1. Auto-correlate all X-ray source catalogues to remove duplicate sources.
+Script: auto_correlate_xray_catalogues.py
+
+2. Run a broad cross-match between the catalogue from step 1 and Gaia, using TOPCAT or CDS Xmatch. Keep all Gaia neighbours within a large matching radius, for example 15 arcsec.
+In practice, 10 arcsec is also acceptable for this step because only a small fraction of X-ray sources are poorly localised, and those will be removed later from the final catalogue.
+
+3. Split the pre-matched Gaia catalogue by survey.
+Script: split_prematched_gaia_catalogue.py
+Output root: x_ray_catalogue_for_nway/
+
+4. Split the concatenated X-ray source catalogue by survey.
+Script: split_concatenated_xray_catalogue.py
+Output root: x_ray_catalogue_for_nway/
+
+5. Prepare the per-survey X-ray and Gaia catalogues for NWAY. This step creates FITS catalogues with the required extensions, columns, and header keywords.
+Run prepare_catalogues_for_nway.sh to execute prepare_catalogue_for_nway.py for all surveys.
+
+6. Run NWAY.
+Change to the workspace root, runaway_high_v_sources/, where code_xmm, code_csc, and the other survey directories are located. Then change to nway/nway.
+Activate the NWAY environment first, otherwise NWAY may fail because of a NumPy compatibility issue. Then run the corresponding .zsh scripts to perform the cross-match.
+
+7. Clean the NWAY-matched catalogues.
+This can be done with clean_nway_catalogue.sh. Adjust the p_i and p_any thresholds if needed.
+
+8. Construct a concantenated X-ray/Gaia catalogue.
+Run construct_concat_xray_catalogue.py. This script concatenates the individual p_i/p_any-cleaned NWAY-matched catalogues produced in step 7.
+
+9. Deduplicate the concatenated X-ray/Gaia catalogue.
+Run deduplicated_concatenated_nway_matches.py. This script check if any Gaia ID is matched to more than one X-ray ID, if so, the closest X-ray/Gaia pair is kept.
+
+10. Perform further cleaning of the catalogue from step 8.
+Run further_cleaning_concatenated_nway_catalogue.py. This script imports decrowding_concatenated_nway_catalogue.py and remove_poorly_localised_xray_sources.py from the same directory.
+The first removes X-ray sources that have more than one neighbour within, for example, twice the error radius. The second removes X-ray sources with error radii above a chosen threshold, for example 10 arcsec.
+After this step, every X-ray source in the catalogue have only one Gaia ID within <specified_error_radius_sigma> and every Gaia ID has only one X-ray counterpart.
