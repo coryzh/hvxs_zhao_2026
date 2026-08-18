@@ -342,7 +342,31 @@ One naming detail to keep in mind:
 
 **Interpretation**
 
-- After this step, the catalogue is intended to contain one Gaia counterpart per retained X-ray source, with crowded and poorly localized matches removed.
+- After this step, the catalogue is intended to contain one Gaia counterpart per retained X-ray source, with "crowded" and poorly localized matches removed. Keep in mind that "crowded" is in the sense of Gaia sources, i.e., an X-ray source can still be in a crowded field with most of the sources not in Gaia.
+
+### 11. Query Gaia archive
+
+**Script**
+
+- `query_gaia_archive.py`
+
+**What it does**
+
+This step is to query the extra Gaia columns from the Gaia Archive using TAP service in astroquery. The script can be used to query the Gaia DR3 archive with different set of columns and joining schemes. I haven't integrated `argparse` into the script, so currently, the user can only manually edit the query scheme within the code. The code will login to the Gaia archive, upload the catalogue from step 10 (if it's not in the user's space), query the database, and save the retrieved table to local.
+
+- Query `astrometry`, `photometry`, `aen`, and `gspphot` from Gaia archive.
+
+**Input file**
+
+- N/A
+
+**Output files**
+
+- `results/combined/catalogues/for_revision/gaia/astrometry.csv`
+- `results/combined/catalogues/for_revision/gaia/photometry.csv`
+- `results/combined/catalogues/for_revision/gaia/aen.csv`
+- `results/combined/catalogues/for_revision/gaia/gspphot.csv`
+
 
 ## Minimal Run Order
 
