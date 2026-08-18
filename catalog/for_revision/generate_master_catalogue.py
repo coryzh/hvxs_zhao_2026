@@ -90,7 +90,7 @@ def _load_df(
     file_root = config.RESULTS_CATALOGUES_FOR_REVISION
 
     if option in ['astrometry', 'photometry', 'aen', 'gspphot']:
-        file_path = file_root / "gaia" / f"{option}_stars_only.csv"
+        file_path = file_root / "gaia" / f"{option}.csv"
     elif option == "velocity":
         file_path = file_root / "velocity" / "space_velocities.csv"
 
@@ -197,8 +197,8 @@ def make_catalogue() -> None:
         left_label='astrometry', right_label='photometry'
     )
 
-    logger.info("Applying parallax zero-point correction ...")
-    df_base = _zp_correction(df_base)
+    # logger.info("Applying parallax zero-point correction ...")
+    # df_base = _zp_correction(df_base)
 
     logger.info(
         "Generating concatenated X-ray catalogue. This catalogue will be "
@@ -222,7 +222,7 @@ def make_catalogue() -> None:
     df_base = _add_fx_fg_col(df_base)
 
     logger.info("Joining additional catalogues ...")
-    for label in ["aen", "gspphot", "velocity", "nway"]:
+    for label in ["aen", "gspphot", "nway"]:
         df_to_join = _load_df(option=label)
 
         df_base = _join_gaia_dfs(

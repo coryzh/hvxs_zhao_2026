@@ -41,8 +41,8 @@ def _render_query_str(
             # Require a matching Gaia DR3 row that meets filters (INNER JOIN)
             "JOIN gaiadr3.gaia_source AS dr3 \n"
             "  ON u.source_id = dr3.source_id \n"
-            "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
-            "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+            # "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
+            # "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
             # Distance may be missing; keep rows even if b is NULL (LEFT JOIN)
             "LEFT JOIN external.gaiaedr3_distance AS b \n"
             "  ON u.source_id = b.source_id \n"
@@ -55,8 +55,8 @@ def _render_query_str(
             f"FROM {user_table_name} AS u \n"
             "JOIN gaiadr3.gaia_source AS dr3 \n"
             "  ON u.source_id = dr3.source_id \n"
-            "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
-            "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+            # "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
+            # "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
         )
 
     elif scheme == "aen":
@@ -67,8 +67,8 @@ def _render_query_str(
             f"FROM {user_table_name} AS u \n"
             "JOIN gaiadr3.gaia_source AS dr3 \n"
             "  ON u.source_id = dr3.source_id \n"
-            "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
-            "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+            # "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
+            # "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
         )
 
     elif scheme == "gspphot":
@@ -86,8 +86,8 @@ def _render_query_str(
             f"FROM {user_table_name} AS u \n"
             "JOIN gaiadr3.gaia_source AS dr3 \n"
             "  ON u.source_id = dr3.source_id \n"
-            "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
-            "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
+            # "  AND dr3.astrometric_params_solved IN (31, 63, 95) \n"
+            # "  AND dr3.classprob_dsc_combmod_star >= 0.9 \n"
             "LEFT JOIN gaiadr3.astrophysical_parameters AS apparams \n"
             "  ON u.source_id = apparams.source_id \n"
         )
@@ -171,7 +171,7 @@ def _render_query_str(
             "  AND dr3.parallax_over_error >= 5 \n"
             "  AND dr3.visibility_periods_used >= 10 \n"
             "  AND astrometric_excess_noise >= 0.01 \n"
-            "  AND dr3.astrometric_excess_noise >= 2 \n"
+            "  AND dr3.astrometric_excess_noise_sig >= 2 \n"
             "  AND dr3.phot_g_mean_mag <= 20 \n"
             "  AND dr3.phot_g_mean_mag >= 13 \n"
             # Distance may be missing; keep rows even if b is NULL (LEFT JOIN)
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     username = "yzhao02"
     table_name = "hvxs_xray_catalogue_concat"
     # Options: astrometry, photometry, aen, gspphot, lsst_non_agn_matches
-    scheme = "high_aen_sources"
+    scheme = "gspphot"
     login(username=username, service="gaia")
 
     table_exists = _check_table_exists(
