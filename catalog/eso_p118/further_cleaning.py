@@ -91,7 +91,9 @@ def main() -> None:
 
     # Run the cleaning pipeline
     df_cleaned = run_cleaning_pipeline(args.catalogue_path, args.simbad_path)
-
+    df_cleaned = df_cleaned.sort_values(
+        by=["ID_x", "ra_x"], ascending=[True, True]
+    )
     # Save the cleaned catalogue
     df_cleaned.to_csv(args.output_path, index=False)
     print(f"Cleaned catalogue saved to {args.output_path}.")
