@@ -108,7 +108,7 @@ def main() -> None:
     if args.out_path is not None:
         fig.savefig(args.out_path, bbox_inches="tight")
 
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
