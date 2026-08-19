@@ -3,35 +3,40 @@
         "parallax >= 0.1 and ",
         "parallax / parallax_error >= 5 and ",
         "1. / parallax <= 1.0 and ",
-        "fx_fg >= 10 ** (bp_rp - 3.5)"
+        "fx_fg >= 10 ** (bp_rp - 3.5) and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32"
     ],
 
     "vol_limited_2kpc": [
         "parallax >= 0.1 and ",
         "parallax / parallax_error >= 5 and ",
         "1. / parallax <= 2.0 and   ",
-        "fx_fg >= 10 ** (bp_rp - 3.5)"
+        "fx_fg >= 10 ** (bp_rp - 3.5) and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32"
     ],
 
     "vol_limited_3kpc": [
         "parallax >= 0.1 and ",
         "parallax / parallax_error >= 5 and ",
         "1. / parallax <= 3.0 and ",
-        "fx_fg >= 10 ** (bp_rp - 3.5)"
+        "fx_fg >= 10 ** (bp_rp - 3.5) and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32"
     ],
 
     "vol_limited_4kpc": [
         "parallax >= 0.1 and ",
         "parallax / parallax_error >= 5 and ",
         "1. / parallax <= 4.0 and ",
-        "fx_fg >= 10 ** (bp_rp - 3.5)"
+        "fx_fg >= 10 ** (bp_rp - 3.5) and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32"
     ],
 
     "vol_limited_5kpc": [
         "parallax >= 0.1 and ",
         "parallax / parallax_error >= 5 and ",
         "1. / parallax <= 5.0 and ",
-        "fx_fg >= 10 ** (bp_rp - 3.5)"
+        "fx_fg >= 10 ** (bp_rp - 3.5) and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32"
     ],
 
     "high_fx_fg": [
@@ -57,6 +62,20 @@
         "phot_g_mean_mag >= 12 and ",
         "phot_g_mean_mag <= 17 and ",
         "fx_fg >= 10 ** (bp_rp - 3.5) and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32 and ",
         "dec <= 10.0"
+    ],
+
+    "low_hanging_fruit": [
+        "parallax >= 0.1 and ",
+        "parallax / parallax_error >= 5 and ",
+        "1. / parallax <= 10.0 and ",
+        "1. / parallax >= 0.1 and ",
+        "phot_g_mean_mag >= 12 and ",
+        "phot_g_mean_mag <= 17 and ",
+        "fx_fg >= 10 ** (bp_rp - 3.5) and ",
+        "astrometric_excess_noise > 0 and ",
+        "astrometric_excess_noise_sig > 2 and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32"
     ]
 }
