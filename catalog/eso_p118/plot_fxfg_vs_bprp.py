@@ -62,15 +62,15 @@ def add_r24_relation(ax: plt.Axes) -> None:
     )
 
     ax.set_xlim(-1.2, 4.1)
-    ax.set_ylim(7e-7, 8)
+    ax.set_ylim(7e-7, 600)
 
 
 def set_axes(ax: plt.Axes) -> None:
-    ax.set_yticks([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1])
+    ax.set_yticks([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100])
     ax.set_yticklabels(
         [
             r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$",
-            r"$0.001$", r"$0.01$", r"$0.1$", r"$1$"
+            r"$0.001$", r"$0.01$", r"$0.1$", r"$1$", r"$10$", r"$100$"
         ]
     )
 
