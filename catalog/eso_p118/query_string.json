@@ -7,6 +7,14 @@
         "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32"
     ],
 
+    "vol_limited_1kpc_high_ratio": [
+        "parallax >= 0.1 and ",
+        "parallax / parallax_error >= 5 and ",
+        "1. / parallax <= 1.0 and ",
+        "fx_fg - 3 * fx_fg_err >= 10 ** (bp_rp - 3.5) and ",
+        "(1. / parallax) ** 2 * f_x * 1.196e44 >= 1e32 and ",
+        "dec <= 10.0"
+    ],
     "vol_limited_2kpc": [
         "parallax >= 0.1 and ",
         "parallax / parallax_error >= 5 and ",
